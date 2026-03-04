@@ -1,1 +1,82 @@
-<p>login works!</p>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login - GLOW_MOD</title>
+<link rel="stylesheet" href="login.css">
+</head>
+
+<body class="login-container">
+
+<div class="login-box">
+  <h2>Iniciar Sesión</h2>
+
+  <input type="email" id="email" placeholder="Correo electrónico">
+  <input type="password" id="password" placeholder="Contraseña">
+
+  
+
+  <div class="forgot-link">¿Olvidaste tu contraseña?</div>
+
+  <button class="primary-btn" onclick="login()">Ingresar</button>
+
+  <p id="errorMsg" class="error-msg"></p>
+
+  <div class="divider">o continuar con</div>
+
+  <div class="social-login">
+    <button class="google-btn">Google</button>
+    <button class="apple-btn">Apple</button>
+    <button class="facebook-btn">Facebook</button>
+  </div>
+</div>
+
+<script>
+
+function login(){
+
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const role = document.getElementById("role").value;
+  const errorMsg = document.getElementById("errorMsg");
+
+  errorMsg.innerText = "";
+
+  // Validación básica
+  if(email === "" || password === ""){
+    errorMsg.innerText = "Completa todos los campos.";
+    return;
+  }
+
+  // Validación formato email
+  const emailPattern = /^[^ ]+@[^ ]+\.[a-z]{2,3}$/;
+  if(!email.match(emailPattern)){
+    errorMsg.innerText = "Correo electrónico inválido.";
+    return;
+  }
+
+  // Simulación usuario admin
+  if(role === "admin"){
+    if(email === "admin@glowmod.com" && password === "admin123"){
+      localStorage.setItem("isLogged", "true");
+      localStorage.setItem("userRole", "admin");
+      localStorage.setItem("userEmail", email);
+      window.location.href = "admin-panel.html";
+    }else{
+      errorMsg.innerText = "Credenciales de administrador incorrectas.";
+    }
+  }else{
+    // Cliente
+    localStorage.setItem("isLogged", "true");
+    localStorage.setItem("userRole", "cliente");
+    localStorage.setItem("userEmail", email);
+    window.location.href = "index.html";
+  }
+
+}
+
+</script>
+
+</body>
+</html>

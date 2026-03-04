@@ -32,51 +32,6 @@
   </div>
 </div>
 
-<script>
-
-function login(){
-
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value.trim();
-  const role = document.getElementById("role").value;
-  const errorMsg = document.getElementById("errorMsg");
-
-  errorMsg.innerText = "";
-
-  // Validación básica
-  if(email === "" || password === ""){
-    errorMsg.innerText = "Completa todos los campos.";
-    return;
-  }
-
-  // Validación formato email
-  const emailPattern = /^[^ ]+@[^ ]+\.[a-z]{2,3}$/;
-  if(!email.match(emailPattern)){
-    errorMsg.innerText = "Correo electrónico inválido.";
-    return;
-  }
-
-  // Simulación usuario admin
-  if(role === "admin"){
-    if(email === "admin@glowmod.com" && password === "admin123"){
-      localStorage.setItem("isLogged", "true");
-      localStorage.setItem("userRole", "admin");
-      localStorage.setItem("userEmail", email);
-      window.location.href = "admin-panel.html";
-    }else{
-      errorMsg.innerText = "Credenciales de administrador incorrectas.";
-    }
-  }else{
-    // Cliente
-    localStorage.setItem("isLogged", "true");
-    localStorage.setItem("userRole", "cliente");
-    localStorage.setItem("userEmail", email);
-    window.location.href = "index.html";
-  }
-
-}
-
-</script>
 
 </body>
 </html>

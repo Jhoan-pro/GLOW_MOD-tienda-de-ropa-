@@ -55,14 +55,21 @@
 .google-btn{
     background:white;
     color:black;
+    border-radius: 50cm;
 }
 
 .apple-btn{
     background:black;
     color:white;
     border:1px solid white;
+    border-radius: 50px;
 }
-
+.facebook-btn{
+    background:rgb(63, 100, 201);
+    color:white;
+    border:1px solid white;
+    border-radius: 50px;
+}
 .forgot-link{
     font-size:13px;
     color:#06b6d4;

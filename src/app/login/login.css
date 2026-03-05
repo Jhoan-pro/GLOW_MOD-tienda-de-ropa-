@@ -51,6 +51,7 @@
     justify-content: center;
     gap:15px;
     margin-top:10px;
+    
 }
 
 .social-login button{
@@ -59,14 +60,14 @@
     cursor: pointer;
     transition: 0.3s;
     font-size: 20px;
+    align-items: center;
     
 }
 
 .social-login img{
-     width: 24px;           
-     height: 24px;         
-     object-fit: contain; 
-      
+     width: 20px;           
+     height: 20px;
+              
 }
 .google-btn {
     background: #ffffff;

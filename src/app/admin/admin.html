@@ -1,1 +1,64 @@
-<p>admin works!</p>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Ropa - Dashboard</title>
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body class="admin-body">
+
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <h2 class="brand">Admin Ropa</h2>
+        </div>
+        
+        <ul class="nav-links">
+            <li class="active"><a href="#">Dashboard</a></li>
+            <li><a href="#">Productos</a></li>
+            <li><a href="#">Inventario</a></li>
+            <li><a href="#">Ventas y Pedidos</a></li>
+            <li><a href="#">Clientes</a></li>
+            <li><a href="#">Empleados</a></li>
+            <li><a href="#">Reportes</a></li>
+            <li><a href="#">Configuración</a></li>
+        </ul>
+    </nav>
+
+    <main class="main-content">
+        
+        <header class="top-header">
+            <h1>Panel de Administración</h1>
+            <div class="user-info">
+                <span class="welcome-text">Bienvenido, Admin</span>
+                <a href="login.html" class="logout-btn">Salir</a>
+            </div>
+        </header>
+
+        <section class="overview">
+            <h2 class="section-title">Resumen del Negocio</h2>
+            
+            <div class="stats-grid">
+                <article class="stat-card">
+                    <span class="stat-label">Ventas Hoy:</span>
+                    <span class="stat-value">$1,250</span>
+                </article>
+                <article class="stat-card">
+                    <span class="stat-label">Productos:</span>
+                    <span class="stat-value">320</span>
+                </article>
+                <article class="stat-card">
+                    <span class="stat-label">Clientes:</span>
+                    <span class="stat-value">85</span>
+                </article>
+            </div>
+
+            <div class="charts-area">
+                <p>[Gráficos de ventas e inventario]</p>
+            </div>
+        </section>
+
+    </main>
+
+</body>
+</html>

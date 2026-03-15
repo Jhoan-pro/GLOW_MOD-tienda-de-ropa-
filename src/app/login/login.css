@@ -43,37 +43,64 @@
     color: white;
     font-size: 20px;
     text-align: center;
+    margin-top: -30px;
 }
 
 .social-login{
     display:flex;
-    flex-direction:column;
-    gap:10px;
+    justify-content: center;
+    gap:15px;
     margin-top:10px;
+    
 }
 
-.google-btn{
-    background:white;
-    color:black;
-    border-radius: 50cm;
+.social-login button{
+    display: flex;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: 0.3s;
+    font-size: 20px;
+    align-items: center;
+    
 }
 
-.apple-btn{
-    background:black;
-    color:white;
-    border:1px solid white;
-    border-radius: 50px;
+.social-login img{
+     width: 20px;           
+     height: 20px;
+              
 }
-.facebook-btn{
-    background:rgb(63, 100, 201);
-    color:white;
-    border:1px solid white;
-    border-radius: 50px;
+.google-btn {
+    background: #ffffff;
+    color: #000000;
 }
-.forgot-link{
-    font-size:13px;
-    color:#06b6d4;
-    cursor:pointer;
-    text-align:right;
+
+.google-btn:hover {
+    background: #f0f0f0;
+}
+
+.apple-btn {
+    background: #000000;
+    color: #ffffff;
+    border: 1px solid #ffffff;
+}
+
+.apple-btn:hover {
+    background: #111111;
+}
+
+.facebook-btn {
+    background: #3f64c9;
+    color: #ffffff;
+}
+
+.facebook-btn:hover {
+    background: #3659a8;
+}
+
+.forgot-link {
+    font-size: 13px;
+    color: #06b6d4;
+    cursor: pointer;
+    text-align: right;
 }
 

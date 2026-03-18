@@ -20,16 +20,18 @@ export const routes: Routes = [
   { path: 'register', component: RegisterUser },
   { path: 'forgot-password', component: ForgotPassword },
 
+
   {
     path: 'dashboard',
     component: DashBoard,
     children: [
-      { path: 'admin', component: Admin },
+  
       { path: 'cashier', component: Cashier },
       { path: 'client', component: Client }
     ]
   },
-
+  
+  { path: 'admin', component: Admin },
   { path: 'cart', component: Cart },
   { path: 'invoice', component: Invoice },
   { path: 'product/new', component: ProductForm },

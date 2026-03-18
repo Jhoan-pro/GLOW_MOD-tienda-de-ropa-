@@ -1,1 +1,51 @@
-<p>navbar works!</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="navbar.css">
+</head>
+<body>
+    <!-- NAVBAR -->
+<header class="navbar">
+  <div class="logo">GLOW_MOD</div>
+
+  <nav class="nav-links">
+    <a href="index.html">Inicio</a>
+    <div class="dropdown">
+      <a href="#">Filtros</a>
+      <div class="dropdown-menu">
+        <a href="#">Categoría 1</a>
+        <a href="#">Categoría 2</a>
+        <a href="#">Categoría 3</a>
+      </div>
+    </div>
+  </nav>   
+
+  <div class="actions">
+    <!-- Buscador -->
+    <div class="search-box">
+      <button id="btn-lupa">🔍</button>
+      <input type="text" id="barra-busqueda" placeholder="Buscar...">
+    </div>
+
+    <!-- Carrito en navbar -->
+    <div class="cart-icon" onclick="toggleCart()">🛒</div>
+
+    <!-- Perfil -->
+    <div class="user-dropdown">
+      <div class="user-icon">👤</div>
+      <div class="dropdown-menu">
+        <a href="#">Administrar cuenta</a>
+        <a href="#">Tus pedidos</a>
+        <a href="#">Reseñas</a>
+        <a href="#">Historial</a>
+        <a href="#">Ajustes</a>
+        <a href="#" class="logout" onclick="logout()">Cerrar sesión</a>
+      </div>
+    </div>
+  </div>
+</header>
+</body>
+</html>

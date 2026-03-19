@@ -18,7 +18,7 @@ body {
   align-items: center;
   padding: 15px 8%;
   background: rgba(15,23,42,0.85);
-  backdrop-filter: blur(12px);
+
   position: sticky;
   top: 0;
   z-index: 1000;

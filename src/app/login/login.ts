@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router'; // 👈 IMPORTANTE
+import { Router } from '@angular/router'; 
 
 @Component({
   selector: 'app-login',
@@ -15,7 +15,7 @@ export class Login {
   password: string = '';
   errorMsg: string = '';
 
-  constructor(private router: Router) {} // 👈 INYECTAR ROUTER
+  constructor(private router: Router) {}
 
   login() {
 

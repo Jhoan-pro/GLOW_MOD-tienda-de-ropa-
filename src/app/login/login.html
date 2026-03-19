@@ -1,37 +1,47 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Login - GLOW_MOD</title>
-<link rel="stylesheet" href="login.css">
-</head>
+<div class="login-container">
 
-<body class="login-container">
+  <div class="login-box">
+    <h2>Iniciar Sesión</h2>
 
-<div class="login-box">
-  <h2>Iniciar Sesión</h2>
+    <input 
+      type="email" 
+      placeholder="Correo electrónico"
+      [(ngModel)]="email"
+    >
 
-  <input type="email" id="email" placeholder="Correo electrónico">
-  <input type="password" id="password" placeholder="Contraseña">
+    <input 
+      type="password" 
+      placeholder="Contraseña"
+      [(ngModel)]="password"
+    >
 
-  
+    <div class="forgot-link">¿Olvidaste tu contraseña?</div>
 
-  <div class="forgot-link">¿Olvidaste tu contraseña?</div>
+    <button class="primary-btn" (click)="login()">
+      Ingresar
+    </button>
 
-  <button class="primary-btn" onclick="login()">Ingresar</button>
+    <p class="error-msg">{{ errorMsg }}</p>
 
-  <p id="errorMsg" class="error-msg"></p>
+    <div class="divider">Continuar con:</div>
 
-  <div class="divider">Continuar con:</div>
+    <div class="social-login">
+      <button class="google-btn">
+        <img src="assets/img/logoGoogle.png" alt="Google">
+        Google
+      </button>
 
-  <div class="social-login">
-    <button class="google-btn"><img src="img/logoGoogle.png" alt="">Google</button>
-    <button class="apple-btn"><img src="img/logoApple.png" alt="">Apple</button>
-    <button class="facebook-btn"><img src="img/logoFacebook.png" alt="">Facebook</button>
+      <button class="apple-btn">
+        <img src="assets/img/logoApple.png" alt="Apple">
+        Apple
+      </button>
+
+      <button class="facebook-btn">
+        <img src="assets/img/logoFacebook.png" alt="Facebook">
+        Facebook
+      </button>
+    </div>
+
   </div>
+
 </div>
-
-
-</body>
-</html>

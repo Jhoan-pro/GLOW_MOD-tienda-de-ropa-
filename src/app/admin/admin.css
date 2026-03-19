@@ -167,3 +167,14 @@ body {
     border-radius: 12px;
     text-align: center;
 }
+
+/* Esto solo ocurre en pantallas pequeñas (celulares) */
+@media (max-width: 600px) {
+    .sidebar {
+        display: none; /* Escondemos la barra lateral en móviles */
+    }
+    
+    .main-content {
+        padding: 1rem; /* Reducimos el espacio para que quepa todo */
+    }
+}

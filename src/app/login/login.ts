@@ -1,6 +1,6 @@
-
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router'; // 👈 IMPORTANTE
 
 @Component({
   selector: 'app-login',
@@ -14,6 +14,8 @@ export class Login {
   email: string = '';
   password: string = '';
   errorMsg: string = '';
+
+  constructor(private router: Router) {} // 👈 INYECTAR ROUTER
 
   login() {
 
@@ -39,8 +41,12 @@ export class Login {
 
     // Simulación de login
     if (this.email === 'admin@gmail.com' && this.password === '123456') {
+
       this.errorMsg = '';
-      alert('Login exitoso');
+
+      // 🔥 REDIRECCIÓN AQUÍ
+      this.router.navigate(['./admin']);
+
     } else {
       this.errorMsg = 'Credenciales incorrectas';
     }

@@ -104,3 +104,9 @@
     text-align: right;
 }
 
+.error-msg{
+    font-size: 13px;
+    color: #ff0000;
+    text-align: left;
+    padding: auto;
+}

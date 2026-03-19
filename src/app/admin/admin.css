@@ -6,7 +6,7 @@
     font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
 }
 
-body {
+.admin-body {
     display: flex;
     background-color: #0f172a; 
     color: #f8fafc; 
@@ -166,18 +166,15 @@ body {
     padding: 3rem;
     border-radius: 12px;
     text-align: center;
-<<<<<<< HEAD
-=======
 }
 
-/* Esto solo ocurre en pantallas pequeñas (celulares) */
+/* Responsive */
 @media (max-width: 600px) {
     .sidebar {
-        display: none; /* Escondemos la barra lateral en móviles */
+        display: none;
     }
     
     .main-content {
-        padding: 1rem; /* Reducimos el espacio para que quepa todo */
+        padding: 1rem;
     }
->>>>>>> c5d656f6f342a18c10fcf00cd005d8edce331b7c
 }

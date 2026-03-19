@@ -1,68 +1,65 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Ropa - Dashboard</title>
-    <link rel="stylesheet" href="admin.css">
-</head>
-<body class="admin-body">
+<div class="admin-body">
 
-    <nav class="sidebar">
-        <div class="sidebar-header">
-            <h2 class="brand">Admin Ropa</h2>
-        </div>
-        
-        <ul class="nav-links">
-            <li class="active"><a href="#">Dashboard</a></li>
-            <li><a href="#">Productos</a></li>
-            <li><a href="#">Inventario</a></li>
-            <li><a href="#">Ventas y Pedidos</a></li>
-            <li><a href="#">Clientes</a></li>
-            <li><a href="#">Empleados</a></li>
-            <li><a href="#">Reportes</a></li>
-            <li><a href="#">Configuración</a></li>
-        </ul>
-    </nav>
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="sidebar-header">
+      <h2 class="brand">Admin Ropa</h2>
+    </div>
+    
+    <ul class="nav-links">
+      <li class="active"><a>Dashboard</a></li>
+      <li><a>Productos</a></li>
+      <li><a>Inventario</a></li>
+      <li><a>Ventas y Pedidos</a></li>
+      <li><a>Clientes</a></li>
+      <li><a>Empleados</a></li>
+      <li><a>Reportes</a></li>
+      <li><a>Configuración</a></li>
+    </ul>
+  </nav>
 
-    <main class="main-content">
-        
-        <header class="top-header">
-            <h1>Panel de Administración</h1>
-            <div class="user-info">
-                <span class="welcome-text">Bienvenido, Admin</span>
-<<<<<<< HEAD
-                <a href="login.html" class="logout-btn">Salir</a>
-=======
-                <a href="./login" class="logout-btn">Salir</a>
->>>>>>> c5d656f6f342a18c10fcf00cd005d8edce331b7c
-            </div>
-        </header>
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="main-content">
 
-        <section class="overview">
-            <h2 class="section-title">Resumen del Negocio</h2>
-            
-            <div class="stats-grid">
-                <article class="stat-card">
-                    <span class="stat-label">Ventas Hoy:</span>
-                    <span class="stat-value">$1,250</span>
-                </article>
-                <article class="stat-card">
-                    <span class="stat-label">Productos:</span>
-                    <span class="stat-value">320</span>
-                </article>
-                <article class="stat-card">
-                    <span class="stat-label">Clientes:</span>
-                    <span class="stat-value">85</span>
-                </article>
-            </div>
+    <!-- HEADER -->
+    <header class="top-header">
+      <h1>Panel de Administración</h1>
 
-            <div class="charts-area">
-                <p>[Gráficos de ventas e inventario]</p>
-            </div>
-        </section>
+      <div class="user-info">
+        <span class="welcome-text">Bienvenido, Admin</span>
 
-    </main>
+        <button class="logout-btn" (click)="logout()">
+          Salir
+        </button>
+      </div>
+    </header>
 
-</body>
-</html>
+    <!-- RESUMEN -->
+    <section class="overview">
+      <h2 class="section-title">Resumen del Negocio</h2>
+
+      <div class="stats-grid">
+        <article class="stat-card">
+          <span class="stat-label">Ventas Hoy:</span>
+          <span class="stat-value">$1,250</span>
+        </article>
+
+        <article class="stat-card">
+          <span class="stat-label">Productos:</span>
+          <span class="stat-value">320</span>
+        </article>
+
+        <article class="stat-card">
+          <span class="stat-label">Clientes:</span>
+          <span class="stat-value">85</span>
+        </article>
+      </div>
+
+      <div class="charts-area">
+        <p>[Gráficos de ventas e inventario]</p>
+      </div>
+    </section>
+
+  </main>
+
+</div>

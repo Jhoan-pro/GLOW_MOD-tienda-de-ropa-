@@ -13,7 +13,7 @@ export class Login {
 
   email: string = '';
   password: string = '';
-  errorMsg: string = '';
+  message: string = '';
 
   constructor(private router: Router) {}
 
@@ -21,7 +21,7 @@ export class Login {
 
     // Validación: campos vacíos
     if (!this.email || !this.password) {
-      this.errorMsg = 'Todos los campos son obligatorios';
+      this.message = 'Todos los campos son obligatorios';
       return;
     }
 
@@ -29,26 +29,26 @@ export class Login {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (!emailRegex.test(this.email)) {
-      this.errorMsg = 'Correo electrónico inválido';
+      this.message = 'Correo electrónico inválido';
       return;
     }
 
     // Validación: longitud de contraseña
     if (this.password.length < 6) {
-      this.errorMsg = 'La contraseña debe tener mínimo 6 caracteres';
+      this.message = 'La contraseña debe tener mínimo 6 caracteres';
       return;
     }
 
     // Simulación de login
     if (this.email === 'admin@gmail.com' && this.password === '123456') {
 
-      this.errorMsg = '';
+      this.message = '';
 
       // REDIRECCIÓN
       this.router.navigate(['./admin']);
 
     } else {
-      this.errorMsg = 'Credenciales incorrectas';
+      this.message = 'Credenciales incorrectas';
     }
   }
 }

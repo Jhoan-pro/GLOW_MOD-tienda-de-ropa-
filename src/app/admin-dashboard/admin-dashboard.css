@@ -1,0 +1,105 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.admin-body {
+    display: flex;
+    min-height: 100vh;
+    background-color: #0f172a;
+    color: #f8fafc;
+    font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
+}
+
+/* SIDEBAR */
+.sidebar {
+    width: 260px;
+    background-color: #1e293b;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid #334155;
+}
+
+.sidebar-header {
+    padding: 2rem 1.5rem;
+}
+
+.brand {
+    background: linear-gradient(45deg, #8b5cf6, #06b6d4);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-size: 1.5rem;
+    font-weight: bold;
+    display: inline-block;
+}
+
+.nav-links {
+    list-style: none;
+    padding: 0 1rem;
+}
+
+.nav-links li {
+    margin-bottom: 0.5rem;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.nav-links li a {
+    display: block;
+    padding: 0.8rem 1rem;
+    color: #94a3b8;
+    text-decoration: none;
+    font-size: 0.95rem;
+}
+
+.nav-links li:hover {
+    background-color: #334155;
+}
+
+.nav-links li a:hover {
+    color: #fff;
+}
+
+/* CONTENIDO */
+.main-content {
+    flex: 1;
+    padding: 2rem 3rem;
+}
+
+/* HEADER */
+.top-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.top-header h1 {
+    font-size: 1.6rem;
+}
+
+.logout-btn {
+    background-color: #ef4444;
+    color: white;
+    border: none;
+    padding: 0.5rem 1.2rem;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.logout-btn:hover {
+    background-color: #dc2626;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    .sidebar {
+        display: none;
+    }
+
+    .main-content {
+        padding: 1rem;
+    }
+}

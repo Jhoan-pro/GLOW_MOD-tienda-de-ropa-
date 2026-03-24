@@ -7,8 +7,12 @@
     </div>
     
     <ul class="nav-links">
-      <li><a routerLink="/admin-dashboard/admin">Dashboard</a></li>
-      <li><a routerLink="/admin-dashboard/products">Productos</a></li>
+      <li routerLinkActive="active">
+        <a routerLink="/admin-dashboard/admin">Resumen del neocio </a>
+     </li>
+      <li routerLinkActive="active">
+        <a routerLink="/admin-dashboard/products">Productos</a>
+      </li>
     </ul>
   </nav>
 
@@ -17,7 +21,7 @@
 
     <header class="top-header">
       <h1>Panel de Administración</h1>
-      <button (click)="logout()">Salir</button>
+      <button class="logout-btn" (click)="logout()">Salir</button>
     </header>
 
     <!-- Aquí se cargan admin, products, etc -->

@@ -2,6 +2,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
 }
 
 .admin-body {
@@ -60,6 +61,15 @@
 
 .nav-links li a:hover {
     color: #fff;
+}
+
+.nav-links li.active {
+    background:linear-gradient(45deg,#8b5cf6,#06b6d4);
+}
+
+.nav-links li.active a {
+    color: #ffffff;
+    font-weight: 500;
 }
 
 /* CONTENIDO */

@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ProductForm } from '../product-form/product-form';
+import { ProductService } from '../services/product';
 
 @Component({
   selector: 'app-products',
@@ -9,9 +10,17 @@ import { ProductForm } from '../product-form/product-form';
   templateUrl: './products.html',
   styleUrl: './products.css',
 })
-export class Products {
+
+
+export class Products implements OnInit {
 
   products: any[] = [];
+
+  constructor(private productService: ProductService) { }
+
+  ngOnInit() {
+    this.products = this.productService.getProducts();
+  }
 
   showModal: boolean = false;
   editingIndex: number | null = null;
@@ -28,6 +37,7 @@ export class Products {
     };
   }
 
+
   openCreate() {
     this.currentProduct = this.getEmptyProduct();
     this.editingIndex = null;
@@ -41,19 +51,23 @@ export class Products {
   }
 
   saveProduct(product: any) {
+
     if (this.editingIndex !== null) {
-      this.products[this.editingIndex] = product;
+      this.productService.updateProduct(this.editingIndex, product);
     } else {
-      this.products.push(product);
+      this.productService.addProduct(product);
     }
 
+    this.products = this.productService.getProducts();
     this.closeModal();
   }
 
   deleteProduct(index: number) {
     const confirmacion = confirm('¿Eliminar producto?');
+
     if (confirmacion) {
-      this.products.splice(index, 1);
+      this.productService.deleteProduct(index);
+      this.products = this.productService.getProducts();
     }
   }
 

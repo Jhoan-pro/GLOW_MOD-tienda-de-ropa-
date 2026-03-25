@@ -16,7 +16,7 @@
       [(ngModel)]="password"
     >
 
-   <a href="/forgot-password" class="forgot-link">
+   <a routerLink="/forgot-password" class="forgot-link">
   ¿Olvidaste tu contraseña?
   </a>
 
@@ -24,23 +24,23 @@
       Ingresar
     </button>
 
-    <p class="error-msg">{{ errorMsg }}</p>
+    <p class="error-msg">{{ message }}</p>
 
     <div class="divider">Continuar con:</div>
 
     <div class="social-login">
       <button class="google-btn">
-        <img src="src/assets/img/logoGoogle.png" alt="Google">
+        <img src="assets/img/logoGoogle.png" alt="Google">
         Google
       </button>
 
       <button class="apple-btn">
-        <img src="src/assets/img/logoApple.png" alt="Apple">
+        <img src="assets/img/logoApple.png" alt="Apple">
         Apple
       </button>
 
       <button class="facebook-btn">
-        <img src="src/assets/img/logoFacebook.png" alt="Facebook">
+        <img src="assets/img/logoFacebook.png" alt="Facebook">
         Facebook
       </button>
     </div>

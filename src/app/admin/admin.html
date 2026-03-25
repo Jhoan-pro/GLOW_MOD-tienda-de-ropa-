@@ -1,65 +1,24 @@
-<div class="admin-body">
+<section class="overview">
+  <h2 class="section-title">Resumen del Negocio</h2>
 
-  <!-- SIDEBAR -->
-  <nav class="sidebar">
-    <div class="sidebar-header">
-      <h2 class="brand">Admin Ropa</h2>
-    </div>
-    
-    <ul class="nav-links">
-      <li class="active"><a>Dashboard</a></li>
-      <li><a>Productos</a></li>
-      <li><a>Inventario</a></li>
-      <li><a>Ventas y Pedidos</a></li>
-      <li><a>Clientes</a></li>
-      <li><a>Empleados</a></li>
-      <li><a>Reportes</a></li>
-      <li><a>Configuración</a></li>
-    </ul>
-  </nav>
+  <div class="stats-grid">
+    <article class="stat-card">
+      <span class="stat-label">Ventas Hoy:</span>
+      <span class="stat-value">$1,250</span>
+    </article>
 
-  <!-- CONTENIDO PRINCIPAL -->
-  <main class="main-content">
+    <article class="stat-card">
+      <span class="stat-label">Productos:</span>
+      <span class="stat-value">320</span>
+    </article>
 
-    <!-- HEADER -->
-    <header class="top-header">
-      <h1>Panel de Administración</h1>
+    <article class="stat-card">
+      <span class="stat-label">Clientes:</span>
+      <span class="stat-value">85</span>
+    </article>
+  </div>
 
-      <div class="user-info">
-        <span class="welcome-text">Bienvenido, Admin</span>
-
-        <button class="logout-btn" (click)="logout()">
-          Salir
-        </button>
-      </div>
-    </header>
-
-    <!-- RESUMEN -->
-    <section class="overview">
-      <h2 class="section-title">Resumen del Negocio</h2>
-
-      <div class="stats-grid">
-        <article class="stat-card">
-          <span class="stat-label">Ventas Hoy:</span>
-          <span class="stat-value">$1,250</span>
-        </article>
-
-        <article class="stat-card">
-          <span class="stat-label">Productos:</span>
-          <span class="stat-value">320</span>
-        </article>
-
-        <article class="stat-card">
-          <span class="stat-label">Clientes:</span>
-          <span class="stat-value">85</span>
-        </article>
-      </div>
-
-      <div class="charts-area">
-        <p>[Gráficos de ventas e inventario]</p>
-      </div>
-    </section>
-
-  </main>
-
-</div>
+  <div class="charts-area">
+    <p>[Gráficos de ventas e inventario]</p>
+  </div>
+</section>

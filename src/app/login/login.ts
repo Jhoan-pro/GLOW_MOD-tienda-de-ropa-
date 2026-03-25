@@ -51,11 +51,11 @@ export class Login {
       this.message = 'Credenciales incorrectas';
     }
     if (this.email === 'cli@gmail.com' && this.password === '1234567'){
-      this.errorMsg ='';
+      this.message = 'Error';
 
-      this.router.navigate(['./home']);{
+      this.router.navigate(['./home']);
 
-      }
+      
     }
   }
 }

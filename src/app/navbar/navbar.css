@@ -135,21 +135,6 @@ body {
   color: #8b5cf6;
   padding: 8px;
 }
-
-/* CARRITO */
-.cart-icon {
-  font-size: 22px;
-  cursor: pointer;
-  padding: 6px;
-  transition: 0.3s;
-  color: #8b5cf6;
-}
-
-.cart-icon:hover {
-  transform: scale(1.1);
-  color: #06b6d4;
-}
-
 /* USER */
 .user-dropdown {
   position: relative;

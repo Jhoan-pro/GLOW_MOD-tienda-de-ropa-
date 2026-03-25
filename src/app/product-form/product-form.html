@@ -1,1 +1,12 @@
-<p>product-form works!</p>
+<h3>{{ product?.id ? 'Editar producto' : 'Agregar producto' }}</h3>
+
+<input type="text" placeholder="Nombre" [(ngModel)]="product.name">
+<input type="number" placeholder="Precio" [(ngModel)]="product.price">
+<input type="number" placeholder="Stock" [(ngModel)]="product.stock">
+<input type="text" placeholder="Categoría" [(ngModel)]="product.category">
+<textarea placeholder="Descripción" [(ngModel)]="product.description"></textarea>
+
+<div class="actions">
+  <button (click)="onSubmit()">Guardar</button>
+  <button class="cancel" (click)="onCancel()">Cancelar</button>
+</div>

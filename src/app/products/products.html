@@ -2,10 +2,9 @@
 
   <div class="header">
     <h2>Productos</h2>
-    <button class="add-btn" (click)="openModal()">Agregar producto</button>
+    <button class="add-btn" (click)="openCreate()">Agregar producto</button>
   </div>
 
-  <!-- TABLA -->
   <table class="products-table">
     <thead>
       <tr>
@@ -13,35 +12,32 @@
         <th>Precio</th>
         <th>Stock</th>
         <th>Categoría</th>
+        <th>Acciones</th>
       </tr>
     </thead>
 
     <tbody>
-      <tr *ngFor="let p of products">
+      <tr *ngFor="let p of products; let i = index">
         <td>{{ p.name }}</td>
         <td>{{ p.price }}</td>
         <td>{{ p.stock }}</td>
         <td>{{ p.category }}</td>
+        <td>
+          <button (click)="openEdit(i)">Editar</button>
+          <button (click)="deleteProduct(i)">Eliminar</button>
+        </td>
       </tr>
     </tbody>
   </table>
 
-  <!-- MODAL -->
   <div class="modal" *ngIf="showModal">
     <div class="modal-content">
 
-      <h3>Agregar producto</h3>
-
-      <input type="text" placeholder="Nombre" [(ngModel)]="newProduct.name">
-      <input type="number" placeholder="Precio" [(ngModel)]="newProduct.price">
-      <input type="number" placeholder="Stock" [(ngModel)]="newProduct.stock">
-      <input type="text" placeholder="Categoría" [(ngModel)]="newProduct.category">
-      <textarea placeholder="Descripción" [(ngModel)]="newProduct.description"></textarea>
-
-      <div class="modal-actions">
-        <button (click)="saveProduct()">Guardar</button>
-        <button class="cancel" (click)="closeModal()">Cancelar</button>
-      </div>
+      <app-product-form
+        [product]="currentProduct"
+        (save)="saveProduct($event)"
+        (cancel)="closeModal()">
+      </app-product-form>
 
     </div>
   </div>

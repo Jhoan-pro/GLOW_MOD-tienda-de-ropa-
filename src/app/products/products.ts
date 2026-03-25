@@ -1,59 +1,63 @@
 import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { ProductForm } from '../product-form/product-form';
 
 @Component({
   selector: 'app-products',
   standalone: true,
-  imports: [FormsModule, CommonModule],
+  imports: [CommonModule, ProductForm],
   templateUrl: './products.html',
   styleUrl: './products.css',
 })
 export class Products {
 
-  // Lista de productos
   products: any[] = [];
 
-  // Control del modal
   showModal: boolean = false;
+  editingIndex: number | null = null;
 
-  // Modelo del formulario
-  newProduct = {
-    name: '',
-    price: 0,
-    stock: 0,
-    category: '',
-    description: ''
-  };
+  currentProduct: any = this.getEmptyProduct();
 
-  // Abrir modal
-  openModal() {
-    this.showModal = true;
-  }
-
-  // Cerrar modal
-  closeModal() {
-    this.showModal = false;
-  }
-
-  // Guardar producto
-  saveProduct() {
-    if (!this.newProduct.name || !this.newProduct.price) {
-      alert('Nombre y precio son obligatorios');
-      return;
-    }
-
-    this.products.push({ ...this.newProduct });
-
-    // Limpiar formulario
-    this.newProduct = {
+  getEmptyProduct() {
+    return {
       name: '',
       price: 0,
       stock: 0,
       category: '',
       description: ''
     };
+  }
+
+  openCreate() {
+    this.currentProduct = this.getEmptyProduct();
+    this.editingIndex = null;
+    this.showModal = true;
+  }
+
+  openEdit(index: number) {
+    this.currentProduct = { ...this.products[index] };
+    this.editingIndex = index;
+    this.showModal = true;
+  }
+
+  saveProduct(product: any) {
+    if (this.editingIndex !== null) {
+      this.products[this.editingIndex] = product;
+    } else {
+      this.products.push(product);
+    }
 
     this.closeModal();
+  }
+
+  deleteProduct(index: number) {
+    const confirmacion = confirm('¿Eliminar producto?');
+    if (confirmacion) {
+      this.products.splice(index, 1);
+    }
+  }
+
+  closeModal() {
+    this.showModal = false;
   }
 }

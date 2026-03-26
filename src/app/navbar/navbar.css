@@ -25,6 +25,7 @@ body {
   border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 
+/* LOGO */
 .logo {
   font-size: 24px;
   font-weight: 700;
@@ -71,9 +72,11 @@ body {
   visibility: hidden;
   transform: translateY(10px);
   transition: 0.3s ease;
+  z-index: 1000;
 }
 
-.dropdown:hover .dropdown-menu {
+.dropdown:hover .dropdown-menu,
+.user-dropdown:hover .dropdown-menu {
   opacity: 1;
   visibility: visible;
   transform: translateY(0);
@@ -104,7 +107,7 @@ body {
 .search-box {
   display: flex;
   align-items: center;
-  background: #b2bed1;
+  background: #1e293b;
   border-radius: 20px;
   overflow: hidden;
 }
@@ -116,6 +119,7 @@ body {
   background: transparent;
   color: white;
   transition: width 0.4s ease;
+  outline: none;
 }
 
 #barra-busqueda.activa {
@@ -129,23 +133,9 @@ body {
   font-size: 1.2em;
   cursor: pointer;
   color: #8b5cf6;
+  padding: 8px;
 }
-
-/* CARRITO */
-.cart-icon {
-  font-size: 22px;
-  cursor: pointer;
-  padding: 6px;
-  transition: 0.3s;
-  color: #8b5cf6;
-}
-
-.cart-icon:hover {
-  transform: scale(1.1);
-  color: #06b6d4;
-}
-
-/* USER DROPDOWN */
+/* USER */
 .user-dropdown {
   position: relative;
 }
@@ -161,19 +151,15 @@ body {
   transform: scale(1.1);
 }
 
-/* Dropdown usuario */
+/* POSICIÓN MENÚ USUARIO */
 .user-dropdown .dropdown-menu {
   right: 0;
   left: auto;
   top: 40px;
+  width: 200px;
 }
 
-.user-dropdown:hover .dropdown-menu {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0);
-}
-
+/* LOGOUT */
 .logout {
   border-top: 1px solid rgba(255,255,255,0.1);
   margin-top: 5px;

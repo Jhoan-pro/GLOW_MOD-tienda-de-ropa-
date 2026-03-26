@@ -16,7 +16,7 @@ export class ForgotPassword {
 
   sendRecovery() {
 
-    // Validar campo vacío
+    // Valida campo vacío
     if (!this.email) {
       this.message = 'El correo es obligatorio';
       return;

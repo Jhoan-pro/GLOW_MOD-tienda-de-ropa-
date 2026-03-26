@@ -1,1 +1,36 @@
-<p>invoice works!</p>
+<div class="invoice-container">
+  <h1>Factura Electrónica - GLOW_MOD</h1>
+
+  <div class="info">
+    <p><strong>N° Factura:</strong> {{ invoice.invoiceNumber }}</p>
+    <p><strong>Fecha:</strong> {{ invoice.date | date:'medium' }}</p>
+    <p><strong>Cliente:</strong> {{ invoice.customerName }}</p>
+    <p><strong>Email:</strong> {{ invoice.customerEmail }}</p>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Producto</th>
+        <th>Cantidad</th>
+        <th>Precio Unitario</th>
+        <th>Subtotal</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let item of invoice.items">
+        <td>{{ item.name }}</td>
+        <td>{{ item.quantity }}</td>
+        <td>{{ item.price | currency:'COP' }}</td>
+        <td>{{ getSubtotal(item) | currency:'COP' }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="total">
+    <h2>Total: {{ getTotal() | currency:'COP' }}</h2>
+  </div>
+
+  <button (click)="imprimirFactura()">🖨️ Imprimir / Descargar</button>
+</div>

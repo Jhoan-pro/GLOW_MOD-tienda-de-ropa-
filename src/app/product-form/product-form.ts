@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { Product } from '../models/product.model';
 
 @Component({
   selector: 'app-product-form',
@@ -11,15 +12,9 @@ import { CommonModule } from '@angular/common';
 })
 export class ProductForm {
 
-  @Input() product: any = {
-    name: '',
-    price: 0,
-    stock: 0,
-    category: '',
-    description: ''
-  };
+  @Input() product!: Product;
 
-  @Output() save = new EventEmitter<any>();
+  @Output() save = new EventEmitter<Product>();
   @Output() cancel = new EventEmitter<void>();
 
   onSubmit() {

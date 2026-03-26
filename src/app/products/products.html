@@ -23,8 +23,8 @@
         <td>{{ p.stock }}</td>
         <td>{{ p.category }}</td>
         <td>
-          <button (click)="openEdit(i)">Editar</button>
-          <button (click)="deleteProduct(i)">Eliminar</button>
+          <button class="update-btn" (click)="openEdit(i)">Editar</button>
+          <button class="delete-btn" (click)="deleteProduct(i)">Eliminar</button>
         </td>
       </tr>
     </tbody>

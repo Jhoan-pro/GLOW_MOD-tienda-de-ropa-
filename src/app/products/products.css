@@ -46,6 +46,34 @@
     background-color: #334155;
 }
 
+/* Botones eliminar-editar */
+.update-btn {
+    background-color: #44d5ef;
+    color: white;
+    border: none;
+    padding: 0.4rem 1.0rem;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-right: 15px;
+}
+
+.update-btn:hover {
+    background-color: #35d2ee;
+}
+
+.delete-btn {
+    background-color: #ec1f1f;
+    color: white;
+    border: none;
+    padding: 0.4rem 1.0rem;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-right: 15px;
+}
+
+.delete-btn:hover {
+    background-color: #eb3131;
+}
 /* MODAL */
 .modal {
     position: fixed;

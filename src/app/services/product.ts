@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Product } from '../models/product.model';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +11,7 @@ export class ProductService {
   constructor() {}
 
   // Obtener productos
-  getProducts(): any[] {
+  getProducts(): Product[] {
     const data = localStorage.getItem(this.storageKey);
     return data ? JSON.parse(data) : [];
   }
@@ -21,14 +22,14 @@ export class ProductService {
   }
 
   // Agregar producto
-  addProduct(product: any) {
+  addProduct(product: Product) {
     const products = this.getProducts();
     products.push(product);
     this.saveProducts(products);
   }
 
   // Actualizar producto
-  updateProduct(index: number, product: any) {
+  updateProduct(index: number, product: Product) {
     const products = this.getProducts();
     products[index] = product;
     this.saveProducts(products);

@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ProductForm } from '../product-form/product-form';
 import { ProductService } from '../services/product';
+import { Product } from '../models/product.model';
 
 @Component({
   selector: 'app-products',
@@ -14,7 +15,7 @@ import { ProductService } from '../services/product';
 
 export class Products implements OnInit {
 
-  products: any[] = [];
+  products: Product[] = [];
 
   constructor(private productService: ProductService) { }
 
@@ -25,9 +26,9 @@ export class Products implements OnInit {
   showModal: boolean = false;
   editingIndex: number | null = null;
 
-  currentProduct: any = this.getEmptyProduct();
+  currentProduct: Product = this.getEmptyProduct();
 
-  getEmptyProduct() {
+  getEmptyProduct() : Product {
     return {
       name: '',
       price: 0,
@@ -36,7 +37,6 @@ export class Products implements OnInit {
       description: ''
     };
   }
-
 
   openCreate() {
     this.currentProduct = this.getEmptyProduct();

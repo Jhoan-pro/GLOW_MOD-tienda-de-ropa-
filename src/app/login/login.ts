@@ -50,9 +50,8 @@ export class Login {
     } else {
       this.message = 'Credenciales incorrectas';
     }
-<<<<<<< HEAD
     
-=======
+
     if (this.email === 'cli@gmail.com' && this.password === '1234567'){
       this.message = 'Error';
 
@@ -60,7 +59,6 @@ export class Login {
 
       
     }
->>>>>>> c6411495c3c4f4e82d3d42206042968ab8bf727d
   }
 
   

@@ -3,11 +3,11 @@ import { CommonModule } from '@angular/common';
 import { ProductForm } from '../product-form/product-form';
 import { ProductService } from '../services/product';
 import { Product } from '../models/product.model';
-
+import { FormsModule } from '@angular/forms';
 @Component({
   selector: 'app-products',
   standalone: true,
-  imports: [CommonModule, ProductForm],
+  imports: [CommonModule, ProductForm, FormsModule],
   templateUrl: './products.html',
   styleUrl: './products.css',
 })
@@ -70,6 +70,16 @@ export class Products implements OnInit {
       this.products = this.productService.getProducts();
     }
   }
+
+  deleteSelected() {
+  const confirmacion = confirm('¿Eliminar productos seleccionados?');
+
+  if (!confirmacion) return;
+
+  this.products = this.products.filter(p => !p.selected);
+
+  this.productService['saveProducts'](this.products); // guardar cambios
+}
 
   closeModal() {
     this.showModal = false;

@@ -5,4 +5,5 @@ export interface Product {
     stock: number;
     category: string;
     description: string;
+    selected?: boolean;
 }

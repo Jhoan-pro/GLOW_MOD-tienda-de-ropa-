@@ -68,19 +68,9 @@ body {
   min-width: 160px;
   padding: 10px 0;
   box-shadow: 0 10px 25px rgba(0,0,0,0.4);
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(10px);
-  transition: 0.3s ease;
-  z-index: 1000;
 }
 
-.dropdown:hover .dropdown-menu,
-.user-dropdown:hover .dropdown-menu {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0);
-}
+
 
 .dropdown-menu a {
   display: block;

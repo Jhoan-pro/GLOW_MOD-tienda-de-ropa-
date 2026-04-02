@@ -2,11 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ProductForm } from '../product-form/product-form';
 import { ProductService } from '../services/product';
-
+import { Product } from '../models/product.model';
+import { FormsModule } from '@angular/forms';
 @Component({
   selector: 'app-products',
   standalone: true,
-  imports: [CommonModule, ProductForm],
+  imports: [CommonModule, ProductForm, FormsModule],
   templateUrl: './products.html',
   styleUrl: './products.css',
 })
@@ -14,7 +15,7 @@ import { ProductService } from '../services/product';
 
 export class Products implements OnInit {
 
-  products: any[] = [];
+  products: Product[] = [];
 
   constructor(private productService: ProductService) { }
 
@@ -25,9 +26,9 @@ export class Products implements OnInit {
   showModal: boolean = false;
   editingIndex: number | null = null;
 
-  currentProduct: any = this.getEmptyProduct();
+  currentProduct: Product = this.getEmptyProduct();
 
-  getEmptyProduct() {
+  getEmptyProduct() : Product {
     return {
       name: '',
       price: 0,
@@ -36,7 +37,6 @@ export class Products implements OnInit {
       description: ''
     };
   }
-
 
   openCreate() {
     this.currentProduct = this.getEmptyProduct();
@@ -70,6 +70,16 @@ export class Products implements OnInit {
       this.products = this.productService.getProducts();
     }
   }
+
+  deleteSelected() {
+  const confirmacion = confirm('¿Eliminar productos seleccionados?');
+
+  if (!confirmacion) return;
+
+  this.products = this.products.filter(p => !p.selected);
+
+  this.productService['saveProducts'](this.products); // guardar cambios
+}
 
   closeModal() {
     this.showModal = false;

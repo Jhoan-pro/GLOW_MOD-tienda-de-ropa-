@@ -5,7 +5,8 @@ import { Navbar } from "../navbar/navbar";
   selector: 'app-home',
   imports: [Navbar],
   templateUrl: './home.html',
-  styleUrl: './home.css',
+  styleUrls: ['./home.css'],
+  standalone:true
 })
 export class Home {
 

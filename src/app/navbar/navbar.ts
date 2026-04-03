@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, ViewEncapsulation, HostListener, ElementRef } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { NgIf } from '@angular/common';
 
@@ -13,8 +13,8 @@ import { NgIf } from '@angular/common';
 export class Navbar {
 
   mostrarFiltros = false;
-  menuUsuarioAbierto = false;
-
+  menuUsuarioAbierto: boolean = false;
+  constructor(private eRef: ElementRef){}
   toggleFiltros() {
     this.mostrarFiltros = !this.mostrarFiltros;
   }
@@ -24,11 +24,18 @@ export class Navbar {
   }
 
   logout() {
-    console.log("Cerrar sesión");
+    console.log("Saliste de sesion");
   }
   carritoAbierto = false;
 
 toggleCarrito() {
   this.carritoAbierto = !this.carritoAbierto;
 }
+  //Detecta clics
+  @HostListener('document: click', ['$event'])
+  clickFuera(event: Event){
+    if(!this.eRef.nativeElement.contains(event.target)){
+      this.menuUsuarioAbierto=false;
+    }
+  }
 }

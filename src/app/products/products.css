@@ -4,9 +4,17 @@
 
 .header {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column; 
+    align-items: flex-start;
+    gap: 10px;
     margin-bottom: 1.5rem;
 }
+
+.actions {
+    display: flex;
+    gap: 10px;
+}
+
 
 .add-btn {
     background:linear-gradient(45deg,#8b5cf6,#06b6d4);
@@ -17,7 +25,7 @@
     font-weight:600;
     cursor:pointer;
     transition:.3s;
-    
+    justify-content: left;
 }
 
 .add-btn:hover {
@@ -74,6 +82,38 @@
 .delete-btn:hover {
     background-color: #eb3131;
 }
+
+.deleteSelected-btn {
+    background-color: #ec1f1f;
+    border:none;
+    padding:4px 15px;
+    border-radius:20px;
+    color:white;
+    font-weight:600;
+    cursor:pointer;
+    transition:.3s;
+    
+}
+
+.deleteSelected-btn:hover {
+    background:#eb3333;
+}
+
+.view-btn {
+    background-color: #eb3bd3;
+    color: white;
+    border: none;
+    padding: 0.4rem 1.0rem;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-right: 15px;
+    
+}
+
+.view-btn:hover {
+    background:#eb1bcf;
+}
+
 /* MODAL */
 .modal {
     position: fixed;

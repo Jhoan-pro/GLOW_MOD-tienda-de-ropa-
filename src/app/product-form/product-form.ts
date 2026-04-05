@@ -13,6 +13,7 @@ import { Product } from '../models/product.model';
 export class ProductForm {
 
   @Input() product!: Product;
+  @Input() viewMode: boolean = false;
 
   @Output() save = new EventEmitter<Product>();
   @Output() cancel = new EventEmitter<void>();

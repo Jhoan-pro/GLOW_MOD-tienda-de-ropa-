@@ -2,10 +2,15 @@
 
   <div class="header">
     <h2>Productos</h2>
-    <button class="add-btn" (click)="openCreate()">Agregar producto</button>
-     <button class="delete-btn" (click)="deleteSelected()">
-       Eliminar seleccionados
-    </button>
+
+    <div>
+      <div class="actions">
+        <button class="add-btn" (click)="openCreate()">Agregar producto</button>
+        <button class="deleteSelected-btn" (click)="deleteSelected()">
+          Eliminar seleccionados
+        </button>
+      </div>
+    </div>
   </div>
 
   <table class="products-table">
@@ -23,9 +28,9 @@
     <tbody>
       <tr *ngFor="let p of products; let i = index">
 
-      
+
         <td>
-           <input type="checkbox" [(ngModel)]="p.selected">
+          <input type="checkbox" [(ngModel)]="p.selected">
         </td>
 
         <td>{{ p.name }}</td>
@@ -34,7 +39,7 @@
         <td>{{ p.category }}</td>
         <td>
           <button class="update-btn" (click)="openEdit(i)">Editar</button>
-          <button class="delete-btn" (click)="deleteProduct(i)">Eliminar</button>
+          <button class="view-btn" (click)="openView(i)">Ver </button>
         </td>
       </tr>
     </tbody>
@@ -43,10 +48,11 @@
   <div class="modal" *ngIf="showModal">
     <div class="modal-content">
 
-      <app-product-form
-        [product]="currentProduct"
-        (save)="saveProduct($event)"
-        (cancel)="closeModal()">
+      <app-product-form 
+      [viewMode]="viewMode"
+      [product]="currentProduct" 
+      (save)="saveProduct($event)"
+      (cancel)="closeModal()">
       </app-product-form>
 
     </div>

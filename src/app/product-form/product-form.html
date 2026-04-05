@@ -1,12 +1,12 @@
 <h3>{{ product.id ? 'Editar producto' : 'Agregar producto' }}</h3>
 
-<input type="text" placeholder="Nombre" [(ngModel)]="product.name">
-<input type="number" placeholder="Precio" [(ngModel)]="product.price">
-<input type="number" placeholder="Stock" [(ngModel)]="product.stock">
-<input type="text" placeholder="Categoría" [(ngModel)]="product.category">
-<textarea placeholder="Descripción" [(ngModel)]="product.description"></textarea>
+<input type="text" placeholder="Nombre" [(ngModel)]="product.name" [disabled]="viewMode">
+<input type="number" placeholder="Precio" [(ngModel)]="product.price" [disabled]="viewMode">
+<input type="number" placeholder="Stock" [(ngModel)]="product.stock" [disabled]="viewMode">
+<input type="text" placeholder="Categoría" [(ngModel)]="product.category" [disabled]="viewMode">
+<textarea placeholder="Descripción" [(ngModel)]="product.description" [disabled]="viewMode"></textarea>
 
 <div class="actions">
-  <button (click)="onSubmit()">Guardar</button>
+  <button *ngIf="!viewMode" (click)="onSubmit()">Guardar</button>
   <button class="cancel" (click)="onCancel()">Cancelar</button>
 </div>

@@ -24,6 +24,7 @@ export class Products implements OnInit {
   }
 
   showModal: boolean = false;
+  viewMode: boolean = false;
   editingIndex: number | null = null;
 
   currentProduct: Product = this.getEmptyProduct();
@@ -80,6 +81,14 @@ export class Products implements OnInit {
 
   this.productService['saveProducts'](this.products); // guardar cambios
 }
+
+
+  openView(index: number) {
+    this.currentProduct = { ...this.products[index] };
+    this.editingIndex = index;
+    this.viewMode = true;
+    this.showModal = true;
+  }
 
   closeModal() {
     this.showModal = false;

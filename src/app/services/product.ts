@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Product } from '../models/product.model';
+import { isPlatformBrowser } from '@angular/common';
+import { inject, PLATFORM_ID } from '@angular/core';
 
 @Injectable({
   providedIn: 'root'
@@ -7,18 +9,25 @@ import { Product } from '../models/product.model';
 export class ProductService {
 
   private storageKey = 'products';
+  private platformid = inject (PLATFORM_ID);
 
   constructor() {}
 
   // Obtener productos
   getProducts(): Product[] {
+    if(isPlatformBrowser(this.platformid)){
     const data = localStorage.getItem(this.storageKey);
     return data ? JSON.parse(data) : [];
+    }
+    return [];
   }
 
   // Guardar lista completa
-  private saveProducts(products: any[]) {
+  private saveProducts(products: Product[]) {
+    if(isPlatformBrowser(this.platformid)){
     localStorage.setItem(this.storageKey, JSON.stringify(products));
+
+    }
   }
 
   // Agregar producto

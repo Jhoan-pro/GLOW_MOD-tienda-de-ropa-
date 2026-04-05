@@ -1,49 +1,87 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="navbar.css">
-</head>
-<body>
-    <!-- NAVBAR -->
 <header class="navbar">
   <div class="logo">GLOW_MOD</div>
 
-  <nav class="nav-links">
-    <a href="index.html">Inicio</a>
-    <div class="dropdown">
-      <a href="#">Filtros</a>
-      <div class="dropdown-menu">
-        <a href="#">Categoría 1</a>
-        <a href="#">Categoría 2</a>
-        <a href="#">Categoría 3</a>
+  <div class="actions">
+    <div class="cart-icon" (click)="toggleCarrito()">🛒</div>
+    <!-- LUPA / FILTROS -->
+    <div class="search-box">
+      <button id="btn-lupa" (click)="toggleFiltros()">🔍</button>
+
+      <div class="filtros-panel" *ngIf="mostrarFiltros">
+        <h4>Filtros</h4>
+
+        <label>
+          Categoría
+          <select>
+            <option>Todos</option>
+            <option>Camisetas</option>
+            <option>Chaquetas</option>
+          </select>
+        </label>
+
+        <label>
+          Precio máximo
+          <input type="range" min="0" max="200">
+        </label>
+
+        <label>
+          Ordenar por
+          <select>
+            <option>Popularidad</option>
+            <option>Precio</option>
+          </select>
+        </label>
+
+        <button class="aplicar">Aplicar</button>
       </div>
     </div>
-  </nav>
-
-  <div class="actions">
-    <!-- Buscador -->
-    <div class="search-box">
-      <button id="btn-lupa">🔍</button>
-      <input type="text" id="barra-busqueda" placeholder="Buscar...">
-    </div>
-
     
-    <!-- Perfil -->
+    <!-- USUARIO -->
     <div class="user-dropdown">
-      <div class="user-icon">👤</div>
-      <div class="dropdown-menu">
-        <a href="#">Administrar cuenta</a>
-        <a href="#">Tùs pedidos</a>
+      <div class="user-icon" (click)="toggleMenuUsuario()">👤</div>
+
+      <div class="dropdown-menu" *ngIf="menuUsuarioAbierto">
+        <a routerLink="/user">Administrar cuenta</a>
+        <a href="#">Tus pedidos</a>
         <a href="#">Reseñas</a>
         <a href="#">Historial</a>
         <a href="#">Ajustes</a>
-        <a href="#" class="logout" onclick="logout()">Cerrar sesión</a>
+        <a class="logout" (click)="logout()">Cerrar sesión</a>
       </div>
     </div>
+
   </div>
 </header>
-</body>
-</html>
+<div class="cart-panel" [class.open]="carritoAbierto">
+
+  <h3>Tu carrito</h3>
+
+  <!-- ITEM -->
+  <div class="cart-item">
+    <img src="https://via.placeholder.com/60" alt="">
+    <div class="info">
+      <p>Chaqueta Urban</p>
+      <span>$79.99</span>
+
+      <div class="cantidad">
+        <button>-</button>
+        <span>2</span>
+        <button>+</button>
+      </div>
+
+      <small class="eliminar">Eliminar</small>
+    </div>
+  </div>
+
+  <!-- TOTAL -->
+  <div class="cart-footer">
+    <p>Subtotal: <span>$159.98</span></p>
+    <p>Total: <span>$159.98</span></p>
+
+    <div class="acciones">
+      <button class="cancelar">Cancelar</button>
+      <button class="comprar">Comprar</button>
+    </div>
+  </div>
+
+</div>

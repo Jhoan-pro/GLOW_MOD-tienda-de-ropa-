@@ -8,7 +8,7 @@ import { ForgotPassword } from './forgot-password/forgot-password';
 import { Admin } from './admin/admin';
 import { Cashier } from './cashier/cashier';
 import { Client } from './client/client';
-
+import { UserProfile } from './user-profile/user-profile';
 import { Cart } from './cart/cart';
 import { Invoice } from './invoice/invoice';
 
@@ -29,14 +29,15 @@ export const routes: Routes = [
   { path: 'login', component: Login },
   { path: 'register', component: RegisterUser },
   { path: 'forgot-password', component: ForgotPassword },
-
+  { path: 'user', component: UserProfile },
   // Dashboard para usuarios normales
   {
     path: 'dashboard',
     component: DashBoard,
     children: [
       { path: 'cashier', component: Cashier },
-      { path: 'client', component: Client }
+      { path: 'client', component: Client },
+      
     ]
   },
 

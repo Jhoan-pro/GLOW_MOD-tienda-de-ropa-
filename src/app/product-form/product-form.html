@@ -1,9 +1,11 @@
 <h3>{{ product.id ? 'Editar producto' : 'Agregar producto' }}</h3>
 
+
 <input type="text" placeholder="Nombre" [(ngModel)]="product.name" [disabled]="viewMode">
 <input type="number" placeholder="Precio" [(ngModel)]="product.price" [disabled]="viewMode">
 <input type="number" placeholder="Stock" [(ngModel)]="product.stock" [disabled]="viewMode">
 <input type="text" placeholder="Categoría" [(ngModel)]="product.category" [disabled]="viewMode">
+<input type="file" (change)="onImageSelected($event)">
 <textarea placeholder="Descripción" [(ngModel)]="product.description" [disabled]="viewMode"></textarea>
 
 <div class="actions">

@@ -85,7 +85,6 @@ export class Products implements OnInit {
 
   openView(index: number) {
     this.currentProduct = { ...this.products[index] };
-    this.editingIndex = index;
     this.viewMode = true;
     this.showModal = true;
   }

@@ -30,4 +30,19 @@ export class ProductForm {
   onCancel() {
     this.cancel.emit();
   }
+
+
+  onImageSelected(event: any) {
+  const file = event.target.files[0];
+
+  if (!file) return;
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+    this.product.image = reader.result as string;
+  };
+
+  reader.readAsDataURL(file);
+}
 }

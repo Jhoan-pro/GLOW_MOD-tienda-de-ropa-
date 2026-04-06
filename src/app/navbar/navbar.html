@@ -58,32 +58,38 @@
 
   <h3>Tu carrito</h3>
 
-  <!-- ITEM -->
-  <div class="cart-item">
-    <img src="https://via.placeholder.com/60" alt="">
-    <div class="info">
-      <p>Chaqueta Urban</p>
-      <span>$79.99</span>
+  <!-- CONTENIDO SCROLL -->
+  <div class="cart-content">
 
-      <div class="cantidad">
-        <button>-</button>
-        <span>2</span>
-        <button>+</button>
+    <div class="cart-item">
+      <img src="https://via.placeholder.com/60" alt="">
+      <div class="info">
+        <p>Chaqueta Urban</p>
+        <span>$79.99</span>
+
+        <div class="cantidad">
+          <button>-</button>
+          <span>2</span>
+          <button>+</button>
+        </div>
+
+        <small class="eliminar">Eliminar</small>
       </div>
-
-      <small class="eliminar">Eliminar</small>
     </div>
+
   </div>
 
-  <!-- TOTAL -->
+  <!-- FOOTER FIJO -->
   <div class="cart-footer">
     <p>Subtotal: <span>$159.98</span></p>
     <p>Total: <span>$159.98</span></p>
 
     <div class="acciones">
-      <button class="cancelar">Cancelar</button>
+      <button class="cancelar" (click)="cerrarCarrito()">Cancelar</button>
+      
       <button class="comprar">Comprar</button>
     </div>
   </div>
 
 </div>
+<div class="overlay" *ngIf="carritoAbierto" (click)="cerrarCarrito()"></div>

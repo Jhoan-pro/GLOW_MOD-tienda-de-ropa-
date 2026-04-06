@@ -32,14 +32,19 @@ export class Navbar {
   }
   carritoAbierto = false;
 
-toggleCarrito() {
+  toggleCarrito() {
   this.carritoAbierto = !this.carritoAbierto;
 }
+  cerrarCarrito(){
+    this.carritoAbierto=false;
+  }
   //Detecta clics
   @HostListener('document: click', ['$event'])
   clickFuera(event: Event){
     if(!this.eRef.nativeElement.contains(event.target)){
       this.menuUsuarioAbierto=false;
+      this.mostrarFiltros = false;
+      this.carritoAbierto= false;
     }
   }
 }

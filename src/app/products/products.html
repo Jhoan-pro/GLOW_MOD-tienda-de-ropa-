@@ -17,6 +17,7 @@
     <thead>
       <tr>
         <th></th>
+        <th>Imagen</th>
         <th>Nombre</th>
         <th>Precio</th>
         <th>Stock</th>
@@ -28,11 +29,8 @@
     <tbody>
       <tr *ngFor="let p of products; let i = index">
 
-
-        <td>
-          <input type="checkbox" [(ngModel)]="p.selected">
-        </td>
-
+        <td><input type="checkbox" [(ngModel)]="p.selected"></td>
+        <td><img [src]="p.image" width="60" height="60" *ngIf="p.image"></td>
         <td>{{ p.name }}</td>
         <td>{{ p.price }}</td>
         <td>{{ p.stock }}</td>

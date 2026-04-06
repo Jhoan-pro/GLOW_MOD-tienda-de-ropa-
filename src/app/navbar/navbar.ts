@@ -1,11 +1,11 @@
 import { Component, ViewEncapsulation, HostListener, ElementRef } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { RouterLink, RouterModule, Router } from '@angular/router';
 import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [RouterLink, NgIf],
+  imports: [RouterLink, NgIf, RouterModule],
   templateUrl: './navbar.html',
   styleUrls: ['./navbar.css'],  
   encapsulation: ViewEncapsulation.None
@@ -14,7 +14,7 @@ export class Navbar {
 
   mostrarFiltros = false;
   menuUsuarioAbierto: boolean = false;
-  constructor(private eRef: ElementRef){}
+  constructor(private eRef: ElementRef, private router:Router){}
   toggleFiltros() {
     this.mostrarFiltros = !this.mostrarFiltros;
   }
@@ -24,7 +24,11 @@ export class Navbar {
   }
 
   logout() {
-    console.log("Saliste de sesion");
+    const confirmacion = confirm('¿Seguro que deseas cerrar sesión?');
+
+    if (confirmacion) {
+      this.router.navigate(['/login']);
+    }
   }
   carritoAbierto = false;
 

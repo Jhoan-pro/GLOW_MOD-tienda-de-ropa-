@@ -1,21 +1,59 @@
-body {
-  margin: 0;
-  height: 100vh;
-  background: linear-gradient(135deg, #0a0a2a, #1e3a8a); 
-  color: white;
-  font-family: 'Times New Roman', Times, serif;
-}
-
-.content {
-  text-align: center;
-  padding: 20px;
-}   
+/* CONTENEDOR PRINCIPAL */
 :host {
   display: block;
-  height: 100vh;
-  background: #1e3a8a; 
+  min-height: 100vh;
+  background: radial-gradient(circle at top, #1e293b, #020617);
   color: white;
-  font-family: 'Times New Roman', Times, serif;
+  font-family: 'Poppins', sans-serif;
 }
 
+/* HERO */
+.hero {
+  height: calc(100vh - 70px); /* resta navbar */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  text-align: center;
+}
 
+/* TITULO */
+.hero h1 {
+  font-size: 60px;
+  font-weight: 700;
+  margin: 0;
+}
+
+/* GRADIENTE TEXTO */
+.gradiente {
+  background: linear-gradient(90deg, #8b5cf6, #06b6d4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* SUBTITULO */
+.hero p {
+  font-size: 18px;
+  color: #94a3b8;
+  margin: 0;
+}
+
+/* BOTON */
+.btn-explorar {
+  margin-top: 10px;
+  padding: 12px 30px;
+  border: none;
+  border-radius: 25px;
+  background: linear-gradient(45deg, #7c3aed, #06b6d4);
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+/* HOVER BOTON */
+.btn-explorar:hover {
+  transform: scale(1.08);
+  box-shadow: 0 10px 25px rgba(6,182,212,0.3);
+}

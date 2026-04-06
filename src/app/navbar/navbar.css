@@ -2,9 +2,25 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px 8%;
-  background: #0f172a;
+  padding: 18px 8%;
+  background: linear-gradient(180deg, #0b1220, #0f172a);
   color: white;
+  z-index: 1000;
+}
+.logo {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  font-family: 'Poppins', sans-serif;
+}
+.logo-glow {
+  background: linear-gradient(45deg, #7c3aed, #06b6d4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.logo-mod {
+  color: #38bdf8;
 }
 body{
   margin:0;
@@ -22,6 +38,14 @@ body{
 #btn-lupa {
   font-size: 20px;
   cursor: pointer;
+  color:#cbd5f5;
+  transition: all 0.3s ease;
+}
+.cart-icon:hover,
+.user-icon:hover,
+#btn-lupa:hover {
+  color: #06b6d4;
+  transform: scale(1.15);
 }
 /* PANEL FILTROS */
 .filtros-panel {
@@ -242,4 +266,11 @@ body {
 
 .dropdown-menu a:hover {
   background-color: #f0f0f0;
+}
+.search-box {
+  position: relative;
+}
+
+.user-dropdown {
+  position: relative;
 }

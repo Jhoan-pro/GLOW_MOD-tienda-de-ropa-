@@ -1,4 +1,4 @@
-input, textarea {
+input, textarea, select {
     width: 100%;
     padding: 12px;
     border-radius: 10px;
@@ -19,4 +19,17 @@ button {
     background-color: #ef4444;
     color: white;
     
+}
+.imagen {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+    margin-bottom: 10px;
+
+}.imagen img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 12px;
+    border: solid 2px black;
 }

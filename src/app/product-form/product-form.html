@@ -1,11 +1,22 @@
 <h3>{{ product.id ? 'Editar producto' : 'Agregar producto' }}</h3>
 
+<input *ngIf="!viewMode" type="file" (change)="onImageSelected($event)" [disabled]="viewMode">
+
+<div class="imagen" *ngIf="product.image">
+  <img [src]="product.image" width="100">
+</div>
 
 <input type="text" placeholder="Nombre" [(ngModel)]="product.name" [disabled]="viewMode">
-<input type="number" placeholder="Precio" [(ngModel)]="product.price" [disabled]="viewMode">
-<input type="number" placeholder="Stock" [(ngModel)]="product.stock" [disabled]="viewMode">
-<input type="text" placeholder="Categoría" [(ngModel)]="product.category" [disabled]="viewMode">
-<input type="file" (change)="onImageSelected($event)">
+<input type="number" placeholder="Precio" [(ngModel)]="product.price" [disabled]="viewMode" min="0">
+<input type="number" placeholder="Stock" [(ngModel)]="product.stock" [disabled]="viewMode" min="0">
+
+<select [(ngModel)]="product.category" [disabled]="viewMode">
+  <option value="" >Selecciona una categoría</option>
+  <option *ngFor="let cat of categories" [value]="cat">
+    {{ cat }}
+  </option>
+</select>
+
 <textarea placeholder="Descripción" [(ngModel)]="product.description" [disabled]="viewMode"></textarea>
 
 <div class="actions">

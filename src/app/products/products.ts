@@ -42,12 +42,14 @@ export class Products implements OnInit {
   openCreate() {
     this.currentProduct = this.getEmptyProduct();
     this.editingIndex = null;
+    this.viewMode = false;
     this.showModal = true;
   }
 
   openEdit(index: number) {
     this.currentProduct = { ...this.products[index] };
     this.editingIndex = index;
+    this.viewMode = false;
     this.showModal = true;
   }
 

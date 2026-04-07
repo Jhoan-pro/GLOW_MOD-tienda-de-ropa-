@@ -55,5 +55,35 @@
 /* HOVER BOTON */
 .btn-explorar:hover {
   transform: scale(1.08);
-  box-shadow: 0 10px 25px rgba(6,182,212,0.3);
+  box-shadow: 0 10px 25px rgba(161, 196, 37, 0.3);
+}
+.hero {
+  text-align: center;
+  padding: 40px;
+  background: linear-gradient(135deg, #9f7aea, #805ad5);
+  color: #fff;
+}
+
+.hero h1 {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+}
+
+.hero p {
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+}
+
+.btn-explorar {
+  background-color: #fff;
+  color: #805ad5;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.btn-explorar:hover {
+  background-color: #f0f0f0;
 }

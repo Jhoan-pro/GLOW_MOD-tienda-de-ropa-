@@ -1,8 +1,9 @@
 <section class="product-car">
   <div class="product-card" *ngFor="let product of products">
-    <img [src]="product.image" alt="{{ product.name }}" class="product-image" />
     <h3 class="product-name">{{ product.name }}</h3>
-    <p class="product-price">${{ product.price }}</p>
+    <img [src]="product.image" alt="{{ product.name }}" class="product-image" />
+    <p class="product-price">Precio: ${{ product.price }}</p>
+    <p class="product-stock">Stock: {{product.stock}}</p>
     <button class="add-btn" (click)="addToCart(product)">Agregar al carrito</button>
   </div>
 </section>

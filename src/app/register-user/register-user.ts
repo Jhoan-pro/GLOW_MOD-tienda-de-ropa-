@@ -57,7 +57,7 @@ export class RegisterUser {
       role: 'client', // Por defecto
     };
 
-    this.userService.addUser(newUser); // <--- GUARDADO REAL
+    this.userService.addUser(newUser); 
     this.message = 'Registro exitoso';
 
     // Simulación de registro

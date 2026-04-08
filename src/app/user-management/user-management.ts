@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { UserService } from '../services/user.service'; // Asegúrate de que la ruta sea correcta
+import { UserService } from '../services/user.service'; 
 import { User } from '../models/user.model';
 import { FormsModule } from '@angular/forms';
 
@@ -32,7 +32,7 @@ export class UserManagement implements OnInit {
       const allUsers = this.userService.getUsers();
       allUsers.splice(index, 1);
       
-      // Actualizamos el localStorage (usando la lógica de tu servicio)
+      // Actualizamos el localStorage 
       localStorage.setItem('app_users', JSON.stringify(allUsers));
       
       // Refrescamos la vista

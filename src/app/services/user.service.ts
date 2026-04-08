@@ -22,7 +22,7 @@ export class UserService {
   addUser(user: User) {
     if (isPlatformBrowser(this.platformid)) {
       const users = this.getUsers();
-      user.id = Date.now(); // ID simple
+      user.id = Date.now(); 
       users.push(user);
       localStorage.setItem(this.storageKey, JSON.stringify(users));
     }

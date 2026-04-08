@@ -41,7 +41,7 @@ export class Login {
       return;
     }
 
-    // Simulación de login
+    // Simulación de login (administrador)
     if (this.email === 'admin@gmail.com' && this.password === '123456') {
       this.message = '';
 
@@ -51,11 +51,6 @@ export class Login {
       this.message = 'Credenciales incorrectas';
     }
 
-    if (this.email === 'cli@gmail.com' && this.password === '1234567') {
-      this.message = 'Error';
-
-      this.router.navigate(['./home']);
-    }
     
    // validacion de usuarios 
     const users = this.UserService.getUsers();

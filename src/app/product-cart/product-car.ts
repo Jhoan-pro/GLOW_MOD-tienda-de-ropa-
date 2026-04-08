@@ -12,12 +12,17 @@ import { CartService } from '../services/cart.service';
 export class ProductCar {
   @Input() products: Product[] = [];
   constructor(private cartService: CartService){}
-  addToCart(product: Product, index: number) {
+  addToCart(product: any, index: number) {
 
   if (product.stock <= 0) return;
+    product.added = true;
+    setTimeout(() => {
+    product.added = false;
+  }, 500);
 
   
 
   this.cartService.addToCart(product, index);
+  
 }
 }

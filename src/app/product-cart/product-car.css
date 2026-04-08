@@ -71,3 +71,12 @@
 .product-car {
   margin-top: 80px;
 }
+.added {
+  animation: pop 0.4s ease;
+}
+
+@keyframes pop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}

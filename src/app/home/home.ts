@@ -19,4 +19,9 @@ export class Home implements OnInit {
   ngOnInit(): void {
     this.products = this.productService.getProducts();
   }
+  irCatalogo() {
+  document.getElementById('catalogo')?.scrollIntoView({
+    behavior: 'smooth'
+  });
+}
 }

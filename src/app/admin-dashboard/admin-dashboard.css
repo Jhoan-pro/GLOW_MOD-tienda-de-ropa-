@@ -7,10 +7,10 @@
 
 .admin-body {
     display: flex;
+    width: 100%;
     min-height: 100vh;
     background-color: #0f172a;
     color: #f8fafc;
-    font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
 }
 
 /* SIDEBAR */

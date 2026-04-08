@@ -32,7 +32,7 @@ export class Navbar {
     const confirmacion = confirm('¿Seguro que deseas cerrar sesión?');
 
     if (confirmacion) {
-      this.router.navigate(['/login']);
+      this.router.navigate(['/register']);
     }
   }
   carritoAbierto = false;

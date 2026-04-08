@@ -5,14 +5,18 @@
     <div class="sidebar-header">
       <h2 class="brand">Admin Ropa</h2>
     </div>
-    
+
     <ul class="nav-links">
       <li routerLinkActive="active">
         <a routerLink="/admin-dashboard/admin">Resumen del neocio </a>
-     </li>
+      </li>
       <li routerLinkActive="active">
         <a routerLink="/admin-dashboard/products">Productos</a>
       </li>
+      <li routerLinkActive="active">
+        <a routerLink="/admin-dashboard/users">Usuarios</a>
+      </li>
+
     </ul>
   </nav>
 
@@ -24,7 +28,7 @@
       <button class="logout-btn" (click)="logout()">Salir</button>
     </header>
 
-    <!-- Aquí se cargan admin, products, etc -->
+    
     <router-outlet></router-outlet>
 
   </main>

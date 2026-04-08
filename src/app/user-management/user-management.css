@@ -1,0 +1,34 @@
+.products-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #1e293b;
+}
+
+.products-table th,
+.products-table td {
+    padding: 1rem;
+    border-bottom: 1px solid #334155;
+    text-align: left;
+}
+
+.products-table th {
+    color: #94a3b8;
+}
+
+.products-table tr:hover {
+    background-color: #334155;
+}
+
+.delete-btn {
+    background-color: #ec1f1f;
+    color: white;
+    border: none;
+    padding: 0.4rem 1.0rem;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-right: 15px;
+}
+
+.delete-btn:hover {
+    background-color: #eb3131;
+}

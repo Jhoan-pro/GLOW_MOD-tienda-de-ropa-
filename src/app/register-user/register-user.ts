@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { UserService } from '../services/user.service';
+import { User } from '../models/user.model';
 
 @Component({
   selector: 'app-register-user',
@@ -10,17 +12,18 @@ import { Router, RouterLink } from '@angular/router';
   styleUrl: './register-user.css',
 })
 export class RegisterUser {
-
   name: string = '';
   email: string = '';
   password: string = '';
   confirmPassword: string = '';
   message: string = '';
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private userService: UserService,
+  ) {}
 
   register() {
-
     // Campos vacíos
     if (!this.name || !this.email || !this.password || !this.confirmPassword) {
       this.message = 'Todos los campos son obligatorios';
@@ -46,6 +49,16 @@ export class RegisterUser {
       this.message = 'Las contraseñas no coinciden';
       return;
     }
+
+    const newUser: User = {
+      name: this.name,
+      email: this.email,
+      password: this.password,
+      role: 'client', // Por defecto
+    };
+
+    this.userService.addUser(newUser); // <--- GUARDADO REAL
+    this.message = 'Registro exitoso';
 
     // Simulación de registro
     this.message = 'Registro exitoso';

@@ -19,6 +19,7 @@ import { DashBoard } from './dash-board/dash-board';
 // Nuevos componentes
 import { AdminDashboard } from './admin-dashboard/admin-dashboard';
 import { Products } from './products/products';
+import { UserManagement } from './user-management/user-management';
 
 export const routes: Routes = [
 
@@ -38,6 +39,7 @@ export const routes: Routes = [
       { path: 'cashier', component: Cashier },
       { path: 'client', component: Client },
       
+      
     ]
   },
 
@@ -47,7 +49,8 @@ export const routes: Routes = [
     component: AdminDashboard,
     children: [
       { path: 'admin', component: Admin },
-      { path: 'products', component: Products }
+      { path: 'products', component: Products },
+      { path: 'users', component: UserManagement }
     ]
   },
 

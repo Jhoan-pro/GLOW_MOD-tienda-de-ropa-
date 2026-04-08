@@ -16,7 +16,7 @@ export class AdminDashboard {
     const confirmacion = confirm('¿Seguro que deseas cerrar sesión?');
 
     if (confirmacion) {
-      this.router.navigate(['/login']);
+      this.router.navigate(['/register']);
     }
   }
 }

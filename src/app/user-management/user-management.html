@@ -1,29 +1,52 @@
 <div class="user-admin">
-  <h2>Usuarios Registrados</h2>
-  <table class="products-table"> <thead>
+  <h2>Gestión de Usuarios</h2>
+  <table class="products-table">
+    <thead>
       <tr>
-        <th>ID</th>
         <th>Nombre</th>
         <th>Email</th>
         <th>Rol</th>
+        <th>Estado</th>
+        <th>Acciones</th>
       </tr>
     </thead>
-<tbody>
-  <tr *ngFor="let user of users; let i = index">
-    <td>{{ user.id }}</td>
-    <td>{{ user.name }}</td>
-    <td>{{ user.email }}</td>
-    <td>
-      <select [ngModel]="user.role" (ngModelChange)="changeRole(i, $event)">
-        <option value="client">Cliente</option>
+    <tbody>
+      <tr *ngFor="let user of users; let i = index" [style.opacity]="user.active ? '1' : '0.5'">
+        <td>{{ user.name }}</td>
+        <td>{{ user.email }}</td>
+        <td>{{ roleLabels [user.role] }}</td>
+        <td>
+          <span [class]="user.active ? 'status-active' : 'status-inactive'">
+            {{ user.active ? 'Activo' : 'Deshabilitado' }}
+          </span>
+        </td>
+        <td>
+          <button class="update-btn" (click)="openEdit(user)">Editar</button>
+          <button 
+            [class]="user.active ? 'delee-btn' : 'view-btn'" 
+            (click)="toggleStatus(i)">
+            {{ user.active ? 'Deshabilitar' : 'Habilitar' }}
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="modal" *ngIf="showEditModal">
+    <div class="modal-content">
+      <h3>Editar Usuario</h3>
+      <input type="text" [(ngModel)]="editingUser!.name" placeholder="Nombre">
+      <input type="text" [(ngModel)]="editingUser!.email" placeholder="Nombre">
+      <select [(ngModel)]="editingUser!.role">
         <option value="admin">Administrador</option>
         <option value="cashier">Cajero</option>
+        <option value="client">Cliente</option>
       </select>
-    </td>
-    <td>
-      <button class="delete-btn" (click)="deleteUser(i)">Eliminar</button>
-    </td>
-  </tr>
-</tbody>
-  </table>
+      
+      <div class="actions">
+        <button (click)="saveEdit()">Actualizar</button>
+        <button class="cancel" (click)="showEditModal = false">Cancelar</button>
+      </div>
+    </div>
+  </div>
 </div>

@@ -4,7 +4,7 @@
 </div>
 
   <div class="actions">
-    <div class="cart-icon" (click)="toggleCarrito()">🛒</div>
+    <div class="cart-icon" (click)="toggleCarrito()">🛒<span class="badge" *ngIf="getCantidadTotal() > 0">{{ getCantidadTotal() }}</span></div>
     <!-- LUPA / FILTROS -->
     <div class="search-box">
       <button id="btn-lupa" (click)="toggleFiltros()">🔍</button>
@@ -56,37 +56,59 @@
 </header>
 <div class="cart-panel" [class.open]="carritoAbierto">
 
-  <h3>Tu carrito</h3>
+  <h3>Tu carrito
+    <span class="vaciar-top" (click)="vaciar()">Vaciar</span>
+  </h3>
 
-  <!-- CONTENIDO SCROLL -->
   <div class="cart-content">
 
-    <div class="cart-item">
-      <img src="https://via.placeholder.com/60" alt="">
-      <div class="info">
-        <p>Chaqueta Urban</p>
-        <span>$79.99</span>
-
-        <div class="cantidad">
-          <button>-</button>
-          <span>2</span>
-          <button>+</button>
-        </div>
-
-        <small class="eliminar">Eliminar</small>
-      </div>
+    <div *ngIf="items.length === 0">
+      <p>El carrito está vacío</p>
     </div>
+
+    <div class="cart-item" *ngFor="let item of items; let i = index">
+  
+  <img [src]="item.product.image" />
+
+  <div class="info">
+    <p class="name">{{ item.product.name }}</p>
+
+    <span class="price">
+      Precio unidad: ${{ item.product.price }}
+    </span>
+
+    <p class="subtotal">
+      Subtotal: ${{ item.product.price * item.cantidad }}
+    </p>
+
+    <div class="cantidad">
+      <button (click)="disminuir(item)">-</button>
+      <span>{{ item.cantidad }}</span>
+      <button 
+        (click)="aumentar(item)" 
+        [disabled]="item.product.stock === 0">
+        +
+      </button>
+    </div>
+
+    <div class="eliminar" (click)="eliminar(i)">
+      Eliminar
+    </div>
+  </div>
+
+</div>
 
   </div>
 
-  <!-- FOOTER FIJO -->
+  <!-- FOOTER -->
   <div class="cart-footer">
-    <p>Subtotal: <span>$159.98</span></p>
-    <p>Total: <span>$159.98</span></p>
+    <p>
+      <span>Total:</span>
+      <strong>${{ getTotal() }}</strong>
+    </p>
 
     <div class="acciones">
-      <button class="cancelar" (click)="cerrarCarrito()">Cancelar</button>
-      
+      <button class="cancelar" (click)="cerrarCarrito()">Cerrar</button>
       <button class="comprar">Comprar</button>
     </div>
   </div>

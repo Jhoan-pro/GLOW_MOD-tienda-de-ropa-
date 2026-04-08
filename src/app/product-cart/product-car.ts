@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Product } from '../models/product.model';
-
+import { CartService } from '../services/cart.service';
 @Component({
   selector: 'app-product-car',
   standalone: true,
@@ -11,9 +11,13 @@ import { Product } from '../models/product.model';
 })
 export class ProductCar {
   @Input() products: Product[] = [];
+  constructor(private cartService: CartService){}
+  addToCart(product: Product, index: number) {
 
-  addToCart(product: Product) {
-    alert(`Producto agregado: ${product.name}`);
-    // Aquí luego puedes integrar con tu servicio de carrito
-  }
+  if (product.stock <= 0) return;
+
+  
+
+  this.cartService.addToCart(product, index);
+}
 }

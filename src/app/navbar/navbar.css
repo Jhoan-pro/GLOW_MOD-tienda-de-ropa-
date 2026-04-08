@@ -12,7 +12,25 @@
   color: white;
   z-index: 1000;
 }
- 
+.info{
+  flex: 1;
+}
+.vaciar-top {
+  float: right;
+  font-size: 14px;
+  color: #ef4444;
+  cursor: pointer;
+}
+.badge {
+  position: absolute;
+  top: -5px;
+  right: -10px;
+  background: #ef4444;
+  color: white;
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 50%;
+}
 .logo {
   font-size: 22px;
   font-weight: 700;
@@ -168,10 +186,10 @@ body {
   display: flex;
   gap: 15px;
   background: #1e293b;
-  padding: 10px;
-  border-radius: 12px;
+  padding: 20px;
+  border-radius: 15px;
   margin-bottom: 15px;
-
+  
   animation: slideItem 0.4s ease;
 }
 @keyframes slideItem {
@@ -186,8 +204,8 @@ body {
 }
 
 .cart-item img {
-  width: 60px;
-  height: 60px;
+  width: 150px;
+  height: 150px;
   border-radius: 10px;
   object-fit: cover;
 }
@@ -344,4 +362,40 @@ body {
   backdrop-filter: blur(3px);
   z-index: 1500;
   animation: fadeIn 0.3s ease;
+}
+.name {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.price {
+  font-size: 13px;
+  color: #94a3b8;
+}
+
+.subtotal {
+  color: #06b6d4;
+  font-weight: bold;
+  margin: 5px 0;
+}
+
+.cantidad {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cantidad button {
+  background: #334155;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+}
+
+.eliminar {
+  color: #ef4444;
+  font-size: 13px;
+  cursor: pointer;
 }

@@ -49,8 +49,10 @@
       <app-product-form 
       [viewMode]="viewMode"
       [product]="currentProduct" 
+      [isEditing]="editingIndex !== null"
       (save)="saveProduct($event)"
       (cancel)="closeModal()">
+      
       </app-product-form>
       
     </div>

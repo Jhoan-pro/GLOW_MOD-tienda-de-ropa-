@@ -31,6 +31,7 @@ export class ProductForm {
 
   @Input() product!: Product;
   @Input() viewMode: boolean = false;
+  @Input() isEditing: boolean = false;
 
   @Output() save = new EventEmitter<Product>();
   @Output() cancel = new EventEmitter<void>();

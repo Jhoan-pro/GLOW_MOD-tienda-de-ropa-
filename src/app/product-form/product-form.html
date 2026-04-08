@@ -1,10 +1,11 @@
-<h3>{{ product.id ? 'Editar producto' : 'Agregar producto' }}</h3>
-
-<input *ngIf="!viewMode" type="file" (change)="onImageSelected($event)" [disabled]="viewMode">
+<h3 >{{ isEditing ? 'Editar producto' : 'Agregar producto' }} </h3>
 
 <div class="imagen" *ngIf="product.image">
   <img [src]="product.image" width="100">
 </div>
+<input *ngIf="!viewMode" type="file" (change)="onImageSelected($event)" [disabled]="viewMode">
+
+
 
 <input type="text" placeholder="Nombre" [(ngModel)]="product.name" [disabled]="viewMode">
 <input type="number" placeholder="Precio" [(ngModel)]="product.price" [disabled]="viewMode" min="0">

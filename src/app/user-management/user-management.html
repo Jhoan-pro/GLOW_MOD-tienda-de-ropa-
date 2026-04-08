@@ -1,0 +1,29 @@
+<div class="user-admin">
+  <h2>Usuarios Registrados</h2>
+  <table class="products-table"> <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Email</th>
+        <th>Rol</th>
+      </tr>
+    </thead>
+<tbody>
+  <tr *ngFor="let user of users; let i = index">
+    <td>{{ user.id }}</td>
+    <td>{{ user.name }}</td>
+    <td>{{ user.email }}</td>
+    <td>
+      <select [ngModel]="user.role" (ngModelChange)="changeRole(i, $event)">
+        <option value="client">Cliente</option>
+        <option value="admin">Administrador</option>
+        <option value="cashier">Cajero</option>
+      </select>
+    </td>
+    <td>
+      <button class="delete-btn" (click)="deleteUser(i)">Eliminar</button>
+    </td>
+  </tr>
+</tbody>
+  </table>
+</div>

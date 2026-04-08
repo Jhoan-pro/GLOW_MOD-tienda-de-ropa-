@@ -11,13 +11,10 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './products.html',
   styleUrl: './products.css',
 })
-
-
 export class Products implements OnInit {
-
   products: Product[] = [];
 
-  constructor(private productService: ProductService) { }
+  constructor(private productService: ProductService) {}
 
   ngOnInit() {
     this.products = this.productService.getProducts();
@@ -29,13 +26,13 @@ export class Products implements OnInit {
 
   currentProduct: Product = this.getEmptyProduct();
 
-  getEmptyProduct() : Product {
+  getEmptyProduct(): Product {
     return {
       name: '',
       price: 0,
       stock: 0,
       category: '',
-      description: ''
+      description: '',
     };
   }
 
@@ -54,7 +51,6 @@ export class Products implements OnInit {
   }
 
   saveProduct(product: any) {
-
     if (this.editingIndex !== null) {
       this.productService.updateProduct(this.editingIndex, product);
     } else {
@@ -75,15 +71,20 @@ export class Products implements OnInit {
   }
 
   deleteSelected() {
-  const confirmacion = confirm('¿Eliminar productos seleccionados?');
+    const selectedProducts = this.products.filter((p) => p.selected);
 
-  if (!confirmacion) return;
+    if (selectedProducts.length === 0) {
+      alert('No has seleccionado ningún producto para eliminar.');
+      return;
+    }
+    const confirmacion = confirm(
+      `¿Eliminar los productos seleccionados?`,
+    );
 
-  this.products = this.products.filter(p => !p.selected);
-
-  this.productService['saveProducts'](this.products); // guardar cambios
-}
-
+    if (!confirmacion) return;
+    this.products = this.products.filter((p) => !p.selected);
+    this.productService['saveProducts'](this.products);
+  }
 
   openView(index: number) {
     this.currentProduct = { ...this.products[index] };

@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { UserService } from '../services/user.service';
 
 @Component({
   selector: 'app-login',
@@ -10,15 +11,16 @@ import { Router, RouterLink } from '@angular/router';
   styleUrl: './login.css',
 })
 export class Login {
-
   email: string = '';
   password: string = '';
   message: string = '';
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private UserService: UserService,
+  ) {}
 
   login() {
-
     // Validación: campos vacíos
     if (!this.email || !this.password) {
       this.message = 'Todos los campos son obligatorios';
@@ -39,27 +41,36 @@ export class Login {
       return;
     }
 
-    // Simulación de login
+    // Simulación de login (administrador)
     if (this.email === 'admin@gmail.com' && this.password === '123456') {
-
       this.message = '';
 
       // REDIRECCIÓN
       this.router.navigate(['/admin-dashboard/admin']);
-
     } else {
       this.message = 'Credenciales incorrectas';
     }
+
     
+   // validacion de usuarios 
+    const users = this.UserService.getUsers();
 
-    if (this.email === 'cli@gmail.com' && this.password === '1234567'){
-      this.message = 'Error';
+    const userFound = users.find((u) => u.email === this.email && u.password === this.password);
 
-      this.router.navigate(['./home']);
+    if (userFound) {
+      this.message = '';
 
+      if (userFound.role === 'admin') {
+        this.router.navigate(['/admin-dashboard/admin']);
+      } else if (userFound.role === 'cashier') {
+        this.router.navigate(['/dashboard/cashier']);
+      } else {
+     
+        this.router.navigate(['/']);
+      }
+    } else {
       
+      this.message = 'Correo o contraseña incorrectos';
     }
   }
-
-  
 }

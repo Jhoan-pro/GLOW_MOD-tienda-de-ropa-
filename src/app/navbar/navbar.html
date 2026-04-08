@@ -37,16 +37,26 @@
         <button class="aplicar">Aplicar</button>
       </div>
     </div>
-    
+
     <!-- USUARIO -->
     <div class="user-dropdown">
       <div class="user-icon" (click)="toggleMenuUsuario()">👤</div>
 
       <div class="dropdown-menu" *ngIf="menuUsuarioAbierto">
-        <a routerLink="/user">Administrar cuenta</a>
-        
-        <button class="logout-btn" (click)="logout()">Salir</button>
-      </div>
+
+  <!-- NO LOGUEADO -->
+  <ng-container *ngIf="!isLoggedIn">
+    <a routerLink="/login">Iniciar sesión</a>
+  </ng-container>
+
+  <!-- LOGUEADO -->
+  <ng-container *ngIf="isLoggedIn">
+    <a href="">Hola</a>
+    <a routerLink="/user">Administrar cuenta</a>
+    <button class="logout-btn" (click)="logout()">Cerrar sesión</button>
+  </ng-container>
+
+</div>
     </div>
 
   </div>
@@ -63,11 +73,7 @@
       <p>El carrito está vacío</p>
     </div>
 
-    <div class="cart-item" *ngFor="let item of items; let i = index">
-  
-  <img [src]="item.product.image" />
-
-  <div class="info">
+    <div class="cart-item" *ngFor="let item of items; let i = index"><img [src]="item.product.image" /><div class="info">
     <p class="name">{{ item.product.name }}</p>
 
     <span class="price">
@@ -81,8 +87,8 @@
     <div class="cantidad">
       <button (click)="disminuir(item)">-</button>
       <span>{{ item.cantidad }}</span>
-      <button 
-        (click)="aumentar(item)" 
+      <button
+        (click)="aumentar(item)"
         [disabled]="item.product.stock === 0">
         +
       </button>

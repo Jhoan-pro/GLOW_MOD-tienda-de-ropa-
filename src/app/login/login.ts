@@ -21,11 +21,11 @@ export class Login {
   ) {}
 
   login() {
-    // Validación: campos vacíos
-    if (!this.email || !this.password) {
-      this.message = 'Todos los campos son obligatorios';
-      return;
-    }
+  // Validación: campos vacíos
+  if (!this.email || !this.password) {
+    this.message = 'Todos los campos son obligatorios';
+    return;
+  }
 
     // Validación: formato de correo
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -51,16 +51,8 @@ export class Login {
       this.message = 'Credenciales incorrectas';
     }
 
-    if (this.email === 'cli@gmail.com' && this.password === '123456') {
-      this.message = '';
 
-      // REDIRECCIÓN
-      this.router.navigate(['/home']);
-    } else {
-      this.message = 'Credenciales incorrectas';
-    }
-
-   // validacion de usuarios 
+   // validacion de usuarios
     const users = this.UserService.getUsers();
 
     const userFound = users.find((u) => u.email === this.email && u.password === this.password);
@@ -68,16 +60,18 @@ export class Login {
     if (userFound) {
       this.message = '';
 
+
+    this.UserService.login(userFound);
       if (userFound.role === 'admin') {
         this.router.navigate(['/admin-dashboard/admin']);
       } else if (userFound.role === 'cashier') {
         this.router.navigate(['/dashboard/cashier']);
       } else {
-     
+
         this.router.navigate(['/']);
       }
     } else {
-      
+
       this.message = 'Correo o contraseña incorrectos';
     }
   }

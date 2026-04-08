@@ -2,24 +2,26 @@ import { Component, ViewEncapsulation, HostListener, ElementRef } from '@angular
 import { RouterLink, RouterModule, Router } from '@angular/router';
 import { NgForOf, NgIf } from '@angular/common';
 import { CartService } from '../services/cart.service';
-
+import { UserService } from '../services/user.service';
 @Component({
   selector: 'app-navbar',
   standalone: true,
   imports: [RouterLink, NgIf, RouterModule, NgForOf],
   templateUrl: './navbar.html',
-  styleUrls: ['./navbar.css'],  
+  styleUrls: ['./navbar.css'],
   encapsulation: ViewEncapsulation.None
 })
 export class Navbar {
   items:any[]=[];
-  
 
 
 
+  isLoggedIn: boolean = false;
   mostrarFiltros = false;
   menuUsuarioAbierto: boolean = false;
-  constructor(private eRef: ElementRef, private router:Router,private cartService: CartService){}
+  constructor(private eRef: ElementRef, private router:Router,private cartService: CartService, private userService: UserService){
+
+  }
   toggleFiltros() {
     this.mostrarFiltros = !this.mostrarFiltros;
   }
@@ -29,12 +31,14 @@ export class Navbar {
   }
 
   logout() {
-    const confirmacion = confirm('¿Seguro que deseas cerrar sesión?');
+  const confirmacion = confirm('¿Seguro que deseas cerrar sesión?');
 
-    if (confirmacion) {
-      this.router.navigate(['/register']);
-    }
+  if (confirmacion) {
+    this.userService.logout();
+    this.isLoggedIn = false;
+    this.router.navigate(['/login']);
   }
+}
   carritoAbierto = false;
 
   toggleCarrito() {
@@ -56,6 +60,8 @@ export class Navbar {
   this.cartService.cart$.subscribe(data => {
     this.items = data;
   });
+
+  this.isLoggedIn = this.userService.isLoggedIn();
 }
   eliminar(index: number){
     this.cartService.removeItem(index);
@@ -77,4 +83,5 @@ export class Navbar {
   getCantidadTotal() {
   return this.items.reduce((acc, item) => acc + item.cantidad, 0);
 }
+
 }

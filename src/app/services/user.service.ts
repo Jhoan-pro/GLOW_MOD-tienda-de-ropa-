@@ -22,10 +22,39 @@ export class UserService {
   addUser(user: User) {
     if (isPlatformBrowser(this.platformid)) {
       const users = this.getUsers();
-      user.id = Date.now(); 
+      user.id = Date.now();
       users.push(user);
       localStorage.setItem(this.storageKey, JSON.stringify(users));
     }
     return [];
   }
+  private currentUserKey = 'current_user';
+
+// Guardar usuario logueado
+login(user: User) {
+  if (isPlatformBrowser(this.platformid)) {
+    localStorage.setItem(this.currentUserKey, JSON.stringify(user));
+  }
+}
+
+// Cerrar sesión
+logout() {
+  if (isPlatformBrowser(this.platformid)) {
+    localStorage.removeItem(this.currentUserKey);
+  }
+}
+
+// Obtener usuario actual
+getCurrentUser(): User | null {
+  if (isPlatformBrowser(this.platformid)) {
+    const user = localStorage.getItem(this.currentUserKey);
+    return user ? JSON.parse(user) : null;
+  }
+  return null;
+}
+
+// Saber si está logueado
+isLoggedIn(): boolean {
+  return this.getCurrentUser() !== null;
+}
 }

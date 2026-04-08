@@ -1,4 +1,4 @@
-<div class="invoice-container">
+<div *ngIf="invoice; else noData" class="invoice-container">
   <h1>Factura Electrónica - GLOW_MOD</h1>
 
   <div class="info">
@@ -6,6 +6,7 @@
     <p><strong>Fecha:</strong> {{ invoice.date | date:'medium' }}</p>
     <p><strong>Cliente:</strong> {{ invoice.customerName }}</p>
     <p><strong>Email:</strong> {{ invoice.customerEmail }}</p>
+    <p><strong>Método de pago:</strong> {{ getMetodoPago() }}</p>
   </div>
 
   <table>
@@ -34,3 +35,9 @@
 
   <button (click)="imprimirFactura()">🖨️ Imprimir / Descargar</button>
 </div>
+
+<ng-template #noData>
+  <p style="text-align:center; margin-top:50px;">
+    No hay factura disponible
+  </p>
+</ng-template>

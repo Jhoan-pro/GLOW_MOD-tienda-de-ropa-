@@ -51,7 +51,15 @@ export class Login {
       this.message = 'Credenciales incorrectas';
     }
 
-    
+    if (this.email === 'cli@gmail.com' && this.password === '123456') {
+      this.message = '';
+
+      // REDIRECCIÓN
+      this.router.navigate(['/home']);
+    } else {
+      this.message = 'Credenciales incorrectas';
+    }
+
    // validacion de usuarios 
     const users = this.UserService.getUsers();
 

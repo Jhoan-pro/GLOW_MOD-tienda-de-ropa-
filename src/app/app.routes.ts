@@ -36,7 +36,7 @@ export const routes: Routes = [
     path: 'dashboard',
     component: DashBoard,
     children: [
-      { path: 'cashier', component: Cashier },
+      
       { path: 'client', component: Client },
       
       
@@ -57,7 +57,7 @@ export const routes: Routes = [
   // Otros módulos
   { path: 'cart', component: Cart },
   { path: 'invoice', component: Invoice },
-
+  { path: 'cashier', component: Cashier },
   // Temporal (puedes eliminarlo después)
   { path: 'product/new', component: ProductForm },
 

@@ -1,20 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-interface InvoiceItem {
-  name: string;
-  quantity: number;
-  price: number;
-}
-
-interface InvoiceData {
-  invoiceNumber: string;
-  date: Date;
-  customerName: string;
-  customerEmail: string;
-  items: InvoiceItem[];
-}
-
 @Component({
   selector: 'app-invoice',
   standalone: true,
@@ -24,26 +10,34 @@ interface InvoiceData {
 })
 export class Invoice {
 
-  invoice: InvoiceData = {
-    invoiceNumber: 'INV-001',
-    date: new Date(),
-    customerName: 'Juan Pérez',
-    customerEmail: 'juan.perez@example.com',
-    items: [
-      { name: 'Camisa Glow', quantity: 2, price: 50000 },
-      { name: 'Pantalón Glow', quantity: 1, price: 80000 }
-    ]
-  };
+  invoice: any;
 
-  getSubtotal(item: InvoiceItem): number {
+  ngOnInit() {
+    const data = localStorage.getItem('lastInvoice');
+    if (data) {
+      this.invoice = JSON.parse(data);
+    }
+  }
+
+  getSubtotal(item: any): number {
     return item.quantity * item.price;
   }
 
   getTotal(): number {
-    return this.invoice.items.reduce(
-      (acc, item) => acc + this.getSubtotal(item),
+    return this.invoice?.items?.reduce(
+      (acc: number, item: any) => acc + this.getSubtotal(item),
       0
-    );
+    ) || 0;
+  }
+
+  getMetodoPago() {
+    switch (this.invoice?.paymentMethod) {
+      case 'card': return 'Tarjeta';
+      case 'transfer': return 'Transferencia';
+      case 'paypal': return 'PayPal';
+      case 'wallet': return 'Nequi / Daviplata';
+      default: return '';
+    }
   }
 
   imprimirFactura() {

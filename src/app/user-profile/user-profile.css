@@ -1,0 +1,87 @@
+.profile-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+}
+
+.profile-card {
+  background: #111827;
+  padding: 30px;
+  border-radius: 16px;
+  width: 400px;
+  color: white;
+  box-shadow: 0 0 20px rgba(0,0,0,0.5);
+}
+
+.profile-card h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+label {
+  font-size: 13px;
+  color: #9ca3af;
+  margin-top: 10px;
+  display: block;
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  border-radius: 8px;
+  border: none;
+  background: #1f2937;
+  color: white;
+}
+
+input:disabled {
+  opacity: 0.6;
+}
+
+.photo-section {
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.photo-section img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+}
+
+.actions {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+button {
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  background: #2563eb;
+  color: white;
+  transition: 0.3s;
+}
+
+button:hover {
+  background: #1d4ed8;
+}
+
+button.back {
+  background: #374151;
+}
+
+button.back:hover {
+  background: #4b5563;
+}
+
+.error {
+  color: #f87171;
+  font-size: 12px;
+}

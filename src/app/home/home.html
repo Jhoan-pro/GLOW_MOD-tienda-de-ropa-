@@ -1,13 +1,12 @@
 <app-navbar></app-navbar>
 
 <section class="hero">
-  <h1>
-    <span class="gradiente">Nueva Colección 2026</span>
-  </h1>
+  <h1><span class="gradiente">Nueva Colección 2026</span></h1>
   <p>Estilo moderno y minimalista</p>
   <button class="btn-explorar" (click)="irCatalogo()">Explorar</button>
-  
 </section>
 
-<!-- Aquí se muestra el catálogo -->
-<app-product-car [products]="products"></app-product-car>
+<!-- Sección del catálogo con ID para scroll -->
+<div id="catalogo">
+  <app-product-car [products]="products"></app-product-car>
+</div>   

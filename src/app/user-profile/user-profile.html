@@ -1,1 +1,64 @@
-<p>user-profile works!</p>
+<div class="profile-container">
+
+  <div class="profile-card">
+
+    <h2>Mi Perfil</h2>
+
+    <!-- FOTO -->
+    <div class="photo-section">
+      <img [src]="user.photo || 'img/default-user.png'" alt="foto">
+    </div>
+
+    <!-- EMAIL -->
+    <label>Email</label>
+    <input type="text" [value]="user.email" disabled>
+
+    <!-- NOMBRE -->
+    <label>Nombre completo</label>
+    <input [(ngModel)]="user.fullName" [disabled]="!editMode">
+    <span class="error" *ngIf="errors.fullName">{{ errors.fullName }}</span>
+
+    <!-- DIRECCION -->
+    <label>Dirección</label>
+    <input [(ngModel)]="user.address" [disabled]="!editMode">
+    <span class="error" *ngIf="errors.address">{{ errors.address }}</span>
+
+    <!-- FECHA -->
+    <label>Fecha de nacimiento</label>
+    <input type="date" [(ngModel)]="user.birthDate" [disabled]="!editMode">
+
+    <!-- IDENTIFICACION -->
+    <label>Identificación</label>
+    <input [(ngModel)]="user.idNumber" [disabled]="!editMode">
+
+    <!-- PAIS -->
+    <label>País / Región</label>
+    <input [(ngModel)]="user.country" [disabled]="!editMode">
+
+    <!-- BOTONES -->
+    <div class="actions">
+
+      <!-- SI NO TIENE INFO -->
+      <button *ngIf="!hasExtraInfo" (click)="enableEdit()">
+        Agregar info
+      </button>
+
+      <!-- SI YA TIENE INFO -->
+      <button *ngIf="hasExtraInfo && !editMode" (click)="enableEdit()">
+        Editar
+      </button>
+
+      <!-- GUARDAR -->
+      <button *ngIf="editMode" (click)="save()">
+        Guardar
+      </button>
+
+      <button class="back" (click)="volver()">
+        Volver
+      </button>
+
+    </div>
+
+  </div>
+
+</div>

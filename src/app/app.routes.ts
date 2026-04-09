@@ -9,7 +9,7 @@ import { Admin } from './admin/admin';
 import { Cashier } from './cashier/cashier';
 import { Client } from './client/client';
 import { UserProfile } from './user-profile/user-profile';
-import { Cart } from './cart/cart';
+
 import { Invoice } from './invoice/invoice';
 
 import { ProductForm } from './product-form/product-form';
@@ -20,7 +20,7 @@ import { DashBoard } from './dash-board/dash-board';
 import { AdminDashboard } from './admin-dashboard/admin-dashboard';
 import { Products } from './products/products';
 import { UserManagement } from './user-management/user-management';
-
+import { cartGuard } from './cart/cart';
 export const routes: Routes = [
 
   // Inicio
@@ -55,11 +55,16 @@ export const routes: Routes = [
   },
 
   // Otros módulos
-  { path: 'cart', component: Cart },
+  
   { path: 'invoice', component: Invoice },
   { path: 'cashier', component: Cashier },
   // Temporal (puedes eliminarlo después)
   { path: 'product/new', component: ProductForm },
+  { 
+  path: 'cashier', 
+  component: Cashier,
+  canActivate: [cartGuard]
+},
 
   // Redirección por defecto
   { path: '**', redirectTo: '' }

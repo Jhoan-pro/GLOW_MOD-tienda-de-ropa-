@@ -51,7 +51,7 @@
 
   <!-- LOGUEADO -->
   <ng-container *ngIf="isLoggedIn">
-    <a href="">Hola</a>
+    
     <a routerLink="/user">Administrar cuenta</a>
     <button class="logout-btn" (click)="logout()">Cerrar sesión</button>
   </ng-container>
@@ -112,7 +112,11 @@
 
     <div class="acciones">
       <button class="cancelar" (click)="cerrarCarrito()">Cerrar</button>
-      <button class="comprar" routerLink="/cashier">Comprar</button>
+      <button 
+  routerLink="/cashier"
+  [disabled]="items.length === 0">
+  Comprar
+</button>
     </div>
   </div>
 

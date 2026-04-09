@@ -27,6 +27,7 @@ export class Login {
   ) {}
 
   login() {
+
     // Validación: campos vacíos
     if (!this.email || !this.password) {
       this.errors.general = 'Todos los campos son obligatorios';
@@ -96,23 +97,24 @@ export class Login {
         this.errors.general = 'Credenciales incorrectas';
       }
 
-      // validacion de usuarios
-      const users = this.UserService.getUsers();
-      const userFound = users.find((u) => u.email === this.email && u.password === this.password);
+    // validacion de usuarios
+    const users = this.UserService.getUsers();
+    const userFound = users.find(u => u.email === this.email && u.password === this.password);
 
-      if (userFound) {
-        if (!userFound.active) {
-          this.errors.general = 'Tu cuenta ha sido deshabilitada. Contacta al admin.';
-          return;
-        }
-
-        // Redirección según rol
-        this.redirectByRole(userFound.role);
-      } else {
-        this.errors.general = 'Credenciales incorrectas';
+    if (userFound) {
+      if (!userFound.active) {
+        this.errors.general = 'Tu cuenta ha sido deshabilitada. Contacta al admin.';
+        return;
       }
+      
+      // Redirección según rol
+      this.UserService.login(userFound);
+      this.redirectByRole(userFound.role);
+    } else {
+      this.errors.general = 'Credenciales incorrectas';
     }
   }
+}
   private redirectByRole(role: string) {
     if (role === 'admin') this.router.navigate(['/admin-dashboard/admin']);
     else if (role === 'cashier') this.router.navigate(['/dashboard/cashier']);

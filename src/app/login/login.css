@@ -136,6 +136,7 @@
   margin-top: 1rem;
   font-size: 0.9rem;
   border: 1px solid #ef4444;
+  text-align: center;
 }
 
 .login-box input.ng-invalid.ng-touched {

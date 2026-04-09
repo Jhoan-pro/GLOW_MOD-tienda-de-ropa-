@@ -1,30 +1,24 @@
-
 <div class="login-container">
 
   <div class="login-box">
+
     <h2>Iniciar Sesión</h2>
 
-    <input 
-      type="email" 
-      placeholder="Correo electrónico"
-      [(ngModel)]="email"
-    >
+    <input type="email" placeholder="Correo electrónico" [(ngModel)]="email">
+    <span class="error-text" *ngIf="errors.email">{{ errors.email }}</span>
 
-    <input 
-      type="password" 
-      placeholder="Contraseña"
-      [(ngModel)]="password"
-    >
+    <input type="password" placeholder="Contraseña" [(ngModel)]="password">
+    <span class="error-text" *ngIf="errors.password">{{ errors.password }}</span>
 
-   <a routerLink="/forgot-password" class="forgot-link">
-  ¿Olvidaste tu contraseña?
-  </a>
+    <a routerLink="/forgot-password" class="forgot-link">
+      ¿Olvidaste tu contraseña?
+    </a>
 
     <button class="primary-btn" (click)="login()">
       Ingresar
     </button>
 
-    <p class="error-msg">{{ message }}</p>
+    <span class="error-msg" *ngIf="errors.general">{{ errors.general }}</span>
 
     <div class="divider">Continuar con:</div>
 

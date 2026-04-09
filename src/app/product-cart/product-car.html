@@ -18,4 +18,20 @@
 </button>
     
   </div>
+  <!-- MODAL LOGIN -->
+<div class="modal-overlay" *ngIf="showLoginAlert">
+
+  <div class="modal">
+
+    <h3>Debes iniciar sesión</h3>
+    <p>Para agregar productos al carrito primero debes iniciar sesión.</p>
+
+    <div class="modal-actions">
+      <button routerLink="/login">Ir a login</button>
+      <button (click)="showLoginAlert = false">Cancelar</button>
+    </div>
+
+  </div>
+
+</div>
 </section>

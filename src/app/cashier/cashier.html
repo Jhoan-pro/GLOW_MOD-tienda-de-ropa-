@@ -7,64 +7,71 @@
     <input [(ngModel)]="customerName" placeholder="Nombre completo">
     <input [(ngModel)]="customerEmail" placeholder="Correo electrónico">
   </div>
+
+  <!-- MÉTODO DE PAGO -->
   <div class="payment-method">
+    <h4>Método de pago</h4>
 
-  <h4>Método de pago</h4>
+    <select [(ngModel)]="paymentMethod" (change)="onPaymentChange()">
+      <option value="">Seleccionar</option>
+      <option value="card">💳 Tarjeta</option>
+      <option value="transfer">🏦 Transferencia</option>
+      <p>Seleccionado: {{paymentMethod}}</p>
+      <option value="paypal">🅿️ PayPal</option>
+      <option value="wallet">📱 Nequi / Daviplata</option>
+    </select>
+  </div>
+  
+  <!-- TARJETA -->
+  <div *ngIf="paymentMethod === 'card'" class="payment-form">
+    <input [(ngModel)]="cardName" placeholder="Nombre en la tarjeta">
+    <input [(ngModel)]="cardNumber" placeholder="Número de tarjeta" maxlength="16">
+    <input [(ngModel)]="expiry" placeholder="MM/AA">
+    <input [(ngModel)]="cvv" placeholder="CVV" maxlength="3">
+  </div>
 
-  <select [(ngModel)]="paymentMethod">
-    <option value="">Seleccionar</option>
-    <option value="card">💳 Tarjeta</option>
-    <option value="transfer">🏦 Transferencia</option>
-    <option value="paypal">🅿️ PayPal</option>
-    <option value="wallet">📱 Nequi / Daviplata</option>
-  </select>
+  <!-- TRANSFERENCIA -->
+  <div *ngIf="paymentMethod === 'transfer'" class="payment-form">
 
-</div>
+    <select [(ngModel)]="bank">
+      <option value="">Selecciona un banco</option>
+      <option *ngFor="let b of banks" [value]="b">{{ b }}</option>
+    </select>
 
-<!-- TARJETA -->
-<div *ngIf="paymentMethod === 'card'" class="payment-form">
-  <input [(ngModel)]="cardName" placeholder="Nombre en la tarjeta">
-  <input [(ngModel)]="cardNumber" placeholder="Número de tarjeta">
-  <input [(ngModel)]="expiry" placeholder="MM/AA">
-  <input [(ngModel)]="cvv" placeholder="CVV">
-</div>
+    <input [(ngModel)]="reference" placeholder="Referencia">
 
-<!-- TRANSFERENCIA -->
-<div *ngIf="paymentMethod === 'transfer'" class="payment-form">
-  <input [(ngModel)]="bank" placeholder="Banco">
-  <input [(ngModel)]="reference" placeholder="Referencia">
-</div>
+  </div>
 
-<!-- PAYPAL -->
-<div *ngIf="paymentMethod === 'paypal'" class="payment-form">
-  <p>Serás redirigido a PayPal</p>
-</div>
+  <!-- PAYPAL -->
+  <div *ngIf="paymentMethod === 'paypal'" class="payment-form">
+    <p>Serás redirigido a PayPal</p>
+  </div>
 
-<!-- WALLET -->
-<div *ngIf="paymentMethod === 'wallet'" class="payment-form">
-  <input [(ngModel)]="phone" placeholder="Número de celular">
-</div>
+  <!-- WALLET -->
+  <div *ngIf="paymentMethod === 'wallet'" class="payment-form">
+    <input [(ngModel)]="phone" placeholder="Número de celular" maxlength="10">
+  </div>
+
   <!-- RESUMEN -->
   <div class="resumen">
-
     <div class="item" *ngFor="let item of items">
       <span>{{ item.product.name }} x {{ item.cantidad }}</span>
       <span>${{ item.product.price * item.cantidad }}</span>
     </div>
 
     <h3>Total: ${{ getTotal() }}</h3>
-
   </div>
 
   <!-- BOTONES -->
   <div class="acciones">
     <button class="cancelar" routerLink="/">Cancelar</button>
+
     <button 
-  class="pagar" 
-  (click)="pagar()" 
-  [disabled]="!customerName || !customerEmail || !paymentMethod || items.length === 0">
-  Pagar
-</button>
+      class="pagar" 
+      (click)="pagar()" 
+      [disabled]="!customerName || !customerEmail || !paymentMethod || items.length === 0">
+      Pagar
+    </button>
   </div>
 
 </div>

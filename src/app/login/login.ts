@@ -34,6 +34,7 @@ export class Login {
       return;
     }
 
+
     this.errors = { email: '', password: '', general: '' };
     // Validación: campos vacíos
     if (!this.email) {
@@ -68,6 +69,7 @@ export class Login {
     } else {
       this.errors.general = 'Credenciales incorrectas';
     }
+
 
     // validacion de usuarios
     const users = this.UserService.getUsers();

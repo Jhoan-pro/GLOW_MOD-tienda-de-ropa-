@@ -61,6 +61,10 @@ export class Navbar {
     this.items = data;
   });
 
+  this.checkLogin();
+}
+
+checkLogin() {
   this.isLoggedIn = this.userService.isLoggedIn();
 }
   eliminar(index: number){
@@ -82,6 +86,9 @@ export class Navbar {
   }
   getCantidadTotal() {
   return this.items.reduce((acc, item) => acc + item.cantidad, 0);
+}
+ngDoCheck() {
+  this.checkLogin();
 }
 
 }

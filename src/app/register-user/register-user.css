@@ -37,6 +37,7 @@
     background-color: #334155;
     color: white;
     outline: none;
+    margin-top: 10px;
 }
 
 .register-box input::placeholder {
@@ -52,18 +53,13 @@
     color: white;
     font-weight: bold;
     cursor: pointer;
-    margin-top: 0.5rem;
+    margin-top: 1.5rem;
 }
 
 .primary-btn:hover {
     opacity: 0.9;
 }
 
-.error-msg {
-    margin-top: 1rem;
-    font-size: 0.85rem;
-    color: #ef4444;
-}
 
 .login-link {
     display: block;
@@ -71,4 +67,23 @@
     font-size: 0.85rem;
     color: #06b6d4;
     text-decoration: none;
+}
+.error-text {
+color: #ef4444;
+    font-size: 0.72rem;
+    text-align: left;
+    margin-bottom: 5px;
+    margin-left: 5px;
+    display: block;
+}
+
+.error-msg {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+  padding: 0.8rem;
+  border-radius: 6px;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  border: 1px solid #ef4444;
+  display: block;
 }

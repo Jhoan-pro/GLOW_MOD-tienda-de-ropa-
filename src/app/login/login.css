@@ -1,119 +1,143 @@
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
 }
 
-.login-container{
-    min-height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    background:linear-gradient(135deg,#0f172a,#1e293b);
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #0f172a, #1e293b);
 }
 
-.login-box{
-    background:rgba(30,41,59,0.8);
-    backdrop-filter:blur(20px);
-    padding:40px;
-    border-radius:20px;
-    width:380px;
-    display:flex;
-    flex-direction:column;
-    gap:15px;
-    box-shadow:0 20px 60px rgba(0,0,0,0.6);
+.login-box {
+  background: rgba(30, 41, 59, 0.8);
+  backdrop-filter: blur(20px);
+  padding: 40px;
+  border-radius: 20px;
+  width: 380px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
 }
 
-.login-box input{
-    padding:12px;
-    border:none;
-    border-radius:10px;
-    background:#0f172a;
-    color:white;
+.login-box input {
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  background: #0f172a;
+  color: white;
 }
-.login-box h2{
-    color: white;
+.login-box h2 {
+  color: white;
 }
 .primary-btn {
-    background:linear-gradient(45deg,#8b5cf6,#06b6d4);
-    border:none;
-    padding:12px 28px;
-    border-radius:30px;
-    color:white;
-    font-weight:600;
-    cursor:pointer;
-    transition:.3s;
+  background: linear-gradient(45deg, #8b5cf6, #06b6d4);
+  border: none;
+  padding: 12px 28px;
+  border-radius: 30px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
 }
 
-.divider{
-    color: white;
-    font-size: 20px;
-    text-align: center;
-    margin-top: -30px;
+.divider {
+  color: #94a3b8; 
+  font-size: 20px; 
+  text-align: center;
+  margin: 20px 0; 
+  position: relative;
+  display: flex;
+  align-items: center;
 }
 
-.social-login{
-    display:flex;
-    justify-content: center;
-    gap:15px;
-    margin-top:10px;
-    
+.divider::before, .divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: rgba(255,255,255,0.1);
+    margin: 0 10px;
 }
 
-.social-login button{
-    display: flex;
-    border-radius: 20px;
-    cursor: pointer;
-    transition: 0.3s;
-    font-size: 20px;
-    align-items: center;
-    
+.social-login {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 10px;
 }
 
-.social-login img{
-     width: 20px;           
-     height: 20px;
-              
+.social-login button {
+  display: flex;
+  border-radius: 20px;
+  padding: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+  font-size: 20px;
+  align-items: center;
+}
+
+.social-login img {
+  width: 20px;
+  height: 20px;
 }
 .google-btn {
-    background: #ffffff;
-    color: #000000;
+  background: #ffffff;
+  color: #000000;
 }
 
 .google-btn:hover {
-    background: #f0f0f0;
+  background: #f0f0f0;
 }
 
 .apple-btn {
-    background: #000000;
-    color: #ffffff;
-    border: 1px solid #ffffff;
+  background: #000000;
+  color: #ffffff;
+  border: 1px solid #ffffff;
 }
 
 .apple-btn:hover {
-    background: #111111;
+  background: #111111;
 }
 
 .facebook-btn {
-    background: #3f64c9;
-    color: #ffffff;
+  background: #3f64c9;
+  color: #ffffff;
 }
 
 .facebook-btn:hover {
-    background: #3659a8;
+  background: #3659a8;
 }
 
 .forgot-link {
-    font-size: 13px;
-    color: #06b6d4;
-    cursor: pointer;
-    text-align: right;
+  font-size: 13px;
+  color: #06b6d4;
+  cursor: pointer;
+  text-align: right;
 }
 
-.error-msg{
-    font-size: 13px;
-    color: #ff0000;
-    text-align: left;
-    padding: auto;
+.error-text {
+  color: #ef4444;
+  font-size: 0.75rem;
+  margin-top: 0.3rem;
+  margin-left: 0.5rem;
+  font-weight: 500;
+}
+
+.error-msg {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+  padding: 0.8rem;
+  border-radius: 6px;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  border: 1px solid #ef4444;
+}
+
+.login-box input.ng-invalid.ng-touched {
+  border-color: #ef4444;
 }

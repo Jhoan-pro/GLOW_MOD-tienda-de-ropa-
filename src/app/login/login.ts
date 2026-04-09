@@ -14,6 +14,7 @@ import { CommonModule } from '@angular/common';
 export class Login {
   email: string = '';
   password: string = '';
+  
   errors: any = {
     email: '',
     password: '',

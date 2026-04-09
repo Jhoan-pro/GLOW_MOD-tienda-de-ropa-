@@ -3,11 +3,12 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { UserService } from '../services/user.service';
 import { User } from '../models/user.model';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-register-user',
   standalone: true,
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink, CommonModule],
   templateUrl: './register-user.html',
   styleUrl: './register-user.css',
 })
@@ -16,7 +17,14 @@ export class RegisterUser {
   email: string = '';
   password: string = '';
   confirmPassword: string = '';
-  message: string = '';
+ 
+
+  errors: any = {
+    email: '',
+    password: '',
+    confirmPassword: '',
+    general: '',
+  };
 
   constructor(
     private router: Router,
@@ -24,9 +32,11 @@ export class RegisterUser {
   ) {}
 
   register() {
+
+    this.errors = { email: '', password: '',confirmPassword: '', general: '' };
     // Campos vacíos
     if (!this.name || !this.email || !this.password || !this.confirmPassword) {
-      this.message = 'Todos los campos son obligatorios';
+      this.errors.general = 'Todos los campos son obligatorios';
       return;
     }
 
@@ -34,19 +44,19 @@ export class RegisterUser {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (!emailRegex.test(this.email)) {
-      this.message = 'Correo inválido';
+      this.errors.email = 'Correo inválido. ej: ejemplo@gmail.com';
       return;
     }
 
     // Validar contraseña
     if (this.password.length < 6) {
-      this.message = 'La contraseña debe tener mínimo 6 caracteres';
+      this.errors.password = 'La contraseña debe tener mínimo 6 caracteres';
       return;
     }
 
     // Confirmar contraseña
     if (this.password !== this.confirmPassword) {
-      this.message = 'Las contraseñas no coinciden';
+      this.errors.confirmPassword = 'Las contraseñas no coinciden';
       return;
     }
 
@@ -54,15 +64,13 @@ export class RegisterUser {
       name: this.name,
       email: this.email,
       password: this.password,
-      role: 'client', 
+      role: 'client',
       active: true,
     };
 
-    this.userService.addUser(newUser); 
-    this.message = 'Registro exitoso';
+    this.userService.addUser(newUser);
+    this.errors.general = 'Registro exitoso';
 
-    // Simulación de registro
-    this.message = 'Registro exitoso';
 
     // Redirigir al login
     setTimeout(() => {

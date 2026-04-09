@@ -54,7 +54,8 @@ export class RegisterUser {
       name: this.name,
       email: this.email,
       password: this.password,
-      role: 'client', // Por defecto
+      role: 'client', 
+      active: true,
     };
 
     this.userService.addUser(newUser); 

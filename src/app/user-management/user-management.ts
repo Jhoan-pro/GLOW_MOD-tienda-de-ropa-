@@ -14,6 +14,14 @@ import { FormsModule } from '@angular/forms';
 export class UserManagement implements OnInit {
   
   users: User[] = [];
+  editingUser: User | null = null;
+  showEditModal: boolean = false
+
+  roleLabels: any = {
+  'admin': 'Administrador',
+  'cashier': 'Cajero',
+  'client': 'Cliente'
+};
 
   constructor(private userService: UserService) {}
 
@@ -25,20 +33,35 @@ export class UserManagement implements OnInit {
     this.users = this.userService.getUsers();
   }
 
-  deleteUser(index: number) {
-    const confirmacion = confirm('¿Estás seguro de eliminar este usuario?');
-    
-    if (confirmacion) {
+  toggleStatus(index: number) {
+    const allUsers = this.userService.getUsers();
+
+    allUsers[index].active = !allUsers[index].active;
+    this.saveAndRefresh(allUsers);
+  }
+
+  openEdit(user: User) {
+    this.editingUser = { ...user }; 
+    this.showEditModal = true;
+  }
+
+  saveEdit() {
+    if (this.editingUser) {
       const allUsers = this.userService.getUsers();
-      allUsers.splice(index, 1);
-      
-      // Actualizamos el localStorage 
-      localStorage.setItem('app_users', JSON.stringify(allUsers));
-      
-      // Refrescamos la vista
-      this.loadUsers();
+      const index = allUsers.findIndex(u => u.id === this.editingUser?.id);
+      if (index !== -1) {
+        allUsers[index] = this.editingUser;
+        this.saveAndRefresh(allUsers);
+        this.showEditModal = false;
+      }
     }
   }
+
+  private saveAndRefresh(updatedUsers: User[]) {
+    localStorage.setItem('app_users', JSON.stringify(updatedUsers));
+    this.loadUsers();
+  }
+
 
  
   changeRole(index: number, newRole: string) {

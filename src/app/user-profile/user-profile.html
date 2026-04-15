@@ -14,9 +14,8 @@
     <input type="text" [value]="user.email" disabled>
 
     <!-- Nombre -->
-    <label>Nombre completo</label>
-    <input [(ngModel)]="user.fullName" [disabled]="!editMode">
-    <span class="error" *ngIf="errors.fullName">{{ errors.fullName }}</span>
+    <label>Nombre</label>
+    <input type="text" [value]="user.name" disabled>
 
     <!-- Direccion -->
     <label>Dirección</label>

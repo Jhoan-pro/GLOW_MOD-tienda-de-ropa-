@@ -80,7 +80,7 @@ export class Cashier {
 
     if (user) {
       this.customerEmail = user.email;
-      this.customerName = user.fullName || '';
+      this.customerName = user.name;
     }
   }
 

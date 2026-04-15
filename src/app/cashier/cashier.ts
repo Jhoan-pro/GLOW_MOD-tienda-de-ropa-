@@ -5,108 +5,131 @@ import { Router } from '@angular/router';
 import { NgForOf, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UserService } from '../services/user.service';
-import { ChangeDetectorRef } from '@angular/core';
+
 import { OrderHistoryService } from '../services/order-history.service';
 
 @Component({
   selector: 'app-cashier',
   standalone: true,
-  imports: [CommonModule,FormsModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './cashier.html',
-  styleUrls: ['./cashier.css']
+  styleUrls: ['./cashier.css'],
 })
 export class Cashier {
-
   items: any[] = [];
 
   customerName = '';
   customerEmail = '';
-  paymentMethod='';
+  paymentMethod = '';
+  alertMessage = '';
+  alertType: 'success' | 'error' = 'success';
+  showAlert = false;
   // tarjeta
-cardName = '';
-cardNumber = '';
-expiry = '';
-cvv = '';
+  cardName = '';
+  cardNumber = '';
+  expiry = '';
+  cvv = '';
 
-// transferencia
-bank = '';
-banks: string[] = [
-  'Bancolombia',
-  'Davivienda',
-  'Banco de Bogotá',
-  'BBVA',
-  'Banco Popular',
-  'Scotiabank Colpatria',
-  'Banco Caja Social',
-  'Banco Agrario',
-  'Itaú',
-  'Banco Falabella'
-];
-reference = '';
+  // transferencia
+  bank = '';
+  banks: string[] = [
+    'Bancolombia',
+    'Davivienda',
+    'Banco de Bogotá',
+    'BBVA',
+    'Banco Popular',
+    'Scotiabank Colpatria',
+    'Banco Caja Social',
+    'Banco Agrario',
+    'Itaú',
+    'Banco Falabella',
+  ];
+  reference = '';
 
-// wallet
-phone = '';
-  constructor(private cartService: CartService,private router: Router, private userService: UserService, private cdr: ChangeDetectorRef, private orderHistory: OrderHistoryService) {}
+  // wallet
+  phone = '';
+  onPaymentChange() {
+  // Limpiar todos los campos al cambiar método
+
+  // tarjeta
+  this.cardName = '';
+  this.cardNumber = '';
+  this.expiry = '';
+  this.cvv = '';
+
+  // transferencia
+  this.bank = '';
+  this.reference = '';
+
+  // wallet
+  this.phone = '';
+}
+  constructor(
+    private cartService: CartService,
+    private router: Router,
+    private userService: UserService,
+    private orderHistory: OrderHistoryService,
+  ) {}
 
   ngOnInit() {
-  this.cartService.cart$.subscribe(data => {
-    this.items = data;
-  });
+    this.cartService.cart$.subscribe((data) => {
+      this.items = data;
+    });
 
-  const user = this.userService.getCurrentUser();
+    const user = this.userService.getCurrentUser();
 
-  if (user) {
-    this.customerEmail = user.email;
-    this.customerName = user.fullName || '';
+    if (user) {
+      this.customerEmail = user.email;
+      this.customerName = user.fullName || '';
+    }
   }
-}
 
   getTotal() {
     return this.cartService.getTotal();
   }
 
- pagar() {
+  pagar() {
 
   if (this.items.length === 0) {
-    alert("El carrito está vacío");
+    this.mostrarAlerta('El carrito está vacío', 'error');
     return;
   }
 
   if (!this.customerName.trim()) {
-    alert("Nombre requerido");
+    this.mostrarAlerta('Nombre requerido', 'error');
     return;
   }
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(this.customerEmail)) {
-    alert("Correo inválido");
+    this.mostrarAlerta('Correo inválido', 'error');
     return;
   }
 
   if (!this.paymentMethod) {
-    alert("Selecciona método de pago");
+    this.mostrarAlerta('Selecciona método de pago', 'error');
     return;
   }
 
   if (this.paymentMethod === 'card') {
 
     if (!/^\d{16}$/.test(this.cardNumber)) {
-      alert("La tarjeta debe tener 16 dígitos");
+      this.mostrarAlerta('La tarjeta debe tener 16 dígitos', 'error');
       return;
     }
 
     if (!this.cardName.trim()) {
-      alert("Nombre en tarjeta requerido");
+      this.mostrarAlerta('Nombre en tarjeta requerido', 'error');
       return;
     }
 
     if (!/^\d{2}\/\d{2}$/.test(this.expiry)) {
-      alert("Formato de fecha inválido (MM/AA)");
+      this.mostrarAlerta('Formato de fecha inválido (MM/AA)', 'error');
       return;
     }
 
     if (!/^\d{3}$/.test(this.cvv)) {
-      alert("CVV inválido (3 dígitos)");
+      this.mostrarAlerta('CVV inválido (3 dígitos)', 'error');
       return;
     }
   }
@@ -114,12 +137,12 @@ phone = '';
   if (this.paymentMethod === 'transfer') {
 
     if (!this.bank) {
-      alert("Selecciona un banco");
+      this.mostrarAlerta('Selecciona un banco', 'error');
       return;
     }
 
     if (!this.reference.trim()) {
-      alert("Referencia requerida");
+      this.mostrarAlerta('Referencia requerida', 'error');
       return;
     }
   }
@@ -127,21 +150,19 @@ phone = '';
   if (this.paymentMethod === 'wallet') {
 
     if (!/^\d{10}$/.test(this.phone)) {
-      alert("El número debe tener exactamente 10 dígitos");
+      this.mostrarAlerta('El número debe tener 10 dígitos', 'error');
       return;
     }
   }
 
-  // Obtener usuario
   const user = this.userService.getCurrentUser();
 
-  // Crear factura
   const invoice = {
     invoiceNumber: 'INV-' + Date.now(),
     date: new Date(),
     customerName: this.customerName,
     customerEmail: this.customerEmail,
-    userId: user?.email, 
+    userId: user?.email,
     paymentMethod: this.paymentMethod,
     items: this.items.map(item => ({
       name: item.product.name,
@@ -151,19 +172,27 @@ phone = '';
     total: this.getTotal()
   };
 
-  // Guardar
   localStorage.setItem('lastInvoice', JSON.stringify(invoice));
   this.orderHistory.addOrder(invoice);
-
   this.cartService.clearCart();
 
-  alert("Pago realizado con éxito");
+  this.mostrarAlerta('Pago realizado con éxito', 'success');
 
-  this.router.navigate(['/invoice']);
+  setTimeout(() => {
+    this.router.navigate(['/invoice']);
+  }, 1500);
 }
-  onPaymentChange() {
-  console.log("Método:", this.paymentMethod);
-  this.cdr.detectChanges();
-}
+mostrarAlerta(msg: string, tipo: 'success' | 'error') {
+  this.showAlert = false; // reset
 
+  setTimeout(() => {
+    this.alertMessage = msg;
+    this.alertType = tipo;
+    this.showAlert = true;
+  }, 50);
+
+  setTimeout(() => {
+    this.showAlert = false;
+  }, 3000);
+}
 }

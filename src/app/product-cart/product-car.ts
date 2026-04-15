@@ -3,10 +3,11 @@ import { CommonModule } from '@angular/common';
 import { Product } from '../models/product.model';
 import { CartService } from '../services/cart.service';
 import { UserService } from '../services/user.service';
+import { RouterLink } from '@angular/router';
 @Component({
   selector: 'app-product-car',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule,RouterLink],
   templateUrl: './product-car.html',
   styleUrls: ['./product-car.css']
 })

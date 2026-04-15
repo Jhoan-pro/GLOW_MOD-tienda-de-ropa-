@@ -23,22 +23,29 @@ export class Navbar {
 
   }
   toggleFiltros() {
-    this.mostrarFiltros = !this.mostrarFiltros;
+  this.mostrarFiltros = !this.mostrarFiltros;
+
+  if (this.mostrarFiltros) {
+    this.menuUsuarioAbierto = false;
+    this.carritoAbierto = false;
   }
+}
 
   toggleMenuUsuario() {
-    this.menuUsuarioAbierto = !this.menuUsuarioAbierto;
+  this.menuUsuarioAbierto = !this.menuUsuarioAbierto;
+
+  if (this.menuUsuarioAbierto) {
+    this.mostrarFiltros = false;
+    this.carritoAbierto = false;
   }
+}
 
   logout() {
-  const confirmacion = confirm('¿Seguro que deseas cerrar sesión?');
+  const confirmacion = window.confirm('Cerrar sesión?');
 
   if (confirmacion) {
     this.userService.logout();
-
-    // CAMBIAR CARRITO AL DE "guest"
     this.cartService.loadCart();
-
     this.isLoggedIn = false;
     this.router.navigate(['/login']);
   }
@@ -47,6 +54,11 @@ export class Navbar {
 
   toggleCarrito() {
   this.carritoAbierto = !this.carritoAbierto;
+
+  if (this.carritoAbierto) {
+    this.mostrarFiltros = false;
+    this.menuUsuarioAbierto = false;
+  }
 }
   cerrarCarrito(){
     this.carritoAbierto=false;

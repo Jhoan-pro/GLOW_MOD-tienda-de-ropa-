@@ -14,16 +14,12 @@ import { Product } from '../models/product.model';
 
 export class ProductForm {
   categories: string[] = [
-    'Camisetas (T-shirts)',
-    'Camisas y Polos',
-    'Tops y Tirantes',
-    'Jeans y Vaqueros',
-    'Pantalones Chinos y de Vestir',
-    'Shorts y Bermudas',
-    'Sudaderas y Jerseys',
-    'Chaquetas y Abrigos',
-    'Calzado y Zapatillas',
-    'Complementos y Cinturones',
+    'Camisetas',
+    'Pantalones',
+    'Zapatos',
+    'Chaquetas',
+    'Suaderas',
+    'Camisetas',
 
   ];
 

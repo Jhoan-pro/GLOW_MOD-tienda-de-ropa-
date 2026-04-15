@@ -25,7 +25,7 @@ import { AdminOrders } from './admin-orders/admin-orders';
 export const routes: Routes = [
 
   // Inicio
-  { path: 'home', component: Home },
+  { path: 'Home', component: Home },
 
   // Autenticación
   { path: 'login', component: Login },
@@ -71,5 +71,5 @@ export const routes: Routes = [
   canActivate: [cartGuard]
 },
 
- 
+ { path: '**', redirectTo: 'Home' }
 ];

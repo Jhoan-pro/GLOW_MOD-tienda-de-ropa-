@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { NgForOf, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UserService } from '../services/user.service';
-import { ChangeDetectorRef } from '@angular/core';
+
 import { OrderHistoryService } from '../services/order-history.service';
 
 @Component({
@@ -21,6 +21,9 @@ export class Cashier {
   customerName = '';
   customerEmail = '';
   paymentMethod = '';
+  alertMessage = '';
+  alertType: 'success' | 'error' = 'success';
+  showAlert = false;
   // tarjeta
   cardName = '';
   cardNumber = '';
@@ -45,11 +48,26 @@ export class Cashier {
 
   // wallet
   phone = '';
+  onPaymentChange() {
+  // Limpiar todos los campos al cambiar método
+
+  // tarjeta
+  this.cardName = '';
+  this.cardNumber = '';
+  this.expiry = '';
+  this.cvv = '';
+
+  // transferencia
+  this.bank = '';
+  this.reference = '';
+
+  // wallet
+  this.phone = '';
+}
   constructor(
     private cartService: CartService,
     private router: Router,
     private userService: UserService,
-    private cdr: ChangeDetectorRef,
     private orderHistory: OrderHistoryService,
   ) {}
 
@@ -62,7 +80,7 @@ export class Cashier {
 
     if (user) {
       this.customerEmail = user.email;
-      this.customerName = user.fullName || '';
+      this.customerName = user.name;
     }
   }
 
@@ -71,101 +89,110 @@ export class Cashier {
   }
 
   pagar() {
-    if (this.items.length === 0) {
-      alert('El carrito está vacío');
+
+  if (this.items.length === 0) {
+    this.mostrarAlerta('El carrito está vacío', 'error');
+    return;
+  }
+
+  if (!this.customerName.trim()) {
+    this.mostrarAlerta('Nombre requerido', 'error');
+    return;
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(this.customerEmail)) {
+    this.mostrarAlerta('Correo inválido', 'error');
+    return;
+  }
+
+  if (!this.paymentMethod) {
+    this.mostrarAlerta('Selecciona método de pago', 'error');
+    return;
+  }
+
+  if (this.paymentMethod === 'card') {
+
+    if (!/^\d{16}$/.test(this.cardNumber)) {
+      this.mostrarAlerta('La tarjeta debe tener 16 dígitos', 'error');
       return;
     }
 
-    if (!this.customerName.trim()) {
-      alert('Nombre requerido');
+    if (!this.cardName.trim()) {
+      this.mostrarAlerta('Nombre en tarjeta requerido', 'error');
       return;
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(this.customerEmail)) {
-      alert('Correo inválido');
+    if (!/^\d{2}\/\d{2}$/.test(this.expiry)) {
+      this.mostrarAlerta('Formato de fecha inválido (MM/AA)', 'error');
       return;
     }
 
-    if (!this.paymentMethod) {
-      alert('Selecciona método de pago');
+    if (!/^\d{3}$/.test(this.cvv)) {
+      this.mostrarAlerta('CVV inválido (3 dígitos)', 'error');
+      return;
+    }
+  }
+
+  if (this.paymentMethod === 'transfer') {
+
+    if (!this.bank) {
+      this.mostrarAlerta('Selecciona un banco', 'error');
       return;
     }
 
-    if (this.paymentMethod === 'card') {
-      if (!/^\d{16}$/.test(this.cardNumber)) {
-        alert('La tarjeta debe tener 16 dígitos');
-        return;
-      }
-
-      if (!this.cardName.trim()) {
-        alert('Nombre en tarjeta requerido');
-        return;
-      }
-
-      if (!/^\d{2}\/\d{2}$/.test(this.expiry)) {
-        alert('Formato de fecha inválido (MM/AA)');
-        return;
-      }
-
-      if (!/^\d{3}$/.test(this.cvv)) {
-        alert('CVV inválido (3 dígitos)');
-        return;
-      }
+    if (!this.reference.trim()) {
+      this.mostrarAlerta('Referencia requerida', 'error');
+      return;
     }
+  }
 
-    if (this.paymentMethod === 'transfer') {
-      if (!this.bank) {
-        alert('Selecciona un banco');
-        return;
-      }
+  if (this.paymentMethod === 'wallet') {
 
-      if (!this.reference.trim()) {
-        alert('Referencia requerida');
-        return;
-      }
+    if (!/^\d{10}$/.test(this.phone)) {
+      this.mostrarAlerta('El número debe tener 10 dígitos', 'error');
+      return;
     }
+  }
 
-    if (this.paymentMethod === 'wallet') {
-      if (!/^\d{10}$/.test(this.phone)) {
-        alert('El número debe tener exactamente 10 dígitos');
-        return;
-      }
-    }
+  const user = this.userService.getCurrentUser();
 
-    // Obtener usuario
-    const user = this.userService.getCurrentUser();
+  const invoice = {
+    invoiceNumber: 'INV-' + Date.now(),
+    date: new Date(),
+    customerName: this.customerName,
+    customerEmail: this.customerEmail,
+    userId: user?.email,
+    paymentMethod: this.paymentMethod,
+    items: this.items.map(item => ({
+      name: item.product.name,
+      quantity: item.cantidad,
+      price: item.product.price
+    })),
+    total: this.getTotal()
+  };
 
-    // Crear factura
-    const invoice = {
-      invoiceNumber: 'INV-' + Date.now(),
-      date: new Date(),
-      customerName: this.customerName,
-      customerEmail: this.customerEmail,
-      userId: user?.email,
-      paymentMethod: this.paymentMethod,
-      items: this.items.map((item) => ({
-        name: item.product.name,
-        quantity: item.cantidad,
-        price: item.product.price,
-      })),
-      total: this.getTotal(),
-    };
+  localStorage.setItem('lastInvoice', JSON.stringify(invoice));
+  this.orderHistory.addOrder(invoice);
+  this.cartService.clearCart();
 
+  this.mostrarAlerta('Pago realizado con éxito', 'success');
 
-    // Guardar
-    localStorage.setItem('lastInvoice', JSON.stringify(invoice));
-    this.orderHistory.addOrder(invoice);
-
-
-    this.cartService.clearCart();
-
-    alert('Pago realizado con éxito');
-
+  setTimeout(() => {
     this.router.navigate(['/invoice']);
-  }
-  onPaymentChange() {
-    console.log('Método:', this.paymentMethod);
-    this.cdr.detectChanges();
-  }
+  }, 1500);
+}
+mostrarAlerta(msg: string, tipo: 'success' | 'error') {
+  this.showAlert = false; // reset
+
+  setTimeout(() => {
+    this.alertMessage = msg;
+    this.alertType = tipo;
+    this.showAlert = true;
+  }, 50);
+
+  setTimeout(() => {
+    this.showAlert = false;
+  }, 3000);
+}
 }

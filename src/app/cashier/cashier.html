@@ -1,11 +1,12 @@
 <div class="cashier-container">
-
   <h2>Finalizar compra</h2>
-
+  <div *ngIf="showAlert" class="custom-alert" [ngClass]="alertType">
+  {{ alertMessage }}
+</div>
   <!-- DATOS CLIENTE -->
   <div class="form">
-    <input [(ngModel)]="customerName" placeholder="Nombre completo">
-    <input [(ngModel)]="customerEmail" placeholder="Correo electrónico">
+    <input [(ngModel)]="customerName" placeholder="Nombre completo" />
+    <input [(ngModel)]="customerEmail" placeholder="Correo electrónico" />
   </div>
 
   <!-- MÉTODO DE PAGO -->
@@ -16,62 +17,61 @@
       <option value="">Seleccionar</option>
       <option value="card">💳 Tarjeta</option>
       <option value="transfer">🏦 Transferencia</option>
-      <p>Seleccionado: {{paymentMethod}}</p>
       <option value="paypal">🅿️ PayPal</option>
       <option value="wallet">📱 Nequi / Daviplata</option>
     </select>
-  </div>
-  
-  <!-- TARJETA -->
-  <div *ngIf="paymentMethod === 'card'" class="payment-form">
-    <input [(ngModel)]="cardName" placeholder="Nombre en la tarjeta">
-    <input [(ngModel)]="cardNumber" placeholder="Número de tarjeta" maxlength="16">
-    <input [(ngModel)]="expiry" placeholder="MM/AA">
-    <input [(ngModel)]="cvv" placeholder="CVV" maxlength="3">
-  </div>
 
-  <!-- TRANSFERENCIA -->
-  <div *ngIf="paymentMethod === 'transfer'" class="payment-form">
+    <p class="metodo-seleccionado" *ngIf="paymentMethod">Método: {{ paymentMethod }}</p>
 
-    <select [(ngModel)]="bank">
-      <option value="">Selecciona un banco</option>
-      <option *ngFor="let b of banks" [value]="b">{{ b }}</option>
-    </select>
-
-    <input [(ngModel)]="reference" placeholder="Referencia">
-
-  </div>
-
-  <!-- PAYPAL -->
-  <div *ngIf="paymentMethod === 'paypal'" class="payment-form">
-    <p>Serás redirigido a PayPal</p>
-  </div>
-
-  <!-- WALLET -->
-  <div *ngIf="paymentMethod === 'wallet'" class="payment-form">
-    <input [(ngModel)]="phone" placeholder="Número de celular" maxlength="10">
-  </div>
-
-  <!-- RESUMEN -->
-  <div class="resumen">
-    <div class="item" *ngFor="let item of items">
-      <span>{{ item.product.name }} x {{ item.cantidad }}</span>
-      <span>${{ item.product.price * item.cantidad }}</span>
+    <!-- TARJETA -->
+    <div *ngIf="paymentMethod === 'card'" class="payment-form">
+      <input [(ngModel)]="cardName" placeholder="Nombre en la tarjeta" />
+      <input [(ngModel)]="cardNumber" placeholder="Número de tarjeta" maxlength="16" />
+      <input [(ngModel)]="expiry" placeholder="MM/AA" />
+      <input [(ngModel)]="cvv" placeholder="CVV" maxlength="3" />
     </div>
 
-    <h3>Total: ${{ getTotal() }}</h3>
+    <!-- TRANSFERENCIA -->
+    <div *ngIf="paymentMethod === 'transfer'" class="payment-form">
+      <select [(ngModel)]="bank">
+        <option value="">Selecciona un banco</option>
+        <option *ngFor="let b of banks" [value]="b">{{ b }}</option>
+      </select>
+
+      <input [(ngModel)]="reference" placeholder="Referencia" />
+    </div>
+
+    <!-- PAYPAL -->
+    <div *ngIf="paymentMethod === 'paypal'" class="payment-form">
+      <p>Serás redirigido a PayPal</p>
+    </div>
+
+    <!-- WALLET -->
+    <div *ngIf="paymentMethod === 'wallet'" class="payment-form">
+      <input [(ngModel)]="phone" placeholder="Número de celular" maxlength="10" />
+    </div>
+
+    <!-- RESUMEN -->
+    <div class="resumen">
+      <div class="item" *ngFor="let item of items">
+        <span>{{ item.product.name }} x {{ item.cantidad }}</span>
+        <span>${{ item.product.price * item.cantidad }}</span>
+      </div>
+
+      <h3>Total: ${{ getTotal() }}</h3>
+    </div>
+
+    <!-- BOTONES -->
+    <div class="acciones">
+      <button class="cancelar" routerLink="/">Cancelar</button>
+
+      <button
+  class="pagar"
+  (click)="pagar()"
+  [disabled]="!customerName || !customerEmail || !paymentMethod || items.length === 0"
+>
+  {{ showAlert && alertType === 'success' ? 'Procesando...' : 'Pagar' }}
+</button>
+    </div>
   </div>
-
-  <!-- BOTONES -->
-  <div class="acciones">
-    <button class="cancelar" routerLink="/">Cancelar</button>
-
-    <button 
-      class="pagar" 
-      (click)="pagar()" 
-      [disabled]="!customerName || !customerEmail || !paymentMethod || items.length === 0">
-      Pagar
-    </button>
-  </div>
-
 </div>

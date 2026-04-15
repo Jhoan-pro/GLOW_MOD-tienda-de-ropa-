@@ -7,7 +7,9 @@
     <div class="cart-icon" (click)="toggleCarrito()">🛒<span class="badge" *ngIf="getCantidadTotal() > 0">{{ getCantidadTotal() }}</span></div>
     <!-- LUPA / FILTROS -->
     <div class="search-box">
-      <button id="btn-lupa" (click)="toggleFiltros()">🔍</button>
+      <button id="btn-lupa" (click)="toggleFiltros()">
+  <i class="fas fa-search">🔍</i>
+</button>
 
       <div class="filtros-panel" *ngIf="mostrarFiltros">
         <h4>Filtros</h4>
@@ -111,13 +113,15 @@
     </p>
 
     <div class="acciones">
-      <button class="cancelar" (click)="cerrarCarrito()">Cerrar</button>
-      <button 
-  routerLink="/cashier"
-  [disabled]="items.length === 0">
-  Comprar
-</button>
-    </div>
+  <button class="cerrar-btn" (click)="cerrarCarrito()">Cerrar</button>
+
+  <button 
+    class="comprar-btn"
+    routerLink="/cashier"
+    [disabled]="items.length === 0">
+    Comprar
+  </button>
+</div>
   </div>
 
 </div>

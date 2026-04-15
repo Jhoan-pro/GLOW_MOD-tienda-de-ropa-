@@ -16,6 +16,8 @@ import { ProductForm } from './product-form/product-form';
 
 import { DashBoard } from './dash-board/dash-board';
 
+import { Navbar } from './navbar/navbar';
+
 // Nuevos componentes
 import { AdminDashboard } from './admin-dashboard/admin-dashboard';
 import { Products } from './products/products';
@@ -34,12 +36,13 @@ export const routes: Routes = [
   { path: 'user', component: UserProfile },
   { path: 'categoria/:nombre', component: Home },
 
+
   // Dashboard para usuarios normales
   {
     path: 'dashboard',
     component: DashBoard,
     children: [
-      
+
       { path: 'client', component: Client },
 
     ]
@@ -53,23 +56,25 @@ export const routes: Routes = [
       { path: 'admin', component: Admin },
       { path: 'products', component: Products },
       { path: 'users', component: UserManagement },
-      { path: 'dashBoard', component: Home },
       { path: 'admin-orders', component: AdminOrders },
+
+      { path: 'dashBoard', component: Home },
+      { path: 'client', component: Client },
+      { path: 'Navbar', component: Navbar },
 
     ]
   },
 
   // Otros módulos
-  
+
   { path: 'invoice', component: Invoice },
   { path: 'cashier', component: Cashier },
-  // Temporal (puedes eliminarlo después)
   { path: 'product/new', component: ProductForm },
-  { 
-  path: 'cashier', 
-  component: Cashier,
-  canActivate: [cartGuard]
-},
+  {
+    path: 'cashier',
+    component: Cashier,
+    canActivate: [cartGuard]
+  },
 
- { path: '**', redirectTo: 'Home' }
+  { path: '**', redirectTo: 'Home' }
 ];

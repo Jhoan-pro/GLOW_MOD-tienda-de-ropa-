@@ -1,7 +1,17 @@
+.main-container {
+  position: relative;
+  z-index: 1; 
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+
+}
+
 /* CONTENEDOR PRINCIPAL */
 :host {
   display: block;
   min-height: 100vh;
+  position: relative;
   background: radial-gradient(
       circle at 50% 30%,
       rgba(59, 130, 246, 0.15),

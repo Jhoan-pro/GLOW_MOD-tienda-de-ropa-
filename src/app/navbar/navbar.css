@@ -520,3 +520,20 @@
     transform: translateY(0) scale(1);
   }
 }
+.filtro-item {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 8px;
+  border: none;
+  border-radius: 10px;
+  background: #1e293b;
+  color: white;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.filtro-item:hover {
+  background: linear-gradient(45deg, #7c3aed, #06b6d4);
+  transform: translateX(5px);
+}

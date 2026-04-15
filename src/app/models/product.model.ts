@@ -7,4 +7,6 @@ export interface Product {
     description: string;
     selected?: boolean;
     image?: string;
+
+    added?: boolean;
 }

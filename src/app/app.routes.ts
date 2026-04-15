@@ -16,8 +16,6 @@ import { ProductForm } from './product-form/product-form';
 
 import { DashBoard } from './dash-board/dash-board';
 
-import { Navbar } from './navbar/navbar';
-
 // Nuevos componentes
 import { AdminDashboard } from './admin-dashboard/admin-dashboard';
 import { Products } from './products/products';
@@ -27,14 +25,14 @@ import { AdminOrders } from './admin-orders/admin-orders';
 export const routes: Routes = [
 
   // Inicio
-  { path: '', component: Home },
+  { path: 'home', component: Home },
 
   // Autenticación
   { path: 'login', component: Login },
   { path: 'register', component: RegisterUser },
   { path: 'forgot-password', component: ForgotPassword },
   { path: 'user', component: UserProfile },
-
+  { path: 'categoria/:nombre', component: Home },
 
   // Dashboard para usuarios normales
   {

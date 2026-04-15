@@ -1,37 +1,40 @@
-<section class="product-car">
-  <div class="product-card" *ngFor="let product of products; let i = index">
-    <h3 class="product-name">{{ product.name }}</h3>
-    <img [src]="product.image" alt="{{ product.name }}" class="product-image" />
-    <p class="product-price">Precio: ${{ product.price }}</p>
-    <p class="product-stock">
-  <p class="product-stock">
-  <span *ngIf="product.stock > 0">
-    Stock: {{ product.stock }}
-  </span>
+<section *ngFor="let category of categories" class="category-section">
+  <h2 class="category-title">{{ category }}</h2>
 
-  <span *ngIf="product.stock === 0" style="color:red;">
-    Exhausted
-  </span>
-</p>
-<button (click)="addToCart(product, i)">
-  Agregar al carrito
-</button>
-    
-  </div>
-  <!-- MODAL LOGIN -->
-<div class="modal-overlay" *ngIf="showLoginAlert">
+  <div class="product-car">
+    <div
+      class="product-card"
+      *ngFor="let product of getProductsByCategory(category); let i = index"
+    >
+      <h3 class="product-name">{{ product.name }}</h3>
 
-  <div class="modal">
+      <img
+        [src]="product.image"
+        alt="{{ product.name }}"
+        class="product-image"
+      />
 
-    
-    <h3>Para agregar productos al carrito primero debes iniciar sesión.</h3>
+      <p class="product-price">Precio: ${{ product.price }}</p>
 
-    <div class="modal-actions">
-      <button ><a routerLink="/login">login</a></button>
-      <button (click)="showLoginAlert = false">Cancelar</button>
+      <p class="product-stock">
+        <span *ngIf="product.stock > 0">
+          Stock: {{ product.stock }}
+        </span>
+
+        <span *ngIf="product.stock === 0" style="color: red">
+          Agotado
+        </span>
+      </p>
+
+      <button
+        class="add-btn"
+        [disabled]="product.stock === 0"
+        [ngClass]="{ added: product.added }"
+        (click)="addToCart(product, i)"
+      >
+        <span *ngIf="product.stock > 0">Agregar</span>
+        <span *ngIf="product.stock === 0">Sin stock</span>
+      </button>
     </div>
-
   </div>
-
-</div>
 </section>

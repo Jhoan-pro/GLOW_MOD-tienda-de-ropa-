@@ -3,6 +3,9 @@ import { RouterLink, RouterModule, Router } from '@angular/router';
 import { NgForOf, NgIf } from '@angular/common';
 import { CartService } from '../services/cart.service';
 import { UserService } from '../services/user.service';
+import { FilterService } from '../services/filter.service';
+
+
 @Component({
   selector: 'app-navbar',
   standalone: true,
@@ -19,7 +22,7 @@ export class Navbar {
   isLoggedIn: boolean = false;
   mostrarFiltros = false;
   menuUsuarioAbierto: boolean = false;
-  constructor(private eRef: ElementRef, private router:Router,private cartService: CartService, private userService: UserService){
+  constructor(private eRef: ElementRef, private router:Router,private cartService: CartService, private userService: UserService,private filterService: FilterService){
 
   }
   toggleFiltros() {
@@ -105,6 +108,15 @@ checkLogin() {
 }
 ngDoCheck() {
   this.checkLogin();
+}
+selectCategory(category: string) {
+  this.mostrarFiltros = false;
+
+  if (category === 'Todos') {
+    this.router.navigate(['/']);
+  } else {
+    this.router.navigate(['/categoria', category.toLowerCase()]);
+  }
 }
 
 }

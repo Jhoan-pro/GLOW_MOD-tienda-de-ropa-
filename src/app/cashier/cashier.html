@@ -1,12 +1,58 @@
 <div class="cashier-container">
   <h2>Finalizar compra</h2>
   <div *ngIf="showAlert" class="custom-alert" [ngClass]="alertType">
-  {{ alertMessage }}
-</div>
+    {{ alertMessage }}
+  </div>
   <!-- DATOS CLIENTE -->
+
   <div class="form">
-    <input [(ngModel)]="customerName" placeholder="Nombre completo" />
-    <input [(ngModel)]="customerEmail" placeholder="Correo electrónico" />
+    <div class="input-group">
+      <input 
+  [(ngModel)]="customerName"[ngClass]="{'input-error': !customerName || !/^[a-zA-Z\s]+$/.test(customerName)}"placeholder="Nombre completo *"/>
+
+      <small *ngIf="!customerName"> Este campo es obligatorio </small>
+
+      <small *ngIf="customerName && !/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(customerName)">
+        Solo letras y espacios
+      </small>
+    </div>
+    <div class="input-group">
+      <input [(ngModel)]="customerEmail" placeholder="Correo electrónico *" />
+
+      <small *ngIf="!customerEmail"> Este campo es obligatorio </small>
+
+      <small *ngIf="customerEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail)">
+        Correo inválido
+      </small>
+    </div>
+    <div class="input-group">
+      <input [(ngModel)]="phone" placeholder="Teléfono *" maxlength="10" />
+
+      <small *ngIf="!phone"> Este campo es obligatorio </small>
+
+      <small *ngIf="phone && !/^\d{10}$/.test(phone)"> Debe tener 10 números </small>
+    </div>
+
+    <div class="input-group">
+      <input [(ngModel)]="address" placeholder="Dirección *" />
+
+      <small *ngIf="!address"> Este campo es obligatorio </small>
+
+      <small *ngIf="address && !/^[a-zA-Z0-9#\-\.\,\s]+$/.test(address)">
+        Solo letras, números y # - , .
+      </small>
+    </div>
+    <div class="input-group">
+      <input [(ngModel)]="city" placeholder="Ciudad *" />
+
+      <small *ngIf="!city"> Este campo es obligatorio </small>
+
+      <small *ngIf="city && !/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(city)"> Solo letras </small>
+    </div>
+    <input [(ngModel)]="documentId" placeholder="Documento / Cédula" />
+
+    <textarea [(ngModel)]="notes" placeholder="Notas adicionales (opcional)"></textarea>
+    <p class="form-info">-->Todos los campos son obligatorios</p>
   </div>
 
   <!-- MÉTODO DE PAGO -->
@@ -63,15 +109,11 @@
 
     <!-- BOTONES -->
     <div class="acciones">
-      <button class="cancelar" routerLink="/">Cancelar</button>
+      <button class="back" (click)="cerrar()">Cancelar</button>
 
-      <button
-  class="pagar"
-  (click)="pagar()"
-  [disabled]="!customerName || !customerEmail || !paymentMethod || items.length === 0"
->
-  {{ showAlert && alertType === 'success' ? 'Procesando...' : 'Pagar' }}
-</button>
+      <button class="pagar" (click)="pagar()">
+        {{ loading ? 'Procesando pago...' : 'Pagar' }}
+      </button>
     </div>
   </div>
 </div>

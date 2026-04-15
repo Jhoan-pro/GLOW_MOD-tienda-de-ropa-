@@ -12,32 +12,24 @@
 </button>
 
       <div class="filtros-panel" *ngIf="mostrarFiltros">
-        <h4>Filtros</h4>
+  <h4>Categorías</h4>
 
-        <label>
-          Categoría
-          <select>
-            <option>Todos</option>
-            <option>Camisetas</option>
-            <option>Chaquetas</option>
-          </select>
-        </label>
+  <button class="filtro-item" (click)="selectCategory('Todos')">
+    🛍️ Todos
+  </button>
 
-        <label>
-          Precio máximo
-          <input type="range" min="0" max="200">
-        </label>
+  <button class="filtro-item" (click)="selectCategory('Camisetas')">
+    👕 Camisetas
+  </button>
 
-        <label>
-          Ordenar por
-          <select>
-            <option>Popularidad</option>
-            <option>Precio</option>
-          </select>
-        </label>
+  <button class="filtro-item" (click)="selectCategory('Chaquetas')">
+    🧥 Chaquetas
+  </button>
 
-        <button class="aplicar">Aplicar</button>
-      </div>
+  <button class="filtro-item" (click)="selectCategory('Zapatillas')">
+    👟 Zapatillas
+  </button>
+</div>
     </div>
 
     <!-- USUARIO -->

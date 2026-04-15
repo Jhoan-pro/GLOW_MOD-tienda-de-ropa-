@@ -1,0 +1,76 @@
+.admin-orders-container {
+    padding: 20px;
+}
+
+.header-stats {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: rgba(6, 182, 212, 0.1);
+    padding: 1rem 2rem;
+    border-radius: 12px;
+    border: 1px solid #06b6d4;
+}
+
+.stat-card .value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #06b6d4;
+    margin-left: 10px;
+}
+
+.products-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 10px; 
+}
+
+.products-table th {
+    padding: 1rem;
+    color: #94a3b8;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    text-align: left;
+}
+
+.products-table tbody tr {
+    background: rgba(30, 41, 59, 0.8);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.products-table tbody tr:hover {
+    transform: scale(1.01);
+    background: rgba(51, 65, 85, 0.9);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+}
+
+.products-table td {
+    padding: 1.2rem 1rem;
+}
+
+
+.products-table td:first-child { border-radius: 12px 0 0 12px; }
+.products-table td:last-child { border-radius: 0 12px 12px 0; }
+
+
+.status-badge {
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+
+
+
+.empty-msg {
+    text-align: center;
+    padding: 3rem;
+    color: #94a3b8;
+}

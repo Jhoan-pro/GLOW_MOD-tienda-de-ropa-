@@ -23,7 +23,7 @@ import { AdminDashboard } from './admin-dashboard/admin-dashboard';
 import { Products } from './products/products';
 import { UserManagement } from './user-management/user-management';
 import { cartGuard } from './cart/cart';
-
+import { AdminOrders } from './admin-orders/admin-orders';
 export const routes: Routes = [
 
   // Inicio
@@ -34,6 +34,7 @@ export const routes: Routes = [
   { path: 'register', component: RegisterUser },
   { path: 'forgot-password', component: ForgotPassword },
   { path: 'user', component: UserProfile },
+
 
   // Dashboard para usuarios normales
   {
@@ -55,6 +56,7 @@ export const routes: Routes = [
       { path: 'products', component: Products },
       { path: 'users', component: UserManagement },
       { path: 'dashBoard', component: Home },
+      { path: 'admin-orders', component: AdminOrders },
 
     ]
   },

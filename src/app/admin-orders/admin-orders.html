@@ -1,0 +1,41 @@
+<div class="admin-orders-container">
+  <div class="header-stats">
+    <h2>Historial de Ventas / Pedidos</h2>
+    <div class="stat-card">
+      <span class="label">Total Recaudado:</span>
+      <span class="value">{{ totalVentas | currency }}</span>
+    </div>
+  </div>
+
+  <table class="products-table">
+    <thead>
+      <tr>
+        <th>ID Pedido</th>
+        <th>Fecha</th>
+        <th>Cliente</th>
+        <th>Productos</th>
+        <th>Total</th>
+        <th>Estado</th>
+        
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let order of orders">
+        <td>#{{ order.id || 'N/A' }}</td>
+        <td>{{ order.date | date:'short' }}</td>
+        <td>{{ order.customerEmail }}</td>
+        <td>{{ order.items[0]?.name }} x {{ order.items[0]?.quantity }}</td>
+        <td>{{ order.total | currency }}</td>
+        <td>
+          <span class="status-badge" >
+            {{ order.status || 'Completado' }}
+          </span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div *ngIf="orders.length === 0" class="empty-msg">
+    <p>No hay registros de ventas todavía.</p>
+  </div>
+</div>

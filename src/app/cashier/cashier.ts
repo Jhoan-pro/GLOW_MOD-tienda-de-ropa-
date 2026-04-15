@@ -6,6 +6,8 @@ import { NgForOf, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UserService } from '../services/user.service';
 import { ChangeDetectorRef } from '@angular/core';
+import { OrderHistoryService } from '../services/order-history.service';
+
 @Component({
   selector: 'app-cashier',
   standalone: true,
@@ -44,7 +46,7 @@ reference = '';
 
 // wallet
 phone = '';
-  constructor(private cartService: CartService,private router: Router, private userService: UserService, private cdr: ChangeDetectorRef) {}
+  constructor(private cartService: CartService,private router: Router, private userService: UserService, private cdr: ChangeDetectorRef, private orderHistory: OrderHistoryService) {}
 
   ngOnInit() {
   this.cartService.cart$.subscribe(data => {
@@ -65,13 +67,11 @@ phone = '';
 
  pagar() {
 
-  // VALIDAR CARRITO
   if (this.items.length === 0) {
     alert("El carrito está vacío");
     return;
   }
 
-  // VALIDAR DATOS CLIENTE
   if (!this.customerName.trim()) {
     alert("Nombre requerido");
     return;
@@ -83,13 +83,11 @@ phone = '';
     return;
   }
 
-  // VALIDAR MÉTODO
   if (!this.paymentMethod) {
     alert("Selecciona método de pago");
     return;
   }
 
-  // TARJETA
   if (this.paymentMethod === 'card') {
 
     if (!/^\d{16}$/.test(this.cardNumber)) {
@@ -113,7 +111,6 @@ phone = '';
     }
   }
 
-  // TRANSFERENCIA
   if (this.paymentMethod === 'transfer') {
 
     if (!this.bank) {
@@ -127,7 +124,6 @@ phone = '';
     }
   }
 
-  // WALLET (Nequi / Daviplata)
   if (this.paymentMethod === 'wallet') {
 
     if (!/^\d{10}$/.test(this.phone)) {
@@ -136,12 +132,16 @@ phone = '';
     }
   }
 
+  // Obtener usuario
+  const user = this.userService.getCurrentUser();
+
   // Crear factura
   const invoice = {
     invoiceNumber: 'INV-' + Date.now(),
     date: new Date(),
     customerName: this.customerName,
     customerEmail: this.customerEmail,
+    userId: user?.email, 
     paymentMethod: this.paymentMethod,
     items: this.items.map(item => ({
       name: item.product.name,
@@ -151,7 +151,9 @@ phone = '';
     total: this.getTotal()
   };
 
+  // Guardar
   localStorage.setItem('lastInvoice', JSON.stringify(invoice));
+  this.orderHistory.addOrder(invoice);
 
   this.cartService.clearCart();
 

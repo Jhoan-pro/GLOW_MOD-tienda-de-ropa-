@@ -67,6 +67,8 @@
     font-size: 0.85rem;
     color: #06b6d4;
     text-decoration: none;
+    justify-content: center;
+    cursor: pointer;
 }
 .error-text {
 color: #ef4444;

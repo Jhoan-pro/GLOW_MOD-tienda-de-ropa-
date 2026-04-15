@@ -1,4 +1,4 @@
-<h3>{{ isEditing ? 'Editar producto' : 'Agregar producto' }} </h3>
+<h3>{{ viewMode ? 'Información del producto' : isEditing ? 'Editar producto' : 'Agregar producto' }} </h3>
 
 <div class="imagen" *ngIf="product.image">
   <img [src]="product.image" width="100">

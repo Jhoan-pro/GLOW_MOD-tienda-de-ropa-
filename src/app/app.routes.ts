@@ -16,11 +16,14 @@ import { ProductForm } from './product-form/product-form';
 
 import { DashBoard } from './dash-board/dash-board';
 
+import { Navbar } from './navbar/navbar';
+
 // Nuevos componentes
 import { AdminDashboard } from './admin-dashboard/admin-dashboard';
 import { Products } from './products/products';
 import { UserManagement } from './user-management/user-management';
 import { cartGuard } from './cart/cart';
+
 export const routes: Routes = [
 
   // Inicio
@@ -31,6 +34,7 @@ export const routes: Routes = [
   { path: 'register', component: RegisterUser },
   { path: 'forgot-password', component: ForgotPassword },
   { path: 'user', component: UserProfile },
+
   // Dashboard para usuarios normales
   {
     path: 'dashboard',
@@ -38,8 +42,7 @@ export const routes: Routes = [
     children: [
       
       { path: 'client', component: Client },
-      
-      
+
     ]
   },
 
@@ -50,7 +53,9 @@ export const routes: Routes = [
     children: [
       { path: 'admin', component: Admin },
       { path: 'products', component: Products },
-      { path: 'users', component: UserManagement }
+      { path: 'users', component: UserManagement },
+      { path: 'dashBoard', component: Home },
+
     ]
   },
 
@@ -66,6 +71,5 @@ export const routes: Routes = [
   canActivate: [cartGuard]
 },
 
-  // Redirección por defecto
-  { path: '**', redirectTo: '' }
+ 
 ];

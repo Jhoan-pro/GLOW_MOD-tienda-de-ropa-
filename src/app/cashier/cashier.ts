@@ -136,7 +136,7 @@ phone = '';
     }
   }
 
-  // CREA FACTURA
+  // Crear factura
   const invoice = {
     invoiceNumber: 'INV-' + Date.now(),
     date: new Date(),

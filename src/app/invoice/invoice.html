@@ -1,6 +1,6 @@
 <div *ngIf="invoice; else noData" class="invoice-container">
 
-  <!-- HEADER -->
+  <!-- Header-->
   <div class="invoice-header">
     <div class="brand">
       <h1><span class="glow">GLOW</span>_MOD</h1>
@@ -46,13 +46,13 @@
     </table>
   </div>
 
-  <!-- TOTAL -->
+  <!-- total cantidad -->
   <div class="total-box">
     <h2>Total</h2>
     <span>{{ getTotal() | currency:'COP' }}</span>
   </div>
 
-  <!-- BOTONES -->
+  <!-- Botones -->
   <div class="acciones">
     <button class="volver" (click)="irHome()">← Volver</button>
     <button class="print" (click)="imprimirFactura()">Imprimir</button>

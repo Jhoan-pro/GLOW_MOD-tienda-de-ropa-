@@ -53,7 +53,7 @@ export class UserProfile implements OnInit {
     this.editMode = false;
     this.hasExtraInfo = true;
   }
-
+  //Vuelve a home
   volver() {
     this.router.navigate(['/home']);
   }

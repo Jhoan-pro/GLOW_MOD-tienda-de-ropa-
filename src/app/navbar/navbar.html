@@ -15,35 +15,35 @@
   <h4>Categorías</h4>
 
   <button class="filtro-item" (click)="selectCategory('Todos')">
-    🛍️ Todos
+    Todos
   </button>
 
   <button class="filtro-item" (click)="selectCategory('Camisetas')">
-    👕 Camisetas
+    Camisetas
   </button>
 
   <button class="filtro-item" (click)="selectCategory('Chaquetas')">
-    🧥 Chaquetas
+    Chaquetas
   </button>
 
   <button class="filtro-item" (click)="selectCategory('Zapatillas')">
-    👟 Zapatillas
+    Zapatillas
   </button>
 </div>
     </div>
 
-    <!-- USUARIO -->
+    <!-- Usuario -->
     <div class="user-dropdown">
       <div class="user-icon" (click)="toggleMenuUsuario()">👤</div>
 
       <div class="dropdown-menu" *ngIf="menuUsuarioAbierto">
 
-  <!-- NO LOGUEADO -->
+  <!-- No logueado -->
   <ng-container *ngIf="!isLoggedIn">
     <a routerLink="/login">Iniciar sesión</a>
   </ng-container>
 
-  <!-- LOGUEADO -->
+  <!-- Logueado -->
   <ng-container *ngIf="isLoggedIn">
     
     <a routerLink="/user">Administrar cuenta</a>
@@ -97,7 +97,7 @@
 
   </div>
 
-  <!-- FOOTER -->
+  <!-- Footer -->
   <div class="cart-footer">
     <p>
       <span>Total:</span>

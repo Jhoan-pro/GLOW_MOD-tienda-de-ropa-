@@ -21,15 +21,20 @@ button {
     
 }
 .imagen {
+    width: 400px;   
+    height: 300px;
+    margin: 10px auto;
+    overflow: hidden;
+    border-radius: 12px;
+    border: solid 2px black;
     display: flex;
     justify-content: center;
-    margin-top: 10px;
-    margin-bottom: 10px;
+    align-items: center;
 
-}.imagen img {
+}
+
+.imagen img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    border-radius: 12px;
-    border: solid 2px black;
 }

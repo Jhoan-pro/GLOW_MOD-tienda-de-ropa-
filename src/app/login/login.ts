@@ -3,7 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { UserService } from '../services/user.service';
 import { CommonModule } from '@angular/common';
-
+import { CartService } from '../services/cart.service';
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -24,6 +24,7 @@ export class Login {
   constructor(
     private router: Router,
     private UserService: UserService,
+    private cartService: CartService
   ) {}
 
   login() {
@@ -111,6 +112,7 @@ export class Login {
       
       // Redirección según rol
       this.UserService.login(userFound);
+      this.cartService.loadCart();
       this.redirectByRole(userFound.role);
     } else {
       this.errors.general = 'Credenciales incorrectas';

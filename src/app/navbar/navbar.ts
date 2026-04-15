@@ -35,6 +35,10 @@ export class Navbar {
 
   if (confirmacion) {
     this.userService.logout();
+
+    // CAMBIAR CARRITO AL DE "guest"
+    this.cartService.loadCart();
+
     this.isLoggedIn = false;
     this.router.navigate(['/login']);
   }

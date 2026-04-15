@@ -16,13 +16,13 @@ export class ProductCar {
   constructor(private cartService: CartService, private userService: UserService){}
   addToCart(product: any, index: number) {
 
-  // ❌ NO LOGUEADO
+  // No logueado
   if (!this.userService.isLoggedIn()) {
     this.showLoginAlert = true;
     return;
   }
 
-  // ❌ SIN STOCK
+  // Sin stock
   if (product.stock <= 0) return;
 
   product.added = true;

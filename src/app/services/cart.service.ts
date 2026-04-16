@@ -11,7 +11,7 @@ interface CartItem {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class CartService {
   private platformId = inject(PLATFORM_ID);
@@ -22,7 +22,7 @@ export class CartService {
 
   constructor(
     private productService: ProductService,
-    private userService: UserService
+    private userService: UserService,
   ) {}
 
   private getCartKey(): string {
@@ -31,60 +31,59 @@ export class CartService {
   }
 
   loadCart() {
-  if (!isPlatformBrowser(this.platformId)) return;
+    if (!isPlatformBrowser(this.platformId)) return;
 
-  const key = this.getCartKey();
-  const data = localStorage.getItem(key);
+    const key = this.getCartKey();
+    const data = localStorage.getItem(key);
 
-  this.items = data ? JSON.parse(data) : [];
+    this.items = data ? JSON.parse(data) : [];
 
-  this.syncStockWithCart(); // 🔥 AQUÍ
+    this.syncStockWithCart();
 
-  this.cartSubject.next([...this.items]);
-}
+    this.cartSubject.next([...this.items]);
+  }
 
   getItems() {
     return this.items;
   }
 
   addToCart(product: Product) {
+    const existing = this.items.find((item) => item.product.id === product.id);
 
-  const existing = this.items.find(item => item.product.id === product.id);
+    if (product.stock <= 0) {
+      alert('Sin stock');
+      return;
+    }
 
-  if (product.stock <= 0) {
-    alert("Sin stock");
-    return;
+    if (existing) {
+      existing.cantidad++;
+    } else {
+      this.items.push({
+        product: { ...product },
+        cantidad: 1,
+      });
+    }
+
+    product.stock--;
+
+    this.productService.updateStock(product.id!, product.stock);
+
+    this.cartSubject.next([...this.items]);
+    this.saveCart();
   }
-
-  if (existing) {
-    existing.cantidad++;
-  } else {
-    this.items.push({
-      product: { ...product },
-      cantidad: 1
-    });
-  }
-
-  product.stock--;
-
-  this.productService.updateStock(product.id!, product.stock); // 🔥 NUEVO
-
-  this.cartSubject.next([...this.items]);
-  this.saveCart();
-}
 
   removeItem(index: number) {
-  const item = this.items[index];
-  if (!item) return;
+    const item = this.items[index];
+    if (!item) return;
 
-  item.product.stock += item.cantidad;
+    item.product.stock += item.cantidad;
 
-  this.productService.updateStock(item.product.id!, item.product.stock);
+    this.productService.updateStock(item.product.id!, item.product.stock);
 
-  this.items.splice(index, 1);
-  this.cartSubject.next([...this.items]);
-  this.saveCart();
-}
+    this.items.splice(index, 1);
+    this.cartSubject.next([...this.items]);
+    this.saveCart();
+  }
 
   increase(item: CartItem) {
     if (item.product.stock <= 0) {
@@ -113,47 +112,44 @@ export class CartService {
   }
 
   getTotal() {
-    return this.items.reduce(
-      (acc, item) => acc + item.product.price * item.cantidad,
-      0
-    );
+    return this.items.reduce((acc, item) => acc + item.product.price * item.cantidad, 0);
   }
   private saveCart() {
-  if (isPlatformBrowser(this.platformId)) {
-    const key = this.getCartKey();
-    localStorage.setItem(key, JSON.stringify(this.items));
+    if (isPlatformBrowser(this.platformId)) {
+      const key = this.getCartKey();
+      localStorage.setItem(key, JSON.stringify(this.items));
+    }
   }
-}
 
   clearCart() {
-  this.items.forEach(item => {
-    const newStock = item.product.stock + item.cantidad;
-    this.productService.updateStock(item.product.id!, newStock);
-  });
+    this.items.forEach((item) => {
+      const newStock = item.product.stock + item.cantidad;
+      this.productService.updateStock(item.product.id!, newStock);
+    });
 
-  this.items = [];
-  this.cartSubject.next([]);
-  this.saveCart();
-}
+    this.items = [];
+    this.cartSubject.next([]);
+    this.saveCart();
+  }
   private syncStockWithCart() {
-  const products = this.productService.getProducts();
+    const products = this.productService.getProducts();
 
-  this.items.forEach(cartItem => {
-    const product = products.find(p => p.id === cartItem.product.id);
+    this.items.forEach((cartItem) => {
+      const product = products.find((p) => p.id === cartItem.product.id);
 
-    if (product) {
-      product.stock -= cartItem.cantidad;
+      if (product) {
+        product.stock -= cartItem.cantidad;
 
-      if (product.stock < 0) {
-        product.stock = 0;
+        if (product.stock < 0) {
+          product.stock = 0;
+        }
+
+        // actualizar referencia
+        cartItem.product = { ...product };
       }
+    });
 
-      // actualizar referencia
-      cartItem.product = { ...product };
-    }
-  });
-
-  // 🔥 guardar cambios
-  (this.productService as any).saveProducts(products);
-}
+    //guardar cambios
+    (this.productService as any).saveProducts(products);
+  }
 }

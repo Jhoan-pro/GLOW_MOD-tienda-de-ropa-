@@ -16,79 +16,86 @@ import { Inject, PLATFORM_ID } from '@angular/core';
   styleUrls: ['./product-car.css']
 })
 export class ProductCar {
-  showLoginAlert=false;
+  showLoginAlert = false;
   @Input() products: Product[] = [];
-  constructor(private cartService: CartService, private userService: UserService, private filterService: FilterService,private route: ActivatedRoute, private router: Router, @Inject(PLATFORM_ID) private platformId: object){}
-  addToCart(product: any, index: number) {
+  filteredProducts: Product[] = [];
 
-  // No logueado
-  if (!this.userService.isLoggedIn()) {
-    this.showLoginAlert = true;
-    return;
-  }
+  constructor(
+    private cartService: CartService,
+    private userService: UserService,
+    private filterService: FilterService,
+    private route: ActivatedRoute,
+    private router: Router,
+    @Inject(PLATFORM_ID) private platformId: object
+  ) {}
 
-  // Sin stock
-  if (product.stock <= 0) return;
-
-  product.added = true;
-
-  setTimeout(() => {
-    product.added = false;
-  }, 500);
-
-  this.cartService.addToCart(product, index);
-}
-get categories(): string[] {
-  return [...new Set(this.products.map(p => p.category))];
-}
-
-getProductsByCategory(category: string) {
-  return this.products.filter(p => p.category === category);
-}
-filteredProducts: Product[] = [];
-
-
-ngOnInit() {
-
-  if (isPlatformBrowser(this.platformId)) {
-    const storedProducts = localStorage.getItem('products');
-
-    if (storedProducts) {
-      this.products = JSON.parse(storedProducts);
+  addToCart(product: Product) {
+    if (!this.userService.isLoggedIn()) {
+      this.showLoginAlert = true;
+      return;
     }
+
+    if (product.stock <= 0) return;
+
+    product.added = true;
+
+    setTimeout(() => {
+      product.added = false;
+    }, 500);
+
+    this.cartService.addToCart(product);
   }
 
-  this.applyFilter();
+  get categories(): string[] {
+    return [...new Set(this.filteredProducts.map(p => p.category))];
+  }
 
-  this.route.params.subscribe(() => {
-    this.applyFilter();
-  });
+  getProductsByCategory(category: string) {
+    return this.filteredProducts.filter(
+      p => p.category.toLowerCase().trim() === category.toLowerCase().trim()
+    );
+  }
 
-  //escuchar navegación SOLO en navegador
-  if (isPlatformBrowser(this.platformId)) {
-    this.router.events.subscribe(() => {
+  ngOnInit() {
+    if (isPlatformBrowser(this.platformId)) {
       const storedProducts = localStorage.getItem('products');
 
       if (storedProducts) {
         this.products = JSON.parse(storedProducts);
-        this.applyFilter();
       }
+    }
+
+    this.applyFilter();
+
+    this.route.params.subscribe(() => {
+      this.applyFilter();
     });
-  }
-}
-ngOnChanges() {
-  this.applyFilter();
-}
 
-applyFilter() {
-  const category = this.route.snapshot.params['nombre'];
+    if (isPlatformBrowser(this.platformId)) {
+      this.router.events.subscribe(() => {
+        const storedProducts = localStorage.getItem('products');
 
-  if (!category) {
-    this.filteredProducts = this.products;
-  } else {
-    this.filteredProducts = this.products.filter(
-      p => p.category.toLowerCase().trim() === category.toLowerCase().trim()
-    );
+        if (storedProducts) {
+          this.products = JSON.parse(storedProducts);
+          this.applyFilter();
+        }
+      });
+    }
   }
-}
+
+  ngOnChanges() {
+    this.applyFilter();
+  }
+
+  applyFilter() {
+    const category = this.route.snapshot.params['nombre'];
+
+    if (!category) {
+      this.filteredProducts = this.products;
+    } else {
+      this.filteredProducts = this.products.filter(
+        p => p.category.toLowerCase().trim() === category.toLowerCase().trim()
+      );
+    }
+  }
 }

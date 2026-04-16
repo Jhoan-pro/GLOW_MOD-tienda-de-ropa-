@@ -44,7 +44,7 @@ export class Navbar {
 }
 
   logout() {
-  const confirmacion = window.confirm('Cerrar sesión?');
+  const confirmacion = window.confirm('¿Cerrar sesión?');
 
   if (confirmacion) {
     this.userService.logout();
@@ -76,6 +76,8 @@ export class Navbar {
     }
   }
   ngOnInit() {
+  this.cartService.loadCart();
+
   this.cartService.cart$.subscribe(data => {
     this.items = data;
   });

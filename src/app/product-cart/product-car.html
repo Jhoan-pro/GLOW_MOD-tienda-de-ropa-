@@ -4,7 +4,7 @@
   <div class="product-car">
     <div
       class="product-card"
-      *ngFor="let product of getProductsByCategory(category); let i = index"
+      *ngFor="let product of getProductsByCategory(category)"
     >
       <h3 class="product-name">{{ product.name }}</h3>
 
@@ -30,7 +30,7 @@
         class="add-btn"
         [disabled]="product.stock === 0"
         [ngClass]="{ added: product.added }"
-        (click)="addToCart(product, i)"
+        (click)="addToCart(product)"
       >
         <span *ngIf="product.stock > 0">Agregar</span>
         <span *ngIf="product.stock === 0">Sin stock</span>

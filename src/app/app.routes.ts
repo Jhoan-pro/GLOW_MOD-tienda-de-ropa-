@@ -68,6 +68,7 @@ export const routes: Routes = [
   // Otros módulos
 
   { path: 'invoice', component: Invoice },
+ 
   { path: 'product/new', component: ProductForm },
   {
     path: 'cashier',

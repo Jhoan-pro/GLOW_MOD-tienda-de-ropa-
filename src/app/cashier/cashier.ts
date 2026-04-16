@@ -21,6 +21,10 @@ export class Cashier {
   customerName = '';
   customerEmail = '';
   
+  phone = '';
+
+
+
   address = '';
   city = '';
   documentId = '';
@@ -52,7 +56,7 @@ export class Cashier {
   reference = '';
 
   // wallet
-  phone = '';
+  phoneWallet = '';
   onPaymentChange() {
     // Limpiar todos los campos al cambiar método
 
@@ -67,7 +71,7 @@ export class Cashier {
     this.reference = '';
 
     // wallet
-    this.phone = '';
+    this.phoneWallet = '';
   }
   constructor(
     private cartService: CartService,
@@ -122,7 +126,7 @@ export class Cashier {
 
   const user = this.userService.getCurrentUser();
 
-  // 🔴 1. VALIDACIÓN GLOBAL PRIMERO
+  //VALIDACIÓN GLOBAL PRIMERO
   if (!this.validarCamposVacios()) {
     this.mostrarAlerta('Primero debes completar todos los campos obligatorios', 'error');
     this.enfocarPrimerError();
@@ -130,7 +134,7 @@ export class Cashier {
     return;
   }
 
-  // 🔴 2. VALIDACIONES ESPECÍFICAS
+  // VALIDACIONES ESPECÍFICAS
 
   if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(this.customerName)) {
     this.mostrarAlerta('Nombre: solo letras y espacios', 'error');
@@ -162,40 +166,55 @@ export class Cashier {
     this.loading = false;
     return;
   }
-
+  // VALIDAR WALLET SOLO SI ES ESE MÉTODO
+if (this.paymentMethod === 'wallet') {
+  if (!/^\d{10}$/.test(this.phoneWallet)) {
+    this.mostrarAlerta('Número de Nequi/Daviplata inválido (10 dígitos)', 'error');
+    this.loading = false;
+    return;
+  }
+}
   if (!this.paymentMethod) {
     this.mostrarAlerta('Selecciona método de pago', 'error');
     this.loading = false;
     return;
   }
 
-  // 🔴 3. TODO BIEN → CREAR FACTURA
+  // CREAR FACTURA
 
   const invoice = {
-    invoiceNumber: 'INV-' + Date.now(),
-    date: new Date(),
+  invoiceNumber: 'INV-' + Date.now(),
+  date: new Date(),
 
-    customer: {
-      name: this.customerName,
-      email: this.customerEmail,
-      phone: this.phone,
-      address: this.address,
-      city: this.city,
-      documentId: this.documentId
-    },
+  customer: {
+    name: this.customerName,
+    email: this.customerEmail,
+    phone: this.phone,
+    address: this.address,
+    city: this.city,
+    documentId: this.documentId
+  },
 
-    notes: this.notes,
-    userId: user?.email,
-    paymentMethod: this.paymentMethod,
+  notes: this.notes,
+  userId: user?.email,
+  paymentMethod: this.paymentMethod,
 
-    items: this.items.map(item => ({
-      name: item.product.name,
-      quantity: item.cantidad,
-      price: item.product.price
-    })),
+  paymentDetails: {
+    walletNumber: this.paymentMethod === 'wallet' ? this.phoneWallet : null,
+    bank: this.paymentMethod === 'transfer' ? this.bank : null,
+    reference: this.paymentMethod === 'transfer' ? this.reference : null,
+    cardName: this.paymentMethod === 'card' ? this.cardName : null,
+    cardNumberLast4: this.paymentMethod === 'card' ? this.cardNumber.slice(-4) : null
+  },
 
-    total: this.getTotal()
-  };
+  items: this.items.map(item => ({
+    name: item.product.name,
+    quantity: item.cantidad,
+    price: item.product.price
+  })),
+
+  total: this.getTotal()
+};
 
   localStorage.setItem('lastInvoice', JSON.stringify(invoice));
   this.orderHistory.addOrder(invoice);

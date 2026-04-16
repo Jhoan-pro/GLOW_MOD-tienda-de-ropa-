@@ -1,6 +1,5 @@
 <div *ngIf="invoice; else noData" class="invoice-container">
 
-  <!-- Header-->
   <div class="invoice-header">
     <div class="brand">
       <h1><span class="glow">GLOW</span>_MOD</h1>
@@ -13,17 +12,29 @@
     </div>
   </div>
 
-  <!-- CLIENTE -->
   <div class="card">
     <h3>Datos del cliente</h3>
     <p><strong>Nombre:</strong> {{ invoice.customer.name }}</p>
     <p><strong>Email:</strong> {{ invoice.customer.email }}</p>
+    <p><strong>Teléfono:</strong> {{ invoice.customer.phone }}</p>
     <p><strong>Ciudad:</strong> {{ invoice.customer.city }}</p>
     <p><strong>Dirección:</strong> {{ invoice.customer.address }}</p>
-    <p><strong>Método:</strong> {{ getMetodoPago() }}</p>
+    <p><strong>Documento:</strong> {{ invoice.customer.documentId || 'N/A' }}</p>
   </div>
 
-  <!-- TABLA -->
+  <div class="card">
+    <h3>Pago</h3>
+    <p><strong>Método:</strong> {{ getMetodoPago() }}</p>
+
+    <ng-container *ngIf="invoice.paymentDetails as payment">
+      <p *ngIf="payment.bank"><strong>Banco:</strong> {{ payment.bank }}</p>
+      <p *ngIf="payment.reference"><strong>Referencia:</strong> {{ payment.reference }}</p>
+      <p *ngIf="payment.walletNumber"><strong>Nequi / Daviplata:</strong> {{ payment.walletNumber }}</p>
+      <p *ngIf="payment.cardName"><strong>Tarjeta:</strong> {{ payment.cardName }}</p>
+      <p *ngIf="payment.cardNumberLast4"><strong>Tarjeta terminada en:</strong> **** {{ payment.cardNumberLast4 }}</p>
+    </ng-container>
+  </div>
+
   <div class="card">
     <table>
       <thead>
@@ -46,23 +57,20 @@
     </table>
   </div>
 
-  <!-- total cantidad -->
   <div class="total-box">
     <h2>Total</h2>
     <span>{{ getTotal() | currency:'COP' }}</span>
   </div>
 
-  <!-- Botones -->
   <div class="acciones">
     <button class="volver" (click)="irHome()">← Volver</button>
     <button class="print" (click)="imprimirFactura()">Imprimir</button>
   </div>
-
 </div>
 
 <ng-template #noData>
   <div class="empty">
     <h2>No hay factura disponible</h2>
-    <button routerLink="/">Ir a tienda</button>
+    <button routerLink="/Home">Ir a tienda</button>
   </div>
 </ng-template>

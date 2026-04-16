@@ -42,6 +42,16 @@ export class Navbar {
     this.carritoAbierto = false;
   }
 }
+  slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .trim()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
 
   logout() {
   const confirmacion = window.confirm('¿Cerrar sesión?');
@@ -112,13 +122,30 @@ ngDoCheck() {
   this.checkLogin();
 }
 selectCategory(category: string) {
+  this.scrollToCategory(category);
+}
+scrollToCategory(category: string) {
   this.mostrarFiltros = false;
 
-  if (category === 'Todos') {
-    this.router.navigate(['/']);
-  } else {
-    this.router.navigate(['/categoria', category.toLowerCase()]);
-  }
+  const targetId =
+    category === 'Todos'
+      ? 'catalogo'
+      : category
+          .toLowerCase()
+          .trim()
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/^-+|-+$/g, '');
+
+  this.router.navigate(['/']).then(() => {
+    setTimeout(() => {
+      document.getElementById(targetId)?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }, 80);
+  });
 }
 
 }

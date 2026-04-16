@@ -1,40 +1,47 @@
-<section *ngFor="let category of categories" class="category-section">
-  <h2 class="category-title">{{ category }}</h2>
+<section class="catalog-wrapper">
+  <ng-container *ngFor="let category of categories">
+    <section class="category-section" [attr.id]="slugify(category)">
+      <div class="category-header">
+        <div>
+          <h2 class="category-title">{{ category }}</h2>
+          <p class="category-subtitle">
+            {{ getProductsByCategory(category).length }} productos disponibles
+          </p>
+        </div>
+      </div>
 
-  <div class="product-car">
-    <div
-      class="product-card"
-      *ngFor="let product of getProductsByCategory(category)"
-    >
-      <h3 class="product-name">{{ product.name }}</h3>
+      <div class="product-car">
+        <article
+          class="product-card"
+          *ngFor="let product of getProductsByCategory(category); trackBy: trackById"
+        >
+          <img
+            [src]="product.image || 'assets/no-image.png'"
+            alt="{{ product.name }}"
+            class="product-image"
+          />
 
-      <img
-        [src]="product.image"
-        alt="{{ product.name }}"
-        class="product-image"
-      />
+          <div class="product-info">
+            <h3 class="product-name">{{ product.name }}</h3>
+            <p class="product-price">Precio: ${{ product.price }}</p>
 
-      <p class="product-price">Precio: ${{ product.price }}</p>
+            <p class="product-stock">
+              <span *ngIf="product.stock > 0">Stock: {{ product.stock }}</span>
+              <span *ngIf="product.stock === 0" class="sold-out">Agotado</span>
+            </p>
 
-      <p class="product-stock">
-        <span *ngIf="product.stock > 0">
-          Stock: {{ product.stock }}
-        </span>
-
-        <span *ngIf="product.stock === 0" style="color: red">
-          Agotado
-        </span>
-      </p>
-
-      <button
-        class="add-btn"
-        [disabled]="product.stock === 0"
-        [ngClass]="{ added: product.added }"
-        (click)="addToCart(product)"
-      >
-        <span *ngIf="product.stock > 0">Agregar</span>
-        <span *ngIf="product.stock === 0">Sin stock</span>
-      </button>
-    </div>
-  </div>
+            <button
+              class="add-btn"
+              [disabled]="product.stock === 0"
+              [ngClass]="{ added: product.added }"
+              (click)="addToCart(product)"
+            >
+              <span *ngIf="product.stock > 0">Agregar</span>
+              <span *ngIf="product.stock === 0">Sin stock</span>
+            </button>
+          </div>
+        </article>
+      </div>
+    </section>
+  </ng-container>
 </section>

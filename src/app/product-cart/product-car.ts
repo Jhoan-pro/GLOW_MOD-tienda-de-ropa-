@@ -29,6 +29,18 @@ export class ProductCar {
     @Inject(PLATFORM_ID) private platformId: object
   ) {}
 
+  slugify(text: string): string {
+    return text
+      .toLowerCase()
+      .trim()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+  }
+  trackById(_: number, item: Product) {
+    return item.id ?? item.name;
+  }
   addToCart(product: Product) {
     if (!this.userService.isLoggedIn()) {
       this.showLoginAlert = true;
@@ -47,14 +59,17 @@ export class ProductCar {
   }
 
   get categories(): string[] {
-    return [...new Set(this.filteredProducts.map(p => p.category))];
+    return [...new Set(this.products.map(p => p.category).filter(Boolean))].sort((a, b) =>
+      a.localeCompare(b)
+    );
   }
 
   getProductsByCategory(category: string) {
-    return this.filteredProducts.filter(
+    return this.products.filter(
       p => p.category.toLowerCase().trim() === category.toLowerCase().trim()
     );
   }
+
 
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {

@@ -19,6 +19,10 @@
 <button class="filtro-item" (click)="selectCategory('Chaquetas')">Chaquetas</button>
 <button class="filtro-item" (click)="selectCategory('Pantalones')">Pantalones</button>
 <button class="filtro-item" (click)="selectCategory('Zapatos')">Zapatos</button>
+
+
+
+
 </div>
     </div>
 
@@ -35,7 +39,7 @@
 
   <!-- Logueado -->
   <ng-container *ngIf="isLoggedIn">
-    
+
     <a routerLink="/user">Administrar cuenta</a>
     <button class="logout-btn" (click)="logout()">Cerrar sesión</button>
   </ng-container>
@@ -97,7 +101,7 @@
     <div class="acciones">
   <button class="cerrar-btn" (click)="cerrarCarrito()">Cerrar</button>
 
-  <button 
+  <button
     class="comprar-btn"
     routerLink="/cashier"
     [disabled]="items.length === 0">

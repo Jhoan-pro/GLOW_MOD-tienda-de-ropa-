@@ -1,8 +1,9 @@
 <h3>{{ viewMode ? 'Información del producto' : isEditing ? 'Editar producto' : 'Agregar producto' }} </h3>
 
 <div class="imagen" *ngIf="product.image">
-  <img [src]="product.image" width="100">
+  <img [src]="product.image">
 </div>
+
 <input *ngIf="!viewMode" type="file" (change)="onImageSelected($event)" [disabled]="viewMode">
 
 

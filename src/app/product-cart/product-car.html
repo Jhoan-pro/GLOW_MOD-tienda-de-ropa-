@@ -1,37 +1,47 @@
-<section class="product-car">
-  <div class="product-card" *ngFor="let product of products; let i = index">
-    <h3 class="product-name">{{ product.name }}</h3>
-    <img [src]="product.image" alt="{{ product.name }}" class="product-image" />
-    <p class="product-price">Precio: ${{ product.price }}</p>
-    <p class="product-stock">
-  <p class="product-stock">
-  <span *ngIf="product.stock > 0">
-    Stock: {{ product.stock }}
-  </span>
+<section class="catalog-wrapper">
+  <ng-container *ngFor="let category of categories">
+    <section class="category-section" [attr.id]="slugify(category)">
+      <div class="category-header">
+        <div>
+          <h2 class="category-title">{{ category }}</h2>
+          <p class="category-subtitle">
+            {{ getProductsByCategory(category).length }} productos disponibles
+          </p>
+        </div>
+      </div>
 
-  <span *ngIf="product.stock === 0" style="color:red;">
-    Exhausted
-  </span>
-</p>
-<button (click)="addToCart(product, i)">
-  Agregar al carrito
-</button>
-    
-  </div>
-  <!-- MODAL LOGIN -->
-<div class="modal-overlay" *ngIf="showLoginAlert">
+      <div class="product-car">
+        <article
+          class="product-card"
+          *ngFor="let product of getProductsByCategory(category); trackBy: trackById"
+        >
+          <img
+            [src]="product.image || 'assets/no-image.png'"
+            alt="{{ product.name }}"
+            class="product-image"
+          />
 
-  <div class="modal">
+          <div class="product-info">
+            <h3 class="product-name">{{ product.name }}</h3>
+            <p class="product-price">Precio: ${{ product.price }}</p>
 
-    
-    <h3>Para agregar productos al carrito primero debes iniciar sesión.</h3>
+            <p class="product-stock">
+              <span *ngIf="product.stock > 0">Stock: {{ product.stock }}</span>
+              <span *ngIf="product.stock === 0" class="sold-out">Agotado</span>
+            </p>
 
-    <div class="modal-actions">
-      <button ><a routerLink="/login">login</a></button>
-      <button (click)="showLoginAlert = false">Cancelar</button>
-    </div>
-
-  </div>
-
-</div>
+            <button
+              class="add-btn"
+              [disabled]="product.stock === 0"
+              [ngClass]="{ added: product.added }"
+              (click)="addToCart(product)"
+            >
+              <span *ngIf="product.stock > 0">Agregar</span>
+              <span *ngIf="product.stock === 0">Sin stock</span>
+            </button>
+          </div>
+        </article>
+      </div>
+    </section>
+  </ng-container>
 </section>

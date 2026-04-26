@@ -1,15 +1,61 @@
 <div class="cashier-container">
   <h2>Finalizar compra</h2>
   <div *ngIf="showAlert" class="custom-alert" [ngClass]="alertType">
-  {{ alertMessage }}
-</div>
-  <!-- DATOS CLIENTE -->
+    {{ alertMessage }}
+  </div>
+  <!-- Datos del cliente -->
+
   <div class="form">
-    <input [(ngModel)]="customerName" placeholder="Nombre completo" />
-    <input [(ngModel)]="customerEmail" placeholder="Correo electrónico" />
+    <div class="input-group">
+      <input 
+  [(ngModel)]="customerName"[ngClass]="{'input-error': !customerName || !/^[a-zA-Z\s]+$/.test(customerName)}"placeholder="Nombre completo *"/>
+
+      <small *ngIf="!customerName"> Este campo es obligatorio </small>
+
+      <small *ngIf="customerName && !/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(customerName)">
+        Solo letras y espacios
+      </small>
+    </div>
+    <div class="input-group">
+      <input [(ngModel)]="customerEmail" placeholder="Correo electrónico *" />
+
+      <small *ngIf="!customerEmail"> Este campo es obligatorio </small>
+
+      <small *ngIf="customerEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail)">
+        Correo inválido
+      </small>
+    </div>
+    <div class="input-group">
+      <input [(ngModel)]="phone" placeholder="Teléfono *" maxlength="10" />
+
+      <small *ngIf="!phone"> Este campo es obligatorio </small>
+
+      <small *ngIf="phone && !/^\d{10}$/.test(phone)"> Debe tener 10 números </small>
+    </div>
+
+    <div class="input-group">
+      <input [(ngModel)]="address" placeholder="Dirección *" />
+
+      <small *ngIf="!address"> Este campo es obligatorio </small>
+
+      <small *ngIf="address && !/^[a-zA-Z0-9#\-\.\,\s]+$/.test(address)">
+        Solo letras, números y # - , .
+      </small>
+    </div>
+    <div class="input-group">
+      <input [(ngModel)]="city" placeholder="Ciudad *" />
+
+      <small *ngIf="!city"> Este campo es obligatorio </small>
+
+      <small *ngIf="city && !/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(city)"> Solo letras </small>
+    </div>
+    <input [(ngModel)]="documentId" placeholder="Documento / Cédula" />
+
+    <textarea [(ngModel)]="notes" placeholder="Notas adicionales (opcional)"></textarea>
+    <p class="form-info">-->Todos los campos son obligatorios</p>
   </div>
 
-  <!-- MÉTODO DE PAGO -->
+  <!-- Metodo de pago -->
   <div class="payment-method">
     <h4>Método de pago</h4>
 
@@ -23,7 +69,7 @@
 
     <p class="metodo-seleccionado" *ngIf="paymentMethod">Método: {{ paymentMethod }}</p>
 
-    <!-- TARJETA -->
+    <!-- Tarjeta -->
     <div *ngIf="paymentMethod === 'card'" class="payment-form">
       <input [(ngModel)]="cardName" placeholder="Nombre en la tarjeta" />
       <input [(ngModel)]="cardNumber" placeholder="Número de tarjeta" maxlength="16" />
@@ -31,7 +77,7 @@
       <input [(ngModel)]="cvv" placeholder="CVV" maxlength="3" />
     </div>
 
-    <!-- TRANSFERENCIA -->
+    <!-- Tranferencia-->
     <div *ngIf="paymentMethod === 'transfer'" class="payment-form">
       <select [(ngModel)]="bank">
         <option value="">Selecciona un banco</option>
@@ -48,7 +94,7 @@
 
     <!-- WALLET -->
     <div *ngIf="paymentMethod === 'wallet'" class="payment-form">
-      <input [(ngModel)]="phone" placeholder="Número de celular" maxlength="10" />
+      <input [(ngModel)]="phoneWallet" placeholder="Número de Nequi / Daviplata" maxlength="10" />
     </div>
 
     <!-- RESUMEN -->
@@ -63,15 +109,11 @@
 
     <!-- BOTONES -->
     <div class="acciones">
-      <button class="cancelar" routerLink="/">Cancelar</button>
+      <button class="back" (click)="cerrar()">Cancelar</button>
 
-      <button
-  class="pagar"
-  (click)="pagar()"
-  [disabled]="!customerName || !customerEmail || !paymentMethod || items.length === 0"
->
-  {{ showAlert && alertType === 'success' ? 'Procesando...' : 'Pagar' }}
-</button>
+      <button class="pagar" (click)="pagar()">
+        {{ loading ? 'Procesando pago...' : 'Pagar' }}
+      </button>
     </div>
   </div>
 </div>

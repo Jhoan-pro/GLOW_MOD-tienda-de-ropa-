@@ -61,23 +61,18 @@ input:hover, select:hover {
   padding-bottom: 5px;
 }
 .custom-alert {
-  position: fixed;
-  top: 20px;
-  right: 20px;
+  animation: slideIn 0.4s ease;
+}
 
-  background: #020617;
-  padding: 15px 20px;
-  border-radius: 12px;
-
-  color: white;
-
-  border-left: 5px solid #06b6d4;
-
-  box-shadow: 
-    0 10px 30px rgba(0,0,0,0.8),
-    0 0 10px rgba(6,182,212,0.2);
-
-  z-index: 3000;
+@keyframes slideIn {
+  from {
+    transform: translateX(120%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 .payment-method {
   margin-top: 20px;
@@ -207,4 +202,100 @@ input:hover, select:hover {
 .payment-method,
 .resumen {
   margin-bottom: 25px;
+}
+.form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.form textarea {
+  grid-column: span 2;
+  min-height: 80px;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: #06b6d4;
+  box-shadow: 0 0 10px rgba(6,182,212,0.3);
+}
+::placeholder {
+  color: rgba(255,255,255,0.5);
+}
+.custom-alert {
+  animation: slideIn 0.4s ease;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(120%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+.input-group {
+  display: flex;
+  flex-direction: column;
+}
+.input-group small {
+  color: #f87171; /* rojo suave */
+  font-size: 12px;
+  margin-top: 4px;
+  margin-left: 5px;
+}
+.input-error {
+  border: 1px solid #ef4444 !important;
+  box-shadow: 0 0 8px rgba(239,68,68,0.4);
+}
+.back {
+  flex: 1;
+  padding: 12px;
+  border-radius: 25px;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* EFECTO BRILLO */
+.back::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(255,255,255,0.3),
+    transparent
+  );
+  transition: 0.5s;
+}
+
+.back:hover::before {
+  left: 100%;
+}
+
+/* HOVER */
+.back:hover {
+  background: #ef4444;
+  color: white;
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.6);
+}
+
+/* CLICK */
+.back:active {
+  transform: scale(0.95);
 }

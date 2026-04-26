@@ -9,7 +9,7 @@ import { Router } from '@angular/router';
   standalone: true,
   imports: [FormsModule, CommonModule],
   templateUrl: './user-profile.html',
-  styleUrl: './user-profile.css'
+  styleUrls: ['./user-profile.css'] 
 })
 export class UserProfile implements OnInit {
 
@@ -53,7 +53,7 @@ export class UserProfile implements OnInit {
     this.editMode = false;
     this.hasExtraInfo = true;
   }
-
+  //Vuelve a home
   volver() {
     this.router.navigate(['/home']);
   }

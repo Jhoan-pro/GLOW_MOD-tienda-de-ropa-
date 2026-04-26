@@ -20,6 +20,15 @@ export class Cashier {
 
   customerName = '';
   customerEmail = '';
+  
+  phone = '';
+
+
+
+  address = '';
+  city = '';
+  documentId = '';
+  notes = '';
   paymentMethod = '';
   alertMessage = '';
   alertType: 'success' | 'error' = 'success';
@@ -29,7 +38,7 @@ export class Cashier {
   cardNumber = '';
   expiry = '';
   cvv = '';
-
+  loading = false;
   // transferencia
   bank = '';
   banks: string[] = [
@@ -47,23 +56,23 @@ export class Cashier {
   reference = '';
 
   // wallet
-  phone = '';
+  phoneWallet = '';
   onPaymentChange() {
-  // Limpiar todos los campos al cambiar método
+    // Limpiar todos los campos al cambiar método
 
-  // tarjeta
-  this.cardName = '';
-  this.cardNumber = '';
-  this.expiry = '';
-  this.cvv = '';
+    // tarjeta
+    this.cardName = '';
+    this.cardNumber = '';
+    this.expiry = '';
+    this.cvv = '';
 
-  // transferencia
-  this.bank = '';
-  this.reference = '';
+    // transferencia
+    this.bank = '';
+    this.reference = '';
 
-  // wallet
-  this.phone = '';
-}
+    // wallet
+    this.phoneWallet = '';
+  }
   constructor(
     private cartService: CartService,
     private router: Router,
@@ -88,111 +97,173 @@ export class Cashier {
     return this.cartService.getTotal();
   }
 
+  updateProductStock() {
+  const storedProducts = JSON.parse(localStorage.getItem('products') || '[]');
+
+  const updatedProducts = storedProducts.map((p: any) => {
+
+    const item = this.items.find(i => i.product.id === p.id);
+
+    if (item) {
+      return {
+        ...p,
+        stock: p.stock - item.cantidad
+      };
+    }
+
+    return p;
+  });
+
+  localStorage.setItem('products', JSON.stringify(updatedProducts));
+}
+
+
   pagar() {
 
-  if (this.items.length === 0) {
-    this.mostrarAlerta('El carrito está vacío', 'error');
+  if (this.loading) return;
+
+  this.loading = true;
+
+  const user = this.userService.getCurrentUser();
+
+  //VALIDACIÓN GLOBAL PRIMERO
+  if (!this.validarCamposVacios()) {
+    this.mostrarAlerta('Primero debes completar todos los campos obligatorios', 'error');
+    this.enfocarPrimerError();
+    this.loading = false;
     return;
   }
 
-  if (!this.customerName.trim()) {
-    this.mostrarAlerta('Nombre requerido', 'error');
+  // VALIDACIONES ESPECÍFICAS
+
+  if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(this.customerName)) {
+    this.mostrarAlerta('Nombre: solo letras y espacios', 'error');
+    this.loading = false;
     return;
   }
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(this.customerEmail)) {
     this.mostrarAlerta('Correo inválido', 'error');
+    this.loading = false;
     return;
   }
 
+  if (!/^\d{10}$/.test(this.phone)) {
+    this.mostrarAlerta('Teléfono: 10 números', 'error');
+    this.loading = false;
+    return;
+  }
+
+  if (!/^[a-zA-Z0-9#\-\.\,\s]+$/.test(this.address)) {
+    this.mostrarAlerta('Dirección inválida (# - , . permitidos)', 'error');
+    this.loading = false;
+    return;
+  }
+
+  if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(this.city)) {
+    this.mostrarAlerta('Ciudad inválida', 'error');
+    this.loading = false;
+    return;
+  }
+  // VALIDAR WALLET SOLO SI ES ESE MÉTODO
+if (this.paymentMethod === 'wallet') {
+  if (!/^\d{10}$/.test(this.phoneWallet)) {
+    this.mostrarAlerta('Número de Nequi/Daviplata inválido (10 dígitos)', 'error');
+    this.loading = false;
+    return;
+  }
+}
   if (!this.paymentMethod) {
     this.mostrarAlerta('Selecciona método de pago', 'error');
+    this.loading = false;
     return;
   }
 
-  if (this.paymentMethod === 'card') {
-
-    if (!/^\d{16}$/.test(this.cardNumber)) {
-      this.mostrarAlerta('La tarjeta debe tener 16 dígitos', 'error');
-      return;
-    }
-
-    if (!this.cardName.trim()) {
-      this.mostrarAlerta('Nombre en tarjeta requerido', 'error');
-      return;
-    }
-
-    if (!/^\d{2}\/\d{2}$/.test(this.expiry)) {
-      this.mostrarAlerta('Formato de fecha inválido (MM/AA)', 'error');
-      return;
-    }
-
-    if (!/^\d{3}$/.test(this.cvv)) {
-      this.mostrarAlerta('CVV inválido (3 dígitos)', 'error');
-      return;
-    }
-  }
-
-  if (this.paymentMethod === 'transfer') {
-
-    if (!this.bank) {
-      this.mostrarAlerta('Selecciona un banco', 'error');
-      return;
-    }
-
-    if (!this.reference.trim()) {
-      this.mostrarAlerta('Referencia requerida', 'error');
-      return;
-    }
-  }
-
-  if (this.paymentMethod === 'wallet') {
-
-    if (!/^\d{10}$/.test(this.phone)) {
-      this.mostrarAlerta('El número debe tener 10 dígitos', 'error');
-      return;
-    }
-  }
-
-  const user = this.userService.getCurrentUser();
+  // CREAR FACTURA
 
   const invoice = {
-    invoiceNumber: 'INV-' + Date.now(),
-    date: new Date(),
-    customerName: this.customerName,
-    customerEmail: this.customerEmail,
-    userId: user?.email,
-    paymentMethod: this.paymentMethod,
-    items: this.items.map(item => ({
-      name: item.product.name,
-      quantity: item.cantidad,
-      price: item.product.price
-    })),
-    total: this.getTotal()
-  };
+  invoiceNumber: 'INV-' + Date.now(),
+  date: new Date(),
+
+  customer: {
+    name: this.customerName,
+    email: this.customerEmail,
+    phone: this.phone,
+    address: this.address,
+    city: this.city,
+    documentId: this.documentId
+  },
+
+  notes: this.notes,
+  userId: user?.email,
+  paymentMethod: this.paymentMethod,
+
+  paymentDetails: {
+    walletNumber: this.paymentMethod === 'wallet' ? this.phoneWallet : null,
+    bank: this.paymentMethod === 'transfer' ? this.bank : null,
+    reference: this.paymentMethod === 'transfer' ? this.reference : null,
+    cardName: this.paymentMethod === 'card' ? this.cardName : null,
+    cardNumberLast4: this.paymentMethod === 'card' ? this.cardNumber.slice(-4) : null
+  },
+
+  items: this.items.map(item => ({
+    name: item.product.name,
+    quantity: item.cantidad,
+    price: item.product.price
+  })),
+
+  total: this.getTotal()
+};
 
   localStorage.setItem('lastInvoice', JSON.stringify(invoice));
   this.orderHistory.addOrder(invoice);
+  this.cartService.clearCart();
+  this.updateProductStock();
   this.cartService.clearCart();
 
   this.mostrarAlerta('Pago realizado con éxito', 'success');
 
   setTimeout(() => {
+    this.loading = false;
     this.router.navigate(['/invoice']);
   }, 1500);
 }
-mostrarAlerta(msg: string, tipo: 'success' | 'error') {
-  this.showAlert = false; // reset
+  enfocarPrimerError() {
+    const campos = document.querySelectorAll('input, select');
 
-  setTimeout(() => {
-    this.alertMessage = msg;
-    this.alertType = tipo;
-    this.showAlert = true;
-  }, 50);
+    for (let campo of campos) {
+      if (!(campo as HTMLInputElement).value) {
+        (campo as HTMLElement).focus();
+        break;
+      }
+    }
+  }
+  mostrarAlerta(msg: string, tipo: 'success' | 'error') {
+    this.showAlert = false; // reset
 
-  setTimeout(() => {
-    this.showAlert = false;
-  }, 3000);
+    setTimeout(() => {
+      this.alertMessage = msg;
+      this.alertType = tipo;
+      this.showAlert = true;
+    }, 50);
+
+    setTimeout(() => {
+      this.loading = false;
+      this.showAlert = false;
+    }, 3000);
+  }
+  validarCamposVacios(): boolean {
+  return (
+    this.customerName.trim() !== '' &&
+    this.customerEmail.trim() !== '' &&
+    this.phone.trim() !== '' &&
+    this.address.trim() !== '' &&
+    this.city.trim() !== '' &&
+    this.paymentMethod !== ''
+  );
 }
+cerrar() {
+    this.router.navigate(['/home']);
+  }
 }

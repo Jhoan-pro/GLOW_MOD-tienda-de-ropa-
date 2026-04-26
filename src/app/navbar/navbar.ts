@@ -3,6 +3,9 @@ import { RouterLink, RouterModule, Router } from '@angular/router';
 import { NgForOf, NgIf } from '@angular/common';
 import { CartService } from '../services/cart.service';
 import { UserService } from '../services/user.service';
+import { FilterService } from '../services/filter.service';
+
+
 @Component({
   selector: 'app-navbar',
   standalone: true,
@@ -19,7 +22,7 @@ export class Navbar {
   isLoggedIn: boolean = false;
   mostrarFiltros = false;
   menuUsuarioAbierto: boolean = false;
-  constructor(private eRef: ElementRef, private router:Router,private cartService: CartService, private userService: UserService){
+  constructor(private eRef: ElementRef, private router:Router,private cartService: CartService, private userService: UserService,private filterService: FilterService){
 
   }
   toggleFiltros() {
@@ -39,9 +42,19 @@ export class Navbar {
     this.carritoAbierto = false;
   }
 }
+  slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .trim()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
 
   logout() {
-  const confirmacion = window.confirm('Cerrar sesión?');
+  const confirmacion = window.confirm('¿Cerrar sesión?');
 
   if (confirmacion) {
     this.userService.logout();
@@ -73,6 +86,8 @@ export class Navbar {
     }
   }
   ngOnInit() {
+  this.cartService.loadCart();
+
   this.cartService.cart$.subscribe(data => {
     this.items = data;
   });
@@ -105,6 +120,32 @@ checkLogin() {
 }
 ngDoCheck() {
   this.checkLogin();
+}
+selectCategory(category: string) {
+  this.scrollToCategory(category);
+}
+scrollToCategory(category: string) {
+  this.mostrarFiltros = false;
+
+  const targetId =
+    category === 'Todos'
+      ? 'catalogo'
+      : category
+          .toLowerCase()
+          .trim()
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/^-+|-+$/g, '');
+
+  this.router.navigate(['/']).then(() => {
+    setTimeout(() => {
+      document.getElementById(targetId)?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }, 80);
+  });
 }
 
 }

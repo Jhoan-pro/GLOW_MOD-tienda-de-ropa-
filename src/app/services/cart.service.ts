@@ -5,60 +5,53 @@ import { Product } from '../models/product.model';
 import { ProductService } from './product';
 import { UserService } from './user.service';
 
+interface CartItem {
+  product: Product;
+  cantidad: number;
+}
+
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class CartService {
-
   private platformId = inject(PLATFORM_ID);
 
-  private items: any[] = [];
-  private cartSubject = new BehaviorSubject<any[]>([]);
+  private items: CartItem[] = [];
+  private cartSubject = new BehaviorSubject<CartItem[]>([]);
   cart$ = this.cartSubject.asObservable();
 
   constructor(
     private productService: ProductService,
-    private userService: UserService
+    private userService: UserService,
   ) {}
-
 
   private getCartKey(): string {
     const user = this.userService.getCurrentUser();
     return user ? `cart_${user.email}` : 'cart_guest';
   }
 
-
   loadCart() {
-  if (isPlatformBrowser(this.platformId)) {
+    if (!isPlatformBrowser(this.platformId)) return;
+
     const key = this.getCartKey();
     const data = localStorage.getItem(key);
 
-    this.items = data ? JSON.parse(data) : []; 
+    this.items = data ? JSON.parse(data) : [];
 
-    this.cartSubject.next([...this.items]); 
-  }
-}
+    this.syncStockWithCart();
 
-  
-  private saveCart() {
-    if (isPlatformBrowser(this.platformId)) {
-      const key = this.getCartKey();
-      localStorage.setItem(key, JSON.stringify(this.items));
-    }
+    this.cartSubject.next([...this.items]);
   }
 
-  
   getItems() {
     return this.items;
   }
 
-  
-  addToCart(product: Product, index: number) {
-
-    const existing = this.items.find(item => item.index === index);
+  addToCart(product: Product) {
+    const existing = this.items.find((item) => item.product.id === product.id);
 
     if (product.stock <= 0) {
-      alert("Sin stock");
+      alert('Sin stock');
       return;
     }
 
@@ -66,99 +59,97 @@ export class CartService {
       existing.cantidad++;
     } else {
       this.items.push({
-        product,
+        product: { ...product },
         cantidad: 1,
-        index
       });
     }
 
     product.stock--;
 
-    this.cartSubject.next(this.items);
+    this.productService.updateStock(product.id!, product.stock);
+
+    this.cartSubject.next([...this.items]);
     this.saveCart();
   }
 
   removeItem(index: number) {
-
     const item = this.items[index];
+    if (!item) return;
 
     item.product.stock += item.cantidad;
 
-    this.items.splice(index, 1);
+    this.productService.updateStock(item.product.id!, item.product.stock);
 
-    this.cartSubject.next(this.items);
+    this.items.splice(index, 1);
+    this.cartSubject.next([...this.items]);
     this.saveCart();
   }
 
- 
-  increase(item: any) {
-
+  increase(item: CartItem) {
     if (item.product.stock <= 0) {
-      alert("No hay más stock");
+      alert('No hay más stock');
       return;
     }
 
     item.cantidad++;
     item.product.stock--;
 
-    this.cartSubject.next(this.items);
+    this.productService.updateStock(item.product.id!, item.product.stock);
+
+    this.cartSubject.next([...this.items]);
     this.saveCart();
   }
 
- 
-  decrease(item: any) {
-
+  decrease(item: CartItem) {
     if (item.cantidad > 1) {
       item.cantidad--;
       item.product.stock++;
+      this.productService.updateStock(item.product.id!, item.product.stock);
     }
 
-    this.cartSubject.next(this.items);
+    this.cartSubject.next([...this.items]);
     this.saveCart();
   }
 
- 
   getTotal() {
-    return this.items.reduce(
-      (acc, item) => acc + item.product.price * item.cantidad,
-      0
-    );
+    return this.items.reduce((acc, item) => acc + item.product.price * item.cantidad, 0);
+  }
+  private saveCart() {
+    if (isPlatformBrowser(this.platformId)) {
+      const key = this.getCartKey();
+      localStorage.setItem(key, JSON.stringify(this.items));
+    }
   }
 
-  
   clearCart() {
-
-    this.items.forEach(item => {
-      item.product.stock += item.cantidad;
+    this.items.forEach((item) => {
+      const newStock = item.product.stock + item.cantidad;
+      this.productService.updateStock(item.product.id!, newStock);
     });
 
     this.items = [];
-
-    this.cartSubject.next(this.items);
+    this.cartSubject.next([]);
     this.saveCart();
   }
-
-  
   private syncStockWithCart() {
-
     const products = this.productService.getProducts();
 
-    this.items.forEach(cartItem => {
+    this.items.forEach((cartItem) => {
+      const product = products.find((p) => p.id === cartItem.product.id);
 
-      const index = cartItem.index;
+      if (product) {
+        product.stock -= cartItem.cantidad;
 
-      if (products[index]) {
-
-        products[index].stock -= cartItem.cantidad;
-
-        if (products[index].stock < 0) {
-          products[index].stock = 0;
+        if (product.stock < 0) {
+          product.stock = 0;
         }
 
-        cartItem.product = products[index];
+        // actualizar referencia
+        cartItem.product = { ...product };
       }
     });
 
-    this.productService['saveProducts'](products);
+    //guardar cambios
+    (this.productService as any).saveProducts(products);
   }
 }

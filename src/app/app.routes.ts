@@ -27,13 +27,14 @@ import { AdminOrders } from './admin-orders/admin-orders';
 export const routes: Routes = [
 
   // Inicio
-  { path: '', component: Home },
+  { path: 'Home', component: Home },
 
   // Autenticación
   { path: 'login', component: Login },
   { path: 'register', component: RegisterUser },
   { path: 'forgot-password', component: ForgotPassword },
   { path: 'user', component: UserProfile },
+  { path: 'categoria/:nombre', component: Home },
 
 
   // Dashboard para usuarios normales
@@ -41,7 +42,7 @@ export const routes: Routes = [
     path: 'dashboard',
     component: DashBoard,
     children: [
-      
+
       { path: 'client', component: Client },
 
     ]
@@ -55,23 +56,25 @@ export const routes: Routes = [
       { path: 'admin', component: Admin },
       { path: 'products', component: Products },
       { path: 'users', component: UserManagement },
-      { path: 'dashBoard', component: Home },
       { path: 'admin-orders', component: AdminOrders },
+
+      { path: 'dashBoard', component: Home },
+      { path: 'client', component: Client },
+      { path: 'Navbar', component: Navbar },
 
     ]
   },
 
   // Otros módulos
-  
-  { path: 'invoice', component: Invoice },
-  { path: 'cashier', component: Cashier },
-  // Temporal (puedes eliminarlo después)
-  { path: 'product/new', component: ProductForm },
-  { 
-  path: 'cashier', 
-  component: Cashier,
-  canActivate: [cartGuard]
-},
 
+  { path: 'invoice', component: Invoice },
  
+  { path: 'product/new', component: ProductForm },
+  {
+    path: 'cashier',
+    component: Cashier,
+    canActivate: [cartGuard]
+  },
+
+  { path: '**', redirectTo: 'Home' }
 ];

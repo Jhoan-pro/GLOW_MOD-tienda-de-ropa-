@@ -52,7 +52,7 @@ export class Products implements OnInit {
 
   saveProduct(product: any) {
     if (this.editingIndex !== null) {
-      this.productService.updateProduct(this.editingIndex, product);
+      this.productService.updateProduct(product);
     } else {
       this.productService.addProduct(product);
     }

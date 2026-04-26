@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-invoice',
   standalone: true,
@@ -11,6 +11,7 @@ import { CommonModule } from '@angular/common';
 export class Invoice {
 
   invoice: any;
+  constructor(private router: Router) {}
 
   ngOnInit() {
     const data = localStorage.getItem('lastInvoice');
@@ -43,4 +44,8 @@ export class Invoice {
   imprimirFactura() {
     window.print();
   }
+  
+irHome() {
+  this.router.navigate(['/home']);
+}
 }

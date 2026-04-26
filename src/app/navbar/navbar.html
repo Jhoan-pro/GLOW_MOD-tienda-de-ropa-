@@ -12,48 +12,34 @@
 </button>
 
       <div class="filtros-panel" *ngIf="mostrarFiltros">
-        <h4>Filtros</h4>
+  <h4>Categorías</h4>
 
-        <label>
-          Categoría
-          <select>
-            <option>Todos</option>
-            <option>Camisetas</option>
-            <option>Chaquetas</option>
-          </select>
-        </label>
+  <button class="filtro-item" (click)="selectCategory('Todos')">Todos</button>
+<button class="filtro-item" (click)="selectCategory('Camisetas')">Camisetas</button>
+<button class="filtro-item" (click)="selectCategory('Chaquetas')">Chaquetas</button>
+<button class="filtro-item" (click)="selectCategory('Pantalones')">Pantalones</button>
+<button class="filtro-item" (click)="selectCategory('Zapatos')">Zapatos</button>
 
-        <label>
-          Precio máximo
-          <input type="range" min="0" max="200">
-        </label>
 
-        <label>
-          Ordenar por
-          <select>
-            <option>Popularidad</option>
-            <option>Precio</option>
-          </select>
-        </label>
 
-        <button class="aplicar">Aplicar</button>
-      </div>
+
+</div>
     </div>
 
-    <!-- USUARIO -->
+    <!-- Usuario -->
     <div class="user-dropdown">
       <div class="user-icon" (click)="toggleMenuUsuario()">👤</div>
 
       <div class="dropdown-menu" *ngIf="menuUsuarioAbierto">
 
-  <!-- NO LOGUEADO -->
+  <!-- No logueado -->
   <ng-container *ngIf="!isLoggedIn">
     <a routerLink="/login">Iniciar sesión</a>
   </ng-container>
 
-  <!-- LOGUEADO -->
+  <!-- Logueado -->
   <ng-container *ngIf="isLoggedIn">
-    
+
     <a routerLink="/user">Administrar cuenta</a>
     <button class="logout-btn" (click)="logout()">Cerrar sesión</button>
   </ng-container>
@@ -105,7 +91,7 @@
 
   </div>
 
-  <!-- FOOTER -->
+  <!-- Footer -->
   <div class="cart-footer">
     <p>
       <span>Total:</span>
@@ -115,7 +101,7 @@
     <div class="acciones">
   <button class="cerrar-btn" (click)="cerrarCarrito()">Cerrar</button>
 
-  <button 
+  <button
     class="comprar-btn"
     routerLink="/cashier"
     [disabled]="items.length === 0">

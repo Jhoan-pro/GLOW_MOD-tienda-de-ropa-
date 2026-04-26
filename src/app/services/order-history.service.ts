@@ -2,11 +2,11 @@ import { Injectable } from '@angular/core';
 import { UserService } from './user.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class OrderHistoryService {
   constructor(private userService: UserService) {}
-  
+
   // Llave del usuario
   private getPersonalKey(): string {
     const user = this.userService.getCurrentUser();
@@ -15,7 +15,6 @@ export class OrderHistoryService {
 
   // Llave  para el Administrador
   private readonly ADMIN_KEY = 'all_orders_global';
-
 
   addOrder(order: any) {
     //  Guardar en su historial personal

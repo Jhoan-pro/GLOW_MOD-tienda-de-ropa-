@@ -11,6 +11,7 @@
     min-height: 100vh;
     background-color: #0f172a;
     color: #f8fafc;
+    overflow: hidden;
 }
 
 /* SIDEBAR */
@@ -75,7 +76,37 @@
 /* CONTENIDO */
 .main-content {
     flex: 1;
-    padding: 2rem 3rem;
+    display: flex;         
+    flex-direction: column; 
+    height: 100vh;         
+    padding: 0;            
+    overflow: hidden;      
+}
+
+.scrollable-content {
+    flex: 1;               
+    overflow-y: auto;      
+    padding: 1rem 3rem;   
+    background-color: transparent; 
+}
+
+/* Aplicado al contenedor que tiene el scroll */
+.scrollable-content::-webkit-scrollbar {
+    width: 6px;               /* Muy delgada */
+    height: 6px;              /* Para scroll horizontal si existiera */
+}
+
+.scrollable-content::-webkit-scrollbar-track {
+    background: transparent;  /* Fondo de la barra invisible */
+}
+
+.scrollable-content::-webkit-scrollbar-thumb {
+    background: #334155;      /* Color sutil (gris azulado oscuro) */
+    border-radius: 10px;      /* Bordes redondeados */
+}
+
+.scrollable-content::-webkit-scrollbar-thumb:hover {
+    background: #475569;      /* Se aclara un poco al pasar el mouse */
 }
 
 /* HEADER */
@@ -83,7 +114,9 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 2rem;
+    padding: 1.5rem 3rem;  
+    margin-bottom: 0;     
+    flex-shrink: 0;        
 }
 
 .top-header h1 {

@@ -16,7 +16,7 @@
         <th>Productos</th>
         <th>Total</th>
         <th>Estado</th>
-        
+
       </tr>
     </thead>
     <tbody>
@@ -24,10 +24,14 @@
         <td>#{{ order.id || 'N/A' }}</td>
         <td>{{ order.date | date:'short' }}</td>
         <td>{{ order.customerEmail }}</td>
-        <td>{{ order.items[0]?.name }} x {{ order.items[0]?.quantity }}</td>
+        <td>
+          <div *ngFor="let prod of order.items">
+            {{ prod.name }} (x{{ prod.quantity }})
+          </div>
+        </td>
         <td>{{ order.total | currency }}</td>
         <td>
-          <span class="status-badge" >
+          <span class="status-badge">
             {{ order.status || 'Completado' }}
           </span>
         </td>

@@ -18,9 +18,9 @@ export class ProductForm {
     'Pantalones',
     'Zapatos',
     'Chaquetas',
-    'Suaderas',
-    'Camisetas',
-
+    'Sudaderas',
+    'Camisas',
+ 
   ];
 
   

@@ -11,7 +11,7 @@
 <input type="number" placeholder="Precio" [ngModel]="product.price === 0 ? null : product.price"
   (ngModelChange)="product.price = $event ?? 0" [disabled]="viewMode" min="0">
 <input type="number" placeholder="Stock" [ngModel]="product.stock === 0 ? null : product.stock"
-  (ngModelChange)="product.stock = $event ?? 0" [disabled]="viewMode" min="0">
+  (ngModelChange)="product.stock = $event ?? 0" [disabled]="viewMode" min="1">
 
 <select [(ngModel)]="product.category" [disabled]="viewMode">
   <option value="">Selecciona una categoría</option>

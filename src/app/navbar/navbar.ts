@@ -4,12 +4,13 @@ import { NgForOf, NgIf } from '@angular/common';
 import { CartService } from '../services/cart.service';
 import { UserService } from '../services/user.service';
 import { FilterService } from '../services/filter.service';
+import { Home } from '../home/home';
 
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [RouterLink, NgIf, RouterModule, NgForOf],
+  imports: [RouterLink, NgIf, RouterModule, NgForOf, Home],
   templateUrl: './navbar.html',
   styleUrls: ['./navbar.css'],
   encapsulation: ViewEncapsulation.None

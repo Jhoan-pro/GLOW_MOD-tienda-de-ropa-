@@ -28,6 +28,7 @@ export const routes: Routes = [
 
   // Inicio
   { path: 'Home', component: Home },
+  { path: 'Navbar', component: Navbar },
 
   // Autenticación
   { path: 'login', component: Login },
@@ -76,5 +77,5 @@ export const routes: Routes = [
     canActivate: [cartGuard]
   },
 
-  { path: '**', redirectTo: 'Home' }
+  { path: '**', redirectTo: 'Navbar' }
 ];

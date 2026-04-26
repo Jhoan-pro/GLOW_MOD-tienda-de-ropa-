@@ -6,7 +6,7 @@ import { Product } from '../models/product.model';
 
 @Component({
   selector: 'app-home',
-  imports: [Navbar, ProductCar],
+  imports: [ProductCar],
   templateUrl: './home.html',
   styleUrls: ['./home.css'],
   standalone: true

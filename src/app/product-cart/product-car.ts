@@ -17,6 +17,7 @@ import { Inject, PLATFORM_ID } from '@angular/core';
 })
 export class ProductCar {
   showLoginAlert = false;
+  isAdminView = false;
   @Input() products: Product[] = [];
   filteredProducts: Product[] = [];
 
@@ -41,7 +42,14 @@ export class ProductCar {
   trackById(_: number, item: Product) {
     return item.id ?? item.name;
   }
+
+  private checkCurrentRoute() {
+    // Detecta si la URL incluye la ruta del dashboard
+    this.isAdminView = this.router.url.includes('admin-dashboard/dashBoard');
+  }
+
   addToCart(product: Product) {
+    if (this.isAdminView) return;
     if (!this.userService.isLoggedIn()) {
       this.showLoginAlert = true;
       return;
@@ -72,6 +80,8 @@ export class ProductCar {
 
 
   ngOnInit() {
+    this.checkCurrentRoute();
+    
     if (isPlatformBrowser(this.platformId)) {
       const storedProducts = localStorage.getItem('products');
 

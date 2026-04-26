@@ -11,15 +11,8 @@
       </div>
 
       <div class="product-car">
-        <article
-          class="product-card"
-          *ngFor="let product of getProductsByCategory(category); trackBy: trackById"
-        >
-          <img
-            [src]="product.image || 'assets/no-image.png'"
-            alt="{{ product.name }}"
-            class="product-image"
-          />
+        <article class="product-card" *ngFor="let product of getProductsByCategory(category); trackBy: trackById">
+          <img [src]="product.image || 'assets/no-image.png'" alt="{{ product.name }}" class="product-image" />
 
           <div class="product-info">
             <h3 class="product-name">{{ product.name }}</h3>
@@ -30,15 +23,13 @@
               <span *ngIf="product.stock === 0" class="sold-out">Agotado</span>
             </p>
 
-            <button
-              class="add-btn"
-              [disabled]="product.stock === 0"
-              [ngClass]="{ added: product.added }"
-              (click)="addToCart(product)"
-            >
+            <button *ngIf="!isAdminView" class="add-btn" [disabled]="product.stock === 0"
+              [ngClass]="{ added: product.added }" (click)="addToCart(product)">
               <span *ngIf="product.stock > 0">Agregar</span>
               <span *ngIf="product.stock === 0">Sin stock</span>
             </button>
+
+            <p *ngIf="isAdminView" class="admin-note">Modo vista previa</p>
           </div>
         </article>
       </div>

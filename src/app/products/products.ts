@@ -1,9 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ProductForm } from '../product-form/product-form';
 import { ProductService } from '../services/product';
 import { Product } from '../models/product.model';
 import { FormsModule } from '@angular/forms';
+import { Subscription } from 'rxjs';
+
 @Component({
   selector: 'app-products',
   standalone: true,
@@ -11,13 +13,20 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './products.html',
   styleUrl: './products.css',
 })
-export class Products implements OnInit {
+export class Products implements OnInit, OnDestroy {
   products: Product[] = [];
+  private sub?: Subscription;
 
   constructor(private productService: ProductService) {}
 
   ngOnInit() {
-    this.products = this.productService.getProducts();
+    this.sub = this.productService.products$.subscribe((products) => {
+      this.products = products;
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.sub?.unsubscribe();
   }
 
   showModal: boolean = false;
@@ -50,14 +59,13 @@ export class Products implements OnInit {
     this.showModal = true;
   }
 
-  saveProduct(product: any) {
+  saveProduct(product: Product) {
     if (this.editingIndex !== null) {
       this.productService.updateProduct(product);
     } else {
       this.productService.addProduct(product);
     }
 
-    this.products = this.productService.getProducts();
     this.closeModal();
   }
 
@@ -66,24 +74,23 @@ export class Products implements OnInit {
 
     if (confirmacion) {
       this.productService.deleteProduct(index);
-      this.products = this.productService.getProducts();
     }
   }
 
   deleteSelected() {
-    const selectedProducts = this.products.filter((p) => p.selected);
+    const ids = this.products
+      .filter((p) => p.selected && p.id)
+      .map((p) => p.id as number);
 
-    if (selectedProducts.length === 0) {
+    if (ids.length === 0) {
       alert('No has seleccionado ningún producto para eliminar.');
       return;
     }
-    const confirmacion = confirm(
-      `¿Eliminar los productos seleccionados?`,
-    );
 
+    const confirmacion = confirm('¿Eliminar los productos seleccionados?');
     if (!confirmacion) return;
-    this.products = this.products.filter((p) => !p.selected);
-    this.productService['saveProducts'](this.products);
+
+    this.productService.deleteProductsByIds(ids);
   }
 
   openView(index: number) {

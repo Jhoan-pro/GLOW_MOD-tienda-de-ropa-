@@ -23,11 +23,32 @@ export class CartService {
   constructor(
     private productService: ProductService,
     private userService: UserService,
-  ) {}
+  ) {
+    if (isPlatformBrowser(this.platformId)) {
+      window.addEventListener('storage', (event: StorageEvent) => {
+        if (event.key === this.getCartKey()) {
+          this.loadCart();
+        }
+      });
+    }
+  }
 
   private getCartKey(): string {
     const user = this.userService.getCurrentUser();
     return user ? `cart_${user.email}` : 'cart_guest';
+  }
+
+  private getCurrentProduct(productId: number): Product | undefined {
+    return this.productService.getProducts().find((p) => p.id === productId);
+  }
+
+  private syncItemSnapshots() {
+    const products = this.productService.getProducts();
+
+    this.items = this.items.map((item) => {
+      const current = products.find((p) => p.id === item.product.id);
+      return current ? { ...item, product: { ...current } } : item;
+    });
   }
 
   loadCart() {
@@ -37,9 +58,7 @@ export class CartService {
     const data = localStorage.getItem(key);
 
     this.items = data ? JSON.parse(data) : [];
-
-    this.syncStockWithCart();
-
+    this.syncItemSnapshots();
     this.cartSubject.next([...this.items]);
   }
 
@@ -48,37 +67,39 @@ export class CartService {
   }
 
   addToCart(product: Product) {
-    const existing = this.items.find((item) => item.product.id === product.id);
+    if (!product.id) return;
 
-    if (product.stock <= 0) {
+    const current = this.getCurrentProduct(product.id);
+    if (!current || current.stock <= 0) {
       alert('Sin stock');
       return;
     }
 
+    const existing = this.items.find((item) => item.product.id === product.id);
+
     if (existing) {
       existing.cantidad++;
+      existing.product.stock = current.stock - 1;
     } else {
       this.items.push({
-        product: { ...product },
+        product: { ...current, stock: current.stock - 1 },
         cantidad: 1,
       });
     }
 
-    product.stock--;
-
-    this.productService.updateStock(product.id!, product.stock);
-
+    this.productService.updateStock(product.id, current.stock - 1);
     this.cartSubject.next([...this.items]);
     this.saveCart();
   }
 
   removeItem(index: number) {
     const item = this.items[index];
-    if (!item) return;
+    if (!item?.product.id) return;
 
-    item.product.stock += item.cantidad;
-
-    this.productService.updateStock(item.product.id!, item.product.stock);
+    const current = this.getCurrentProduct(item.product.id);
+    if (current) {
+      this.productService.updateStock(item.product.id, current.stock + item.cantidad);
+    }
 
     this.items.splice(index, 1);
     this.cartSubject.next([...this.items]);
@@ -86,70 +107,72 @@ export class CartService {
   }
 
   increase(item: CartItem) {
-    if (item.product.stock <= 0) {
+    if (!item.product.id) return;
+
+    const current = this.getCurrentProduct(item.product.id);
+    if (!current || current.stock <= 0) {
       alert('No hay más stock');
       return;
     }
 
     item.cantidad++;
-    item.product.stock--;
+    item.product.stock = current.stock - 1;
 
-    this.productService.updateStock(item.product.id!, item.product.stock);
-
+    this.productService.updateStock(item.product.id, current.stock - 1);
     this.cartSubject.next([...this.items]);
     this.saveCart();
   }
 
   decrease(item: CartItem) {
+    if (!item.product.id) return;
+
+    const current = this.getCurrentProduct(item.product.id);
+    if (!current) return;
+
     if (item.cantidad > 1) {
       item.cantidad--;
-      item.product.stock++;
-      this.productService.updateStock(item.product.id!, item.product.stock);
+      item.product.stock = current.stock + 1;
+      this.productService.updateStock(item.product.id, current.stock + 1);
+      this.cartSubject.next([...this.items]);
+      this.saveCart();
+      return;
     }
 
-    this.cartSubject.next([...this.items]);
-    this.saveCart();
-  }
-
-  getTotal() {
-    return this.items.reduce((acc, item) => acc + item.product.price * item.cantidad, 0);
-  }
-  private saveCart() {
-    if (isPlatformBrowser(this.platformId)) {
-      const key = this.getCartKey();
-      localStorage.setItem(key, JSON.stringify(this.items));
+    const index = this.items.findIndex((i) => i.product.id === item.product.id);
+    if (index !== -1) {
+      this.removeItem(index);
     }
   }
 
   clearCart() {
     this.items.forEach((item) => {
-      const newStock = item.product.stock + item.cantidad;
-      this.productService.updateStock(item.product.id!, newStock);
+      if (!item.product.id) return;
+
+      const current = this.getCurrentProduct(item.product.id);
+      if (current) {
+        this.productService.updateStock(item.product.id, current.stock + item.cantidad);
+      }
     });
 
     this.items = [];
     this.cartSubject.next([]);
     this.saveCart();
   }
-  private syncStockWithCart() {
-    const products = this.productService.getProducts();
 
-    this.items.forEach((cartItem) => {
-      const product = products.find((p) => p.id === cartItem.product.id);
+  finalizePurchase() {
+    this.items = [];
+    this.cartSubject.next([]);
+    this.saveCart();
+  }
 
-      if (product) {
-        product.stock -= cartItem.cantidad;
+  getTotal() {
+    return this.items.reduce((acc, item) => acc + item.product.price * item.cantidad, 0);
+  }
 
-        if (product.stock < 0) {
-          product.stock = 0;
-        }
+  private saveCart() {
+    if (!isPlatformBrowser(this.platformId)) return;
 
-        // actualizar referencia
-        cartItem.product = { ...product };
-      }
-    });
-
-    //guardar cambios
-    (this.productService as any).saveProducts(products);
+    const key = this.getCartKey();
+    localStorage.setItem(key, JSON.stringify(this.items));
   }
 }

@@ -1,13 +1,11 @@
-import { Component, inject, Input } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, Input, OnChanges, OnInit, SimpleChanges, Inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Product } from '../models/product.model';
 import { CartService } from '../services/cart.service';
 import { UserService } from '../services/user.service';
-import { Router, RouterLink } from '@angular/router';
-import { FilterService } from '../services/filter.service';
+import { Router } from '@angular/router';
 import { ActivatedRoute } from '@angular/router';
-import { isPlatformBrowser } from '@angular/common';
-import { Inject, PLATFORM_ID } from '@angular/core';
+
 @Component({
   selector: 'app-product-car',
   standalone: true,
@@ -15,16 +13,17 @@ import { Inject, PLATFORM_ID } from '@angular/core';
   templateUrl: './product-car.html',
   styleUrls: ['./product-car.css']
 })
-export class ProductCar {
+export class ProductCar implements OnInit, OnChanges {
   showLoginAlert = false;
   isAdminView = false;
+
   @Input() products: Product[] = [];
-  filteredProducts: Product[] = [];
+
+  currentCategory: string | null = null;
 
   constructor(
     private cartService: CartService,
     private userService: UserService,
-    private filterService: FilterService,
     private route: ActivatedRoute,
     private router: Router,
     @Inject(PLATFORM_ID) private platformId: object
@@ -39,23 +38,56 @@ export class ProductCar {
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-+|-+$/g, '');
   }
+
   trackById(_: number, item: Product) {
     return item.id ?? item.name;
   }
 
   private checkCurrentRoute() {
-    // Detecta si la URL incluye la ruta del dashboard
     this.isAdminView = this.router.url.includes('admin-dashboard/dashBoard');
+  }
+
+  ngOnInit() {
+    this.checkCurrentRoute();
+
+    this.route.params.subscribe((params) => {
+      this.currentCategory = params['nombre'] ?? null;
+    });
+  }
+
+  ngOnChanges(_: SimpleChanges) {
+    this.checkCurrentRoute();
+  }
+
+  get visibleProducts(): Product[] {
+    if (!this.currentCategory) return this.products;
+
+    return this.products.filter(
+      (p) =>
+        p.category?.toLowerCase().trim() ===
+        this.currentCategory!.toLowerCase().trim()
+    );
+  }
+
+  get categories(): string[] {
+    return [...new Set(this.visibleProducts.map((p) => p.category).filter(Boolean))].sort((a, b) =>
+      a.localeCompare(b)
+    );
+  }
+
+  getProductsByCategory(category: string) {
+    return this.visibleProducts.filter(
+      (p) => p.category.toLowerCase().trim() === category.toLowerCase().trim()
+    );
   }
 
   addToCart(product: Product) {
     if (this.isAdminView) return;
+
     if (!this.userService.isLoggedIn()) {
       this.showLoginAlert = true;
       return;
     }
-
-    if (product.stock <= 0) return;
 
     product.added = true;
 
@@ -65,62 +97,13 @@ export class ProductCar {
 
     this.cartService.addToCart(product);
   }
+  //Alerta de compra sino esta registrado aun
+  closeLoginAlert() {
+  this.showLoginAlert = false;
+}
 
-  get categories(): string[] {
-    return [...new Set(this.products.map(p => p.category).filter(Boolean))].sort((a, b) =>
-      a.localeCompare(b)
-    );
-  }
-
-  getProductsByCategory(category: string) {
-    return this.products.filter(
-      p => p.category.toLowerCase().trim() === category.toLowerCase().trim()
-    );
-  }
-
-
-  ngOnInit() {
-    this.checkCurrentRoute();
-    
-    if (isPlatformBrowser(this.platformId)) {
-      const storedProducts = localStorage.getItem('products');
-
-      if (storedProducts) {
-        this.products = JSON.parse(storedProducts);
-      }
-    }
-
-    this.applyFilter();
-
-    this.route.params.subscribe(() => {
-      this.applyFilter();
-    });
-
-    if (isPlatformBrowser(this.platformId)) {
-      this.router.events.subscribe(() => {
-        const storedProducts = localStorage.getItem('products');
-
-        if (storedProducts) {
-          this.products = JSON.parse(storedProducts);
-          this.applyFilter();
-        }
-      });
-    }
-  }
-
-  ngOnChanges() {
-    this.applyFilter();
-  }
-
-  applyFilter() {
-    const category = this.route.snapshot.params['nombre'];
-
-    if (!category) {
-      this.filteredProducts = this.products;
-    } else {
-      this.filteredProducts = this.products.filter(
-        p => p.category.toLowerCase().trim() === category.toLowerCase().trim()
-      );
-    }
-  }
+goToLogin() {
+  this.showLoginAlert = false;
+  this.router.navigate(['/login']);
+}
 }

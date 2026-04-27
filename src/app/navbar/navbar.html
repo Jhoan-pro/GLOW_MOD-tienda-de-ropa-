@@ -83,9 +83,9 @@
         <div class="cantidad">
           <button (click)="disminuir(item)">-</button>
           <span>{{ item.cantidad }}</span>
-          <button (click)="aumentar(item)" [disabled]="item.product.stock === 0">
-            +
-          </button>
+<button (click)="aumentar(item)" [disabled]="item.product.stock === 0">
+  +
+</button>
         </div>
 
         <div class="eliminar" (click)="eliminar(i)">

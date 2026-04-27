@@ -36,3 +36,19 @@
     </section>
   </ng-container>
 </section>
+<div class="login-alert-overlay" *ngIf="showLoginAlert" (click)="closeLoginAlert()">
+  <div class="login-alert-card" (click)="$event.stopPropagation()">
+    <h3>Debes iniciar sesión</h3>
+    <p>Para agregar productos al carrito primero debes iniciar sesión.</p>
+
+    <div class="login-alert-actions">
+      <button class="go-login-btn" (click)="goToLogin()">
+        Ir a login
+      </button>
+
+      <button class="cancel-btn" (click)="closeLoginAlert()">
+        Cancelar
+      </button>
+    </div>
+  </div>
+</div>

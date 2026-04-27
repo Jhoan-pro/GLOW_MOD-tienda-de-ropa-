@@ -36,7 +36,8 @@
     <div class="modal-content">
       <h3>Editar Usuario</h3>
       <input type="text" [(ngModel)]="editingUser!.name" placeholder="Nombre">
-      <input type="text" [(ngModel)]="editingUser!.email" placeholder="Nombre">
+      <input type="text" [(ngModel)]="editingUser!.email" placeholder="Correo">
+      <span class="error-text" *ngIf="errors.email">{{ errors.email }}</span>
       <select [(ngModel)]="editingUser!.role">
         <option value="admin">Administrador</option>
         <option value="cashier">Cajero</option>

@@ -17,7 +17,6 @@ export class RegisterUser {
   email: string = '';
   password: string = '';
   confirmPassword: string = '';
- 
 
   errors: any = {
     email: '',
@@ -32,8 +31,8 @@ export class RegisterUser {
   ) {}
 
   register() {
+    this.errors = { email: '', password: '', confirmPassword: '', general: '' };
 
-    this.errors = { email: '', password: '',confirmPassword: '', general: '' };
     // Campos vacíos
     if (!this.name || !this.email || !this.password || !this.confirmPassword) {
       this.errors.general = 'Todos los campos son obligatorios';
@@ -59,6 +58,14 @@ export class RegisterUser {
       this.errors.confirmPassword = 'Las contraseñas no coinciden';
       return;
     }
+    
+    const usuarios = this.userService.getUsers();
+    const existe = usuarios.some((u) => u.email.toLowerCase() === this.email.toLowerCase());
+
+    if (existe) {
+      this.errors.email = 'Este correo ya está registrado';
+      return;
+    }
 
     const newUser: User = {
       name: this.name,
@@ -70,7 +77,6 @@ export class RegisterUser {
 
     this.userService.addUser(newUser);
     this.errors.general = 'Registro exitoso';
-
 
     // Redirigir al login
     setTimeout(() => {

@@ -25,6 +25,7 @@ export class UserService {
       user.id = Date.now();
       users.push(user);
       localStorage.setItem(this.storageKey, JSON.stringify(users));
+      console.log('usuario guardado')
     }
     return [];
   }
@@ -52,6 +53,7 @@ getCurrentUser(): User | null {
   }
   return null;
 }
+
 
 // Saber si está logueado
 isLoggedIn(): boolean {

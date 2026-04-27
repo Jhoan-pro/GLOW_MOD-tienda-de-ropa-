@@ -21,9 +21,9 @@
     </thead>
     <tbody>
       <tr *ngFor="let order of orders">
-        <td>#{{ order.id || 'N/A' }}</td>
+        <td>#{{ order.invoiceNumber || 'N/A' }}</td>
         <td>{{ order.date | date:'short' }}</td>
-        <td>{{ order.customerEmail }}</td>
+        <td>{{ order.customer.email }}</td>
         <td>
           <div *ngFor="let prod of order.items">
             {{ prod.name }} (x{{ prod.quantity }})

@@ -46,6 +46,6 @@ export class Invoice {
   }
   
 irHome() {
-  this.router.navigate(['/home']);
+  this.router.navigate(['/Navbar']);
 }
 }

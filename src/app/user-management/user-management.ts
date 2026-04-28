@@ -50,6 +50,7 @@ export class UserManagement implements OnInit {
   }
 
   openEdit(user: User) {
+    this.errors = { email: '', password: '', confirmPassword: '', general: '' };
     this.editingUser = { ...user };
     this.showEditModal = true;
   }
@@ -57,16 +58,29 @@ export class UserManagement implements OnInit {
   saveEdit() {
     if (this.editingUser) {
       this.errors.email = '';
+      this.errors.general = '';
       const allUsers = this.userService.getUsers();
       const emailExiste = allUsers.some(
         (u) =>
           u.email.toLowerCase() === this.editingUser?.email.toLowerCase() &&
-          u.id !== this.editingUser?.id, 
+          u.id !== this.editingUser?.id,
       );
 
       if (emailExiste) {
         this.errors.email = 'Este correo ya está en uso por otro usuario.';
-        return; 
+        return;
+      }
+
+      if (!this.editingUser.name?.trim() || !this.editingUser.email?.trim()) {
+        this.errors.general = 'El nombre y el correo no pueden estar vacíos.';
+        return;
+      }
+
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+      if (!emailRegex.test(this.email)) {
+        this.errors.email = 'Correo electrónico inválido. ej: ejemplo@gmail.com';
+        return;
       }
 
       const index = allUsers.findIndex((u) => u.id === this.editingUser?.id);

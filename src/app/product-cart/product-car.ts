@@ -1,10 +1,9 @@
-import { Component, Input, OnChanges, OnInit, SimpleChanges, Inject, PLATFORM_ID } from '@angular/core';
-import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { Product } from '../models/product.model';
 import { CartService } from '../services/cart.service';
 import { UserService } from '../services/user.service';
 import { Router } from '@angular/router';
-import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-product-car',
@@ -19,14 +18,10 @@ export class ProductCar implements OnInit, OnChanges {
 
   @Input() products: Product[] = [];
 
-  currentCategory: string | null = null;
-
   constructor(
     private cartService: CartService,
     private userService: UserService,
-    private route: ActivatedRoute,
-    private router: Router,
-    @Inject(PLATFORM_ID) private platformId: object
+    private router: Router
   ) {}
 
   slugify(text: string): string {
@@ -49,35 +44,21 @@ export class ProductCar implements OnInit, OnChanges {
 
   ngOnInit() {
     this.checkCurrentRoute();
-
-    this.route.params.subscribe((params) => {
-      this.currentCategory = params['nombre'] ?? null;
-    });
   }
 
   ngOnChanges(_: SimpleChanges) {
     this.checkCurrentRoute();
   }
 
-  get visibleProducts(): Product[] {
-    if (!this.currentCategory) return this.products;
-
-    return this.products.filter(
-      (p) =>
-        p.category?.toLowerCase().trim() ===
-        this.currentCategory!.toLowerCase().trim()
-    );
-  }
-
   get categories(): string[] {
-    return [...new Set(this.visibleProducts.map((p) => p.category).filter(Boolean))].sort((a, b) =>
+    return [...new Set(this.products.map(p => p.category).filter(Boolean))].sort((a, b) =>
       a.localeCompare(b)
     );
   }
 
   getProductsByCategory(category: string) {
-    return this.visibleProducts.filter(
-      (p) => p.category.toLowerCase().trim() === category.toLowerCase().trim()
+    return this.products.filter(
+      p => p.category?.toLowerCase().trim() === category.toLowerCase().trim()
     );
   }
 
@@ -90,20 +71,32 @@ export class ProductCar implements OnInit, OnChanges {
     }
 
     product.added = true;
-
-    setTimeout(() => {
-      product.added = false;
-    }, 500);
+    setTimeout(() => (product.added = false), 500);
 
     this.cartService.addToCart(product);
   }
-  //Alerta de compra sino esta registrado aun
-  closeLoginAlert() {
-  this.showLoginAlert = false;
-}
 
-goToLogin() {
-  this.showLoginAlert = false;
-  this.router.navigate(['/login']);
-}
+  closeLoginAlert() {
+    this.showLoginAlert = false;
+  }
+
+  goToLogin() {
+    this.showLoginAlert = false;
+    this.router.navigate(['/login']);
+  }
+
+  carouselId(category: string): string {
+    return `carousel-${this.slugify(category)}`;
+  }
+
+  scrollCategory(category: string, amount: number) {
+    const container = document.getElementById(this.carouselId(category));
+
+    if (container) {
+      container.scrollBy({
+        left: amount,
+        behavior: 'smooth'
+      });
+    }
+  }
 }

@@ -1,18 +1,41 @@
-<section class="catalog-wrapper">
-  <ng-container *ngFor="let category of categories">
-    <section class="category-section" [attr.id]="slugify(category)">
-      <div class="category-header">
-        <div>
-          <h2 class="category-title">{{ category }}</h2>
-          <p class="category-subtitle">
-            {{ getProductsByCategory(category).length }} productos disponibles
-          </p>
-        </div>
+<section class="catalog-wrapper" id="catalogo">
+  <section
+    class="category-section"
+    *ngFor="let category of categories"
+    [attr.id]="slugify(category)"
+  >
+    <div class="category-header">
+      <div>
+        <h2 class="category-title">{{ category }}</h2>
+        <p class="category-subtitle">
+          {{ getProductsByCategory(category).length }} productos disponibles
+        </p>
       </div>
+    </div>
 
-      <div class="product-car">
-        <article class="product-card" *ngFor="let product of getProductsByCategory(category); trackBy: trackById">
-          <img [src]="product.image || 'assets/no-image.png'" alt="{{ product.name }}" class="product-image" />
+    <div class="carousel-wrapper">
+      <button
+        *ngIf="getProductsByCategory(category).length > 3"
+        class="arrow left"
+        (click)="scrollCategory(category, -350)"
+      >
+        ❮
+      </button>
+
+      <div
+        class="product-carousel"
+        [attr.id]="carouselId(category)"
+        [ngClass]="{ 'center-products': getProductsByCategory(category).length <= 3 }"
+      >
+        <article
+          class="product-card"
+          *ngFor="let product of getProductsByCategory(category); trackBy: trackById"
+        >
+          <img
+            [src]="product.image || 'assets/no-image.png'"
+            [alt]="product.name"
+            class="product-image"
+          />
 
           <div class="product-info">
             <h3 class="product-name">{{ product.name }}</h3>
@@ -23,8 +46,13 @@
               <span *ngIf="product.stock === 0" class="sold-out">Agotado</span>
             </p>
 
-            <button *ngIf="!isAdminView" class="add-btn" [disabled]="product.stock === 0"
-              [ngClass]="{ added: product.added }" (click)="addToCart(product)">
+            <button
+              *ngIf="!isAdminView"
+              class="add-btn"
+              [disabled]="product.stock === 0"
+              [ngClass]="{ added: product.added }"
+              (click)="addToCart(product)"
+            >
               <span *ngIf="product.stock > 0">Agregar</span>
               <span *ngIf="product.stock === 0">Sin stock</span>
             </button>
@@ -33,22 +61,26 @@
           </div>
         </article>
       </div>
-    </section>
-  </ng-container>
+
+      <button
+        *ngIf="getProductsByCategory(category).length > 3"
+        class="arrow right"
+        (click)="scrollCategory(category, 350)"
+      >
+        ❯
+      </button>
+    </div>
+  </section>
 </section>
+
 <div class="login-alert-overlay" *ngIf="showLoginAlert" (click)="closeLoginAlert()">
   <div class="login-alert-card" (click)="$event.stopPropagation()">
     <h3>Debes iniciar sesión</h3>
     <p>Para agregar productos al carrito primero debes iniciar sesión.</p>
 
     <div class="login-alert-actions">
-      <button class="go-login-btn" (click)="goToLogin()">
-        Ir a login
-      </button>
-
-      <button class="cancel-btn" (click)="closeLoginAlert()">
-        Cancelar
-      </button>
+      <button class="go-login-btn" (click)="goToLogin()">Ir a login</button>
+      <button class="cancel-btn" (click)="closeLoginAlert()">Cancelar</button>
     </div>
   </div>
 </div>

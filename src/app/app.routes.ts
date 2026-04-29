@@ -14,8 +14,6 @@ import { Invoice } from './invoice/invoice';
 
 import { ProductForm } from './product-form/product-form';
 
-import { DashBoard } from './dash-board/dash-board';
-
 import { Navbar } from './navbar/navbar';
 
 // Nuevos componentes
@@ -38,16 +36,7 @@ export const routes: Routes = [
   { path: 'categoria/:nombre', component: Home },
 
 
-  // Dashboard para usuarios normales
-  {
-    path: 'dashboard',
-    component: DashBoard,
-    children: [
-
-      { path: 'client', component: Client },
-
-    ]
-  },
+  
 
   // Dashboard de administrador
   {

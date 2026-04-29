@@ -59,4 +59,19 @@ getCurrentUser(): User | null {
 isLoggedIn(): boolean {
   return this.getCurrentUser() !== null;
 }
+updateUserProfile(updatedUser: User) {
+  if (!isPlatformBrowser(this.platformid)) return;
+
+  const users = this.getUsers();
+
+  const updatedUsers = users.map((user) => {
+    if (user.id === updatedUser.id || user.email === updatedUser.email) {
+      return { ...user, ...updatedUser };
+    }
+    return user;
+  });
+
+  localStorage.setItem(this.storageKey, JSON.stringify(updatedUsers));
+  localStorage.setItem(this.currentUserKey, JSON.stringify(updatedUser));
+}
 }

@@ -29,17 +29,22 @@ export class UserProfile implements OnInit {
   constructor(private userService: UserService, private router: Router) {}
 
   ngOnInit() {
-    const currentUser = this.userService.getCurrentUser();
+  const currentUser = this.userService.getCurrentUser();
 
-    if (!currentUser) {
-      this.router.navigate(['/login']);
-      return;
-    }
-
-    this.user = { ...currentUser };
-
-    this.hasExtraInfo = !!this.user.address;
+  if (!currentUser) {
+    this.router.navigate(['/login']);
+    return;
   }
+
+  const users = this.userService.getUsers();
+  const savedUser = users.find(
+    u => u.email === currentUser.email || u.id === currentUser.id
+  );
+
+  this.user = savedUser ? { ...savedUser } : { ...currentUser };
+
+  this.hasExtraInfo = !!this.user.address;
+}
 
   enableEdit() {
     this.editMode = true;
@@ -129,10 +134,12 @@ export class UserProfile implements OnInit {
     this.submitted = true;
 
     if (!this.validarFormulario()) return;
-
+    
     // Normalizar antes de guardar
     this.user.address = this.user.address.trim();
     this.user.country = this.user.country.trim();
+
+    this.userService.updateUserProfile(this.user);
 
     this.userService.login(this.user);
 

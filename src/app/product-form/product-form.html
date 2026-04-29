@@ -1,29 +1,47 @@
-<h3>{{ viewMode ? 'Información del producto' : isEditing ? 'Editar producto' : 'Agregar producto' }} </h3>
+<div class="form-container"><h3>{{ viewMode ? 'Información del producto' : isEditing ? 'Editar producto' : 'Agregar producto' }}</h3>
 
 <div class="imagen" *ngIf="product.image">
   <img [src]="product.image">
 </div>
 
-<input *ngIf="!viewMode" type="file" (change)="onImageSelected($event)" [disabled]="viewMode">
+<div *ngIf="!viewMode">
+  <input type="file" (change)="onImageSelected($event)" accept="image/*">
+  <span class="error-text" *ngIf="errors.image">{{ errors.image }}</span>
+</div>
 
+<div class="form-group">
+  <input type="text" placeholder="Nombre" [(ngModel)]="product.name" [disabled]="viewMode">
+  <span class="error-text" *ngIf="errors.name">{{ errors.name }}</span>
+</div>
 
+<div class="form-group">
+  <input type="number" placeholder="Precio" 
+    [ngModel]="product.price === 0 ? null : product.price"
+    (ngModelChange)="product.price = $event ?? 0" 
+    [disabled]="viewMode" min="0">
+  <span class="error-text" *ngIf="errors.price">{{ errors.price }}</span>
+</div>
 
-<input type="text" placeholder="Nombre" [(ngModel)]="product.name" [disabled]="viewMode">
-<input type="number" placeholder="Precio" [ngModel]="product.price === 0 ? null : product.price"
-  (ngModelChange)="product.price = $event ?? 0" [disabled]="viewMode" min="0">
-<input type="number" placeholder="Stock" [ngModel]="product.stock === 0 ? null : product.stock"
-  (ngModelChange)="product.stock = $event ?? 0" [disabled]="viewMode" min="1">
+<div class="form-group">
+  <input type="number" placeholder="Stock" 
+    [ngModel]="product.stock === 0 ? null : product.stock"
+    (ngModelChange)="product.stock = $event ?? 0" 
+    [disabled]="viewMode" min="0">
+  <span class="error-text" *ngIf="errors.stock">{{ errors.stock }}</span>
+</div>
 
-<select [(ngModel)]="product.category" [disabled]="viewMode">
-  <option value="">Selecciona una categoría</option>
-  <option *ngFor="let cat of categories" [value]="cat">
-    {{ cat }}
-  </option>
-</select>
+<div class="form-group">
+  <select [(ngModel)]="product.category" [disabled]="viewMode">
+    <option value="">Selecciona una categoría</option>
+    <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+  </select>
+  <span class="error-text" *ngIf="errors.category">{{ errors.category }}</span>
+</div>
 
-<textarea placeholder="Descripción" [(ngModel)]="product.description" [disabled]="viewMode"></textarea>
+<textarea placeholder="Descripción (Opcional)" [(ngModel)]="product.description" [disabled]="viewMode"></textarea>
 
 <div class="actions">
   <button *ngIf="!viewMode" (click)="onSubmit()">Guardar</button>
-  <button class="cancel" (click)="onCancel()">Cancelar</button>
+  <button class="cancel" (click)="onCancel()">{{ viewMode ? 'Cerrar' : 'Cancelar' }}</button>
+</div>
 </div>

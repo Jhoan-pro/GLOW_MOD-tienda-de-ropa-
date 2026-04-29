@@ -78,14 +78,27 @@ confirmarLogout() {
     this.carritoAbierto=false;
   }
   //Detecta clics
-  @HostListener('document: click', ['$event'])
-  clickFuera(event: Event){
-    if(!this.eRef.nativeElement.contains(event.target)){
-      this.menuUsuarioAbierto=false;
-      this.mostrarFiltros = false;
-      this.carritoAbierto= false;
-    }
+  @HostListener('document:click', ['$event'])
+clickFuera(event: MouseEvent) {
+
+  const target = event.target as HTMLElement;
+
+  const clickDentroFiltros = target.closest('.search-box');
+  const clickDentroUsuario = target.closest('.user-dropdown');
+  const clickDentroCarrito = target.closest('.cart-panel');
+  const clickIconCarrito = target.closest('.cart-icon');
+
+  if (
+    !clickDentroFiltros &&
+    !clickDentroUsuario &&
+    !clickDentroCarrito &&
+    !clickIconCarrito
+  ) {
+    this.mostrarFiltros = false;
+    this.menuUsuarioAbierto = false;
+    this.carritoAbierto = false;
   }
+}
   ngOnInit() {
   this.cartService.loadCart();
 

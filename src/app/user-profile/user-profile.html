@@ -1,63 +1,68 @@
 <div class="profile-container">
-
   <div class="profile-card">
-
     <h2>Mi Perfil</h2>
 
     <!-- Foto -->
     <div class="photo-section">
-      <img [src]="user.photo || 'img/default-user.png'" alt="foto">
+      <img [src]="user.photo || 'img/user.png'" alt="foto" />
     </div>
 
     <!-- Email -->
     <label>Email</label>
-    <input type="text" [value]="user.email" disabled>
+    <input type="text" [value]="user.email" disabled />
 
     <!-- Nombre -->
     <label>Nombre</label>
-    <input type="text" [value]="user.name" disabled>
+    <input type="text" [value]="user.name" disabled />
 
     <!-- Direccion -->
-    <label>Dirección</label>
-    <input [(ngModel)]="user.address" [disabled]="!editMode">
-    <span class="error" *ngIf="errors.address">{{ errors.address }}</span>
-
+     <label>Dirección</label>
+    <input
+  [(ngModel)]="user.address"
+  name="address"
+  (input)="user.address = normalizeAddress(user.address)"
+  [disabled]="!editMode"
+  [ngClass]="{'input-error': submitted && errors.address}"
+/>
+<span class="error" *ngIf="submitted && errors.address">{{ errors.address }}</span>
     <!-- Fecha-->
     <label>Fecha de nacimiento</label>
-    <input type="date" [(ngModel)]="user.birthDate" [disabled]="!editMode">
+    <input type="date" [(ngModel)]="user.birthDate" [disabled]="!editMode" />
 
     <!-- Identificaciòn-->
     <label>Identificación</label>
-    <input [(ngModel)]="user.idNumber" [disabled]="!editMode">
-
+<input
+  [(ngModel)]="user.idNumber"
+  name="idNumber"
+  (input)="user.idNumber = normalizeDigits(user.idNumber)"
+  (keypress)="allowOnlyDigits($event)"
+  [disabled]="!editMode"
+  [ngClass]="{'input-error': submitted && errors.idNumber}"
+/>
+<span class="error" *ngIf="submitted && errors.idNumber">{{ errors.idNumber }}</span>
     <!-- Pais -->
     <label>País / Región</label>
-    <input [(ngModel)]="user.country" [disabled]="!editMode">
-
+<input
+  [(ngModel)]="user.country"
+  name="country"
+  (input)="user.country = normalizeLetters(user.country)"
+  (keypress)="allowOnlyLetters($event)"
+  [disabled]="!editMode"
+  [ngClass]="{'input-error': submitted && errors.country}"
+/>
+<span class="error" *ngIf="submitted && errors.country">{{ errors.country }}</span>
     <!-- Botones -->
     <div class="actions">
-
       <!-- Si no tiene info-->
-      <button *ngIf="!hasExtraInfo" (click)="enableEdit()">
-        Agregar info
-      </button>
+      <button *ngIf="!hasExtraInfo" (click)="enableEdit()">Agregar info</button>
 
       <!-- Si ya tiene info-->
-      <button *ngIf="hasExtraInfo && !editMode" (click)="enableEdit()">
-        Editar
-      </button>
+      <button *ngIf="hasExtraInfo && !editMode" (click)="enableEdit()">Editar</button>
 
       <!-- Guardar -->
-      <button *ngIf="editMode" (click)="save()">
-        Guardar
-      </button>
+      <button *ngIf="editMode" (click)="save()">Guardar</button>
 
-      <button class="back" (click)="volver()">
-        Volver
-      </button>
-
+      <button class="back" (click)="volver()">Volver</button>
     </div>
-
   </div>
-
 </div>

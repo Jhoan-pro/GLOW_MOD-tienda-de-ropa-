@@ -85,3 +85,19 @@ button.back:hover {
   color: #f87171;
   font-size: 12px;
 }
+.input-error {
+  border: 1px solid #ef4444;
+  box-shadow: 0 0 6px rgba(239,68,68,0.4);
+}
+
+.error {
+  color: #f87171;
+  font-size: 12px;
+  margin-top: 4px;
+  display: block;
+}
+
+input:focus {
+  outline: none;
+  box-shadow: 0 0 8px rgba(37,99,235,0.5);
+}

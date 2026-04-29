@@ -6,6 +6,22 @@ import { FormsModule } from '@angular/forms';
 import { UserService } from '../services/user.service';
 import { OrderHistoryService } from '../services/order-history.service';
 
+type ErrorKeys =
+  | 'customerName'
+  | 'customerEmail'
+  | 'phone'
+  | 'address'
+  | 'city'
+  | 'documentId'
+  | 'paymentMethod'
+  | 'cardName'
+  | 'cardNumber'
+  | 'expiry'
+  | 'cvv'
+  | 'bank'
+  | 'reference'
+  | 'phoneWallet';
+
 @Component({
   selector: 'app-cashier',
   standalone: true,
@@ -27,12 +43,12 @@ export class Cashier {
   alertMessage = '';
   alertType: 'success' | 'error' = 'success';
   showAlert = false;
+  loading = false;
 
   cardName = '';
   cardNumber = '';
   expiry = '';
   cvv = '';
-  loading = false;
 
   bank = '';
   banks: string[] = [
@@ -48,8 +64,10 @@ export class Cashier {
     'Banco Falabella',
   ];
   reference = '';
-
   phoneWallet = '';
+
+  submitted = false;
+  errors: Partial<Record<ErrorKeys, string>> = {};
 
   constructor(
     private cartService: CartService,
@@ -82,96 +100,235 @@ export class Cashier {
     this.bank = '';
     this.reference = '';
     this.phoneWallet = '';
+    this.errors = {
+      ...this.errors,
+      paymentMethod: undefined,
+      cardName: undefined,
+      cardNumber: undefined,
+      expiry: undefined,
+      cvv: undefined,
+      bank: undefined,
+      reference: undefined,
+      phoneWallet: undefined,
+    };
   }
 
-  validarCamposVacios(): boolean {
-    return (
-      this.customerName.trim() !== '' &&
-      this.customerEmail.trim() !== '' &&
-      this.phone.trim() !== '' &&
-      this.address.trim() !== '' &&
-      this.city.trim() !== '' &&
-      this.paymentMethod !== ''
-    );
+  normalizeLetters(value: string): string {
+    return value
+      .replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '')
+      .replace(/\s{2,}/g, ' ');
+  }
+
+  normalizeDigits(value: string): string {
+    return value.replace(/\D/g, '');
+  }
+
+  normalizeAddress(value: string): string {
+    return value.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ#\-\.,\s]/g, '');
+  }
+
+  allowOnlyLetters(event: KeyboardEvent) {
+    const allowed = [
+      'Backspace',
+      'Delete',
+      'Tab',
+      'ArrowLeft',
+      'ArrowRight',
+      'Home',
+      'End',
+    ];
+
+    if (allowed.includes(event.key) || event.ctrlKey || event.metaKey) return;
+
+    if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]$/.test(event.key)) {
+      event.preventDefault();
+      this.mostrarAlerta('Solo se permiten letras y espacios', 'error');
+    }
+  }
+
+  allowOnlyDigits(event: KeyboardEvent) {
+    const allowed = [
+      'Backspace',
+      'Delete',
+      'Tab',
+      'ArrowLeft',
+      'ArrowRight',
+      'Home',
+      'End',
+    ];
+
+    if (allowed.includes(event.key) || event.ctrlKey || event.metaKey) return;
+
+    if (!/^\d$/.test(event.key)) {
+      event.preventDefault();
+      this.mostrarAlerta('Solo se permiten números', 'error');
+    }
+  }
+
+  private isValidEmail(email: string): boolean {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+  }
+
+  private isFutureOrCurrentExpiry(expiry: string): boolean {
+    const match = expiry.trim().match(/^(0[1-9]|1[0-2])\/(\d{2})$/);
+    if (!match) return false;
+
+    const month = Number(match[1]);
+    const year = 2000 + Number(match[2]);
+
+    const now = new Date();
+    const currentMonth = now.getMonth() + 1;
+    const currentYear = now.getFullYear();
+
+    return year > currentYear || (year === currentYear && month >= currentMonth);
+  }
+
+  private setError(key: ErrorKeys, message: string) {
+    this.errors[key] = message;
+  }
+
+  validarFormulario(): boolean {
+    this.errors = {};
+
+    // Nombre
+    if (!this.customerName.trim()) {
+      this.setError('customerName', 'Nombre completo obligatorio. Ej: Juan Pérez');
+    } else if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(this.customerName.trim())) {
+      this.setError('customerName', 'Solo letras y espacios');
+    } else if (this.customerName.trim().length < 3) {
+      this.setError('customerName', 'Debe tener mínimo 3 caracteres');
+    }
+
+    // Email
+    if (!this.customerEmail.trim()) {
+      this.setError('customerEmail', 'Correo electrónico obligatorio. Ej: correo@dominio.com');
+    } else if (!this.isValidEmail(this.customerEmail)) {
+      this.setError('customerEmail', 'Correo inválido');
+    }
+
+    // Teléfono
+    if (!this.phone.trim()) {
+      this.setError('phone', 'Teléfono obligatorio. Ej: 3001234567');
+    } else if (!/^\d{10}$/.test(this.phone)) {
+      this.setError('phone', 'Debe tener exactamente 10 números');
+    }
+
+    // Dirección
+    if (!this.address.trim()) {
+      this.setError('address', 'Dirección obligatoria. Ej: Cra 12 # 34-56');
+    } else if (this.address.trim().length < 5) {
+      this.setError('address', 'La dirección es muy corta');
+    } else if (!/^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ#\-\.,\s]+$/.test(this.address)) {
+      this.setError('address', 'Solo letras, números y # - , .');
+    }
+
+    // Ciudad
+    if (!this.city.trim()) {
+      this.setError('city', 'Ciudad obligatoria. Ej: Popayán');
+    } else if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(this.city.trim())) {
+      this.setError('city', 'Solo letras y espacios');
+    }
+
+    // Documento
+    if (!this.documentId.trim()) {
+      this.setError('documentId', 'Documento obligatorio. Ej: 123456789');
+    } else if (!/^\d{6,12}$/.test(this.documentId)) {
+      this.setError('documentId', 'Solo números, entre 6 y 12 dígitos');
+    }
+
+    // Método de pago
+    if (!this.paymentMethod) {
+      this.setError('paymentMethod', 'Selecciona un método de pago');
+    }
+
+    // Validaciones por método
+    if (this.paymentMethod === 'card') {
+      if (!this.cardName.trim()) {
+        this.setError('cardName', 'Nombre en la tarjeta obligatorio');
+      } else if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(this.cardName.trim())) {
+        this.setError('cardName', 'Solo letras y espacios');
+      }
+
+      if (!this.cardNumber.trim()) {
+        this.setError('cardNumber', 'Número de tarjeta obligatorio');
+      } else if (!/^\d{16}$/.test(this.cardNumber)) {
+        this.setError('cardNumber', 'Debe tener 16 números');
+      }
+
+      if (!this.expiry.trim()) {
+        this.setError('expiry', 'Fecha de vencimiento obligatoria. Ej: 12/29');
+      } else if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(this.expiry)) {
+        this.setError('expiry', 'Formato inválido. Usa MM/AA');
+      } else if (!this.isFutureOrCurrentExpiry(this.expiry)) {
+        this.setError('expiry', 'La tarjeta está vencida');
+      }
+
+      if (!this.cvv.trim()) {
+        this.setError('cvv', 'CVV obligatorio');
+      } else if (!/^\d{3}$/.test(this.cvv)) {
+        this.setError('cvv', 'Debe tener 3 números');
+      }
+    }
+
+    if (this.paymentMethod === 'transfer') {
+      if (!this.bank) {
+        this.setError('bank', 'Selecciona un banco');
+      }
+
+      if (!this.reference.trim()) {
+        this.setError('reference', 'Referencia obligatoria');
+      } else if (!/^[a-zA-Z0-9\-]+$/.test(this.reference.trim())) {
+        this.setError('reference', 'Solo letras, números y guion');
+      } else if (this.reference.trim().length < 4) {
+        this.setError('reference', 'La referencia es muy corta');
+      }
+    }
+
+    if (this.paymentMethod === 'wallet') {
+      if (!this.phoneWallet.trim()) {
+        this.setError('phoneWallet', 'Número de Nequi / Daviplata obligatorio');
+      } else if (!/^\d{10}$/.test(this.phoneWallet)) {
+        this.setError('phoneWallet', 'Debe tener 10 números');
+      }
+    }
+
+    return Object.keys(this.errors).length === 0;
   }
 
   pagar() {
     if (this.loading) return;
+
+    this.submitted = true;
     this.loading = true;
 
-    const user = this.userService.getCurrentUser();
-
-    if (!this.validarCamposVacios()) {
-      this.mostrarAlerta('Primero debes completar todos los campos obligatorios', 'error');
+    if (!this.validarFormulario()) {
+      this.mostrarAlerta('Revisa los campos marcados en rojo', 'error');
       this.enfocarPrimerError();
       this.loading = false;
       return;
     }
 
-    if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(this.customerName)) {
-      this.mostrarAlerta('Nombre: solo letras y espacios', 'error');
-      this.loading = false;
-      return;
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(this.customerEmail)) {
-      this.mostrarAlerta('Correo inválido', 'error');
-      this.loading = false;
-      return;
-    }
-
-    if (!/^\d{10}$/.test(this.phone)) {
-      this.mostrarAlerta('Teléfono: 10 números', 'error');
-      this.loading = false;
-      return;
-    }
-
-    if (!/^[a-zA-Z0-9#\-\.\,\s]+$/.test(this.address)) {
-      this.mostrarAlerta('Dirección inválida (# - , . permitidos)', 'error');
-      this.loading = false;
-      return;
-    }
-
-    if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(this.city)) {
-      this.mostrarAlerta('Ciudad inválida', 'error');
-      this.loading = false;
-      return;
-    }
-
-    if (this.paymentMethod === 'wallet') {
-      if (!/^\d{10}$/.test(this.phoneWallet)) {
-        this.mostrarAlerta('Número de Nequi/Daviplata inválido (10 dígitos)', 'error');
-        this.loading = false;
-        return;
-      }
-    }
-
-    if (!this.paymentMethod) {
-      this.mostrarAlerta('Selecciona método de pago', 'error');
-      this.loading = false;
-      return;
-    }
+    const user = this.userService.getCurrentUser();
 
     const invoice = {
       invoiceNumber: 'INV-' + Date.now(),
       date: new Date(),
       customer: {
-        name: this.customerName,
-        email: this.customerEmail,
-        phone: this.phone,
-        address: this.address,
-        city: this.city,
-        documentId: this.documentId,
+        name: this.customerName.trim(),
+        email: this.customerEmail.trim(),
+        phone: this.phone.trim(),
+        address: this.address.trim(),
+        city: this.city.trim(),
+        documentId: this.documentId.trim(),
       },
-      notes: this.notes,
+      notes: this.notes.trim(),
       userId: user?.email,
       paymentMethod: this.paymentMethod,
       paymentDetails: {
-        walletNumber: this.paymentMethod === 'wallet' ? this.phoneWallet : null,
+        walletNumber: this.paymentMethod === 'wallet' ? this.phoneWallet.trim() : null,
         bank: this.paymentMethod === 'transfer' ? this.bank : null,
-        reference: this.paymentMethod === 'transfer' ? this.reference : null,
-        cardName: this.paymentMethod === 'card' ? this.cardName : null,
+        reference: this.paymentMethod === 'transfer' ? this.reference.trim() : null,
+        cardName: this.paymentMethod === 'card' ? this.cardName.trim() : null,
         cardNumberLast4: this.paymentMethod === 'card' ? this.cardNumber.slice(-4) : null,
       },
       items: this.items.map((item) => ({
@@ -185,7 +342,6 @@ export class Cashier {
     localStorage.setItem('lastInvoice', JSON.stringify(invoice));
     this.orderHistory.addOrder(invoice);
 
-    // Compra finalizada: se vacía el carrito, pero NO se repone stock
     this.cartService.finalizePurchase();
 
     this.mostrarAlerta('Pago realizado con éxito', 'success');
@@ -197,14 +353,10 @@ export class Cashier {
   }
 
   enfocarPrimerError() {
-    const campos = document.querySelectorAll('input, select');
-
-    for (const campo of campos) {
-      if (!(campo as HTMLInputElement).value) {
-        (campo as HTMLElement).focus();
-        break;
-      }
-    }
+    setTimeout(() => {
+      const firstError = document.querySelector('.input-error') as HTMLElement | null;
+      firstError?.focus();
+    }, 0);
   }
 
   mostrarAlerta(msg: string, tipo: 'success' | 'error') {

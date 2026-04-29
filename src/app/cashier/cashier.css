@@ -299,3 +299,33 @@ input:focus, select:focus, textarea:focus {
 .back:active {
   transform: scale(0.95);
 }
+.hint {
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 12px;
+  margin-top: 4px;
+  margin-left: 5px;
+}
+
+.input-error {
+  border: 1px solid #ef4444 !important;
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.35);
+}
+
+small {
+  display: block;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 90px;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: rgba(255, 255, 255, 0.45);
+}

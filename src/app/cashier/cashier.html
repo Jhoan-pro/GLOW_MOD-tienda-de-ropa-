@@ -7,85 +7,199 @@
 
   <div class="form">
     <div class="input-group">
-      <input 
-  [(ngModel)]="customerName"[ngClass]="{'input-error': !customerName || !/^[a-zA-Z\s]+$/.test(customerName)}"placeholder="Nombre completo *"/>
-
-      <small *ngIf="!customerName"> Este campo es obligatorio </small>
-
-      <small *ngIf="customerName && !/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(customerName)">
-        Solo letras y espacios
-      </small>
-    </div>
+  <input
+    name="customerName"
+    [(ngModel)]="customerName"
+    (input)="customerName = normalizeLetters(customerName)"
+    (keypress)="allowOnlyLetters($event)"
+    [ngClass]="{'input-error': submitted && errors.customerName}"
+    placeholder="Nombre completo *"
+    autocomplete="name"
+    maxlength="60"
+  />
+  <small *ngIf="submitted && errors.customerName">{{ errors.customerName }}</small>
+  <small class="hint">Ej: Juan Pérez</small>
+</div>
     <div class="input-group">
-      <input [(ngModel)]="customerEmail" placeholder="Correo electrónico *" />
+  <input
+    name="customerEmail"
+    [(ngModel)]="customerEmail"
+    [ngClass]="{'input-error': submitted && errors.customerEmail}"
+    placeholder="Correo electrónico *"
+    autocomplete="email"
+    maxlength="80"
+  />
+  <small *ngIf="submitted && errors.customerEmail">{{ errors.customerEmail }}</small>
+  <small class="hint">Ej: correo@dominio.com</small>
+</div>
+   <div class="input-group">
+  <input
+    name="phone"
+    [(ngModel)]="phone"
+    (input)="phone = normalizeDigits(phone)"
+    (keypress)="allowOnlyDigits($event)"
+    [ngClass]="{'input-error': submitted && errors.phone}"
+    placeholder="Teléfono *"
+    autocomplete="tel"
+    inputmode="numeric"
+    maxlength="10"
+  />
+  <small *ngIf="submitted && errors.phone">{{ errors.phone }}</small>
+  <small class="hint">Ej: 3001234567</small>
+</div>
 
-      <small *ngIf="!customerEmail"> Este campo es obligatorio </small>
-
-      <small *ngIf="customerEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail)">
-        Correo inválido
-      </small>
-    </div>
     <div class="input-group">
-      <input [(ngModel)]="phone" placeholder="Teléfono *" maxlength="10" />
-
-      <small *ngIf="!phone"> Este campo es obligatorio </small>
-
-      <small *ngIf="phone && !/^\d{10}$/.test(phone)"> Debe tener 10 números </small>
-    </div>
-
+  <input
+    name="address"
+    [(ngModel)]="address"
+    (input)="address = normalizeAddress(address)"
+    [ngClass]="{'input-error': submitted && errors.address}"
+    placeholder="Dirección *"
+    autocomplete="street-address"
+    maxlength="80"
+  />
+  <small *ngIf="submitted && errors.address">{{ errors.address }}</small>
+  <small class="hint">Ej: Cra 12 # 34-56</small>
+</div>
     <div class="input-group">
-      <input [(ngModel)]="address" placeholder="Dirección *" />
-
-      <small *ngIf="!address"> Este campo es obligatorio </small>
-
-      <small *ngIf="address && !/^[a-zA-Z0-9#\-\.\,\s]+$/.test(address)">
-        Solo letras, números y # - , .
-      </small>
-    </div>
+  <input
+    name="city"
+    [(ngModel)]="city"
+    (input)="city = normalizeLetters(city)"
+    (keypress)="allowOnlyLetters($event)"
+    [ngClass]="{'input-error': submitted && errors.city}"
+    placeholder="Ciudad *"
+    autocomplete="address-level2"
+    maxlength="50"
+  />
+  <small *ngIf="submitted && errors.city">{{ errors.city }}</small>
+  <small class="hint">Ej: Popayán</small>
+</div>
     <div class="input-group">
-      <input [(ngModel)]="city" placeholder="Ciudad *" />
-
-      <small *ngIf="!city"> Este campo es obligatorio </small>
-
-      <small *ngIf="city && !/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(city)"> Solo letras </small>
-    </div>
-    <input [(ngModel)]="documentId" placeholder="Documento / Cédula" />
-
-    <textarea [(ngModel)]="notes" placeholder="Notas adicionales (opcional)"></textarea>
-    <p class="form-info">-->Todos los campos son obligatorios</p>
+  <input
+    name="documentId"
+    [(ngModel)]="documentId"
+    (input)="documentId = normalizeDigits(documentId)"
+    (keypress)="allowOnlyDigits($event)"
+    [ngClass]="{'input-error': submitted && errors.documentId}"
+    placeholder="Documento / Cédula *"
+    inputmode="numeric"
+    maxlength="12"
+  />
+  <small *ngIf="submitted && errors.documentId">{{ errors.documentId }}</small>
+  <small class="hint">Ej: 123456789</small>
+</div>
+   <div class="input-group">
+  <textarea
+    name="notes"
+    [(ngModel)]="notes"
+    placeholder="Notas adicionales (opcional)"
+    maxlength="250"
+  ></textarea>
+  <small class="hint">Máximo 250 caracteres</small>
+</div>
+    
   </div>
 
   <!-- Metodo de pago -->
   <div class="payment-method">
     <h4>Método de pago</h4>
 
-    <select [(ngModel)]="paymentMethod" (change)="onPaymentChange()">
-      <option value="">Seleccionar</option>
-      <option value="card">💳 Tarjeta</option>
-      <option value="transfer">🏦 Transferencia</option>
-      <option value="paypal">🅿️ PayPal</option>
-      <option value="wallet">📱 Nequi / Daviplata</option>
-    </select>
+    <select
+  name="paymentMethod"
+  [(ngModel)]="paymentMethod"
+  (change)="onPaymentChange()"
+  [ngClass]="{'input-error': submitted && errors.paymentMethod}"
+>
+  <option value="">Seleccionar</option>
+  <option value="card">💳 Tarjeta</option>
+  <option value="transfer">🏦 Transferencia</option>
+  <option value="paypal">🅿️ PayPal</option>
+  <option value="wallet">📱 Nequi / Daviplata</option>
+</select>
+  <small *ngIf="submitted && errors.paymentMethod">{{ errors.paymentMethod }}</small>
+    
 
-    <p class="metodo-seleccionado" *ngIf="paymentMethod">Método: {{ paymentMethod }}</p>
-
-    <!-- Tarjeta -->
     <div *ngIf="paymentMethod === 'card'" class="payment-form">
-      <input [(ngModel)]="cardName" placeholder="Nombre en la tarjeta" />
-      <input [(ngModel)]="cardNumber" placeholder="Número de tarjeta" maxlength="16" />
-      <input [(ngModel)]="expiry" placeholder="MM/AA" />
-      <input [(ngModel)]="cvv" placeholder="CVV" maxlength="3" />
-    </div>
+  <div class="input-group">
+    <input
+      name="cardName"
+      [(ngModel)]="cardName"
+      (input)="cardName = normalizeLetters(cardName)"
+      (keypress)="allowOnlyLetters($event)"
+      [ngClass]="{'input-error': submitted && errors.cardName}"
+      placeholder="Nombre en la tarjeta"
+      maxlength="60"
+    />
+    <small *ngIf="submitted && errors.cardName">{{ errors.cardName }}</small>
+  </div>
+
+  <div class="input-group">
+    <input
+      name="cardNumber"
+      [(ngModel)]="cardNumber"
+      (input)="cardNumber = normalizeDigits(cardNumber)"
+      (keypress)="allowOnlyDigits($event)"
+      [ngClass]="{'input-error': submitted && errors.cardNumber}"
+      placeholder="Número de tarjeta"
+      inputmode="numeric"
+      maxlength="16"
+    />
+    <small *ngIf="submitted && errors.cardNumber">{{ errors.cardNumber }}</small>
+  </div>
+
+  <div class="input-group">
+    <input
+      name="expiry"
+      [(ngModel)]="expiry"
+      [ngClass]="{'input-error': submitted && errors.expiry}"
+      placeholder="MM/AA"
+      maxlength="5"
+    />
+    <small *ngIf="submitted && errors.expiry">{{ errors.expiry }}</small>
+  </div>
+
+  <div class="input-group">
+    <input
+      name="cvv"
+      [(ngModel)]="cvv"
+      (input)="cvv = normalizeDigits(cvv)"
+      (keypress)="allowOnlyDigits($event)"
+      [ngClass]="{'input-error': submitted && errors.cvv}"
+      placeholder="CVV"
+      inputmode="numeric"
+      maxlength="3"
+    />
+    <small *ngIf="submitted && errors.cvv">{{ errors.cvv }}</small>
+  </div>
+</div>
 
     <!-- Tranferencia-->
     <div *ngIf="paymentMethod === 'transfer'" class="payment-form">
-      <select [(ngModel)]="bank">
-        <option value="">Selecciona un banco</option>
-        <option *ngFor="let b of banks" [value]="b">{{ b }}</option>
-      </select>
+  <div class="input-group">
+    <select
+      name="bank"
+      [(ngModel)]="bank"
+      [ngClass]="{'input-error': submitted && errors.bank}"
+    >
+      <option value="">Selecciona un banco</option>
+      <option *ngFor="let b of banks" [value]="b">{{ b }}</option>
+    </select>
+    <small *ngIf="submitted && errors.bank">{{ errors.bank }}</small>
+  </div>
 
-      <input [(ngModel)]="reference" placeholder="Referencia" />
-    </div>
+  <div class="input-group">
+    <input
+      name="reference"
+      [(ngModel)]="reference"
+      [ngClass]="{'input-error': submitted && errors.reference}"
+      placeholder="Referencia"
+      maxlength="25"
+    />
+    <small *ngIf="submitted && errors.reference">{{ errors.reference }}</small>
+    <small class="hint">Ej: TRF-45872</small>
+  </div>
+</div>
 
     <!-- PAYPAL -->
     <div *ngIf="paymentMethod === 'paypal'" class="payment-form">
@@ -94,8 +208,21 @@
 
     <!-- WALLET -->
     <div *ngIf="paymentMethod === 'wallet'" class="payment-form">
-      <input [(ngModel)]="phoneWallet" placeholder="Número de Nequi / Daviplata" maxlength="10" />
-    </div>
+  <div class="input-group">
+    <input
+      name="phoneWallet"
+      [(ngModel)]="phoneWallet"
+      (input)="phoneWallet = normalizeDigits(phoneWallet)"
+      (keypress)="allowOnlyDigits($event)"
+      [ngClass]="{'input-error': submitted && errors.phoneWallet}"
+      placeholder="Número de Nequi / Daviplata"
+      inputmode="numeric"
+      maxlength="10"
+    />
+    <small *ngIf="submitted && errors.phoneWallet">{{ errors.phoneWallet }}</small>
+    <small class="hint">Ej: 3001234567</small>
+  </div>
+</div>
 
     <!-- RESUMEN -->
     <div class="resumen">
@@ -109,11 +236,11 @@
 
     <!-- BOTONES -->
     <div class="acciones">
-      <button class="back" (click)="cerrar()">Cancelar</button>
+  <button class="back" type="button" (click)="cerrar()">Cancelar</button>
 
-      <button class="pagar" (click)="pagar()">
-        {{ loading ? 'Procesando pago...' : 'Pagar' }}
-      </button>
-    </div>
+  <button class="pagar" type="button" [disabled]="loading" (click)="pagar()">
+    {{ loading ? 'Procesando pago...' : 'Pagar' }}
+  </button>
+</div>
   </div>
 </div>

@@ -26,7 +26,9 @@
   cursor: pointer;
   transition: 0.3s;
 }
-.add-btn:hover { background: linear-gradient(45deg, #8e61f7, #10b4d1); }
+.add-btn:hover {
+  background: linear-gradient(45deg, #8e61f7, #10b4d1);
+}
 
 /* TABLA */
 .products-table {
@@ -46,7 +48,9 @@
 
 .products-table tbody tr {
   background: rgba(30, 41, 59, 0.8);
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
 }
 
 .products-table tbody tr:hover {
@@ -59,38 +63,115 @@
   padding: 1.2rem 1rem;
 }
 
-.products-table td:first-child { border-radius: 12px 0 0 12px; }
-.products-table td:last-child  { border-radius: 0 12px 12px 0; }
+.products-table td:first-child {
+  border-radius: 12px 0 0 12px;
+}
+.products-table td:last-child {
+  border-radius: 0 12px 12px 0;
+}
 
 /* Botones */
-.update-btn, .delete-btn, .view-btn {
+.update-btn,
+.delete-btn,
+.view-btn,
+.deleteSelected-btn,
+.add-btn {
   color: white;
   border: none;
-  padding: 0.4rem 1rem;
-  border-radius: 6px;
+  border-radius: 25px;
+  font-weight: 700;
   cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+/* Efecto brillo */
+.update-btn::before,
+.delete-btn::before,
+.view-btn::before,
+.deleteSelected-btn::before,
+.add-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transition: 0.5s;
+}
+.update-btn:hover::before,
+.delete-btn:hover::before,
+.view-btn:hover::before,
+.deleteSelected-btn:hover::before,
+.add-btn:hover::before {
+  left: 100%;
+}
+
+/* Colores individuales */
+.add-btn {
+  background: linear-gradient(135deg, #7c3aed, #06b6d4);
+  padding: 8px 28px;
+  border-radius: 20px;
+}
+.add-btn:hover {
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 10px 25px rgba(6, 182, 212, 0.45);
+}
+
+.update-btn {
+  background: linear-gradient(135deg, #0e9bb5, #06b6d4);
+  padding: 0.4rem 1rem;
   margin-right: 8px;
   margin-bottom: 4px;
-  transition: background 0.2s;
 }
-.update-btn       { background-color: #44d5ef; }
-.update-btn:hover { background-color: #35d2ee; }
-.delete-btn       { background-color: #ec1f1f; }
-.delete-btn:hover { background-color: #eb3131; }
-.view-btn         { background-color: #eb3bd3; }
-.view-btn:hover   { background-color: #eb1bcf; }
+.update-btn:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 20px rgba(6, 182, 212, 0.4);
+}
+
+.delete-btn {
+  background: linear-gradient(135deg, #b91c1c, #ec1f1f);
+  padding: 0.4rem 1rem;
+  margin-right: 8px;
+  margin-bottom: 4px;
+}
+.delete-btn:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 20px rgba(236, 31, 31, 0.45);
+}
+
+.view-btn {
+  background: linear-gradient(135deg, #a21caf, #eb3bd3);
+  padding: 0.4rem 1rem;
+  margin-right: 8px;
+  margin-bottom: 4px;
+}
+.view-btn:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 20px rgba(235, 59, 211, 0.45);
+}
 
 .deleteSelected-btn {
-  background-color: #ec1f1f;
-  border: none;
+  background: linear-gradient(135deg, #b91c1c, #ec1f1f);
   padding: 4px 15px;
-  border-radius: 20px;
-  color: white;
-  font-weight: 600;
-  cursor: pointer;
-  transition: 0.3s;
 }
-.deleteSelected-btn:hover { background: #eb3333; }
+.deleteSelected-btn:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 20px rgba(236, 31, 31, 0.45);
+}
+
+/* Estado activo */
+.update-btn:active,
+.delete-btn:active,
+.view-btn:active,
+.deleteSelected-btn:active,
+.add-btn:active {
+  transform: scale(0.95);
+}
 
 /* MODAL */
 .modal {
@@ -122,7 +203,9 @@
   overflow-y: auto;
   overflow-x: hidden;
 }
-.modal-content::-webkit-scrollbar { width: 6px; }
+.modal-content::-webkit-scrollbar {
+  width: 6px;
+}
 
 .modal-content input,
 .modal-content textarea,
@@ -148,9 +231,29 @@
   color: white;
 }
 
-/* ── RESPONSIVE ── */
+/* RESPONSIVE */
+/* RESPONSIVE */
 @media (max-width: 768px) {
-  .products-table thead { display: none; }
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .add-btn,
+  .deleteSelected-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .products-table thead {
+    display: none;
+  }
 
   .products-table,
   .products-table tbody,
@@ -172,6 +275,7 @@
     justify-content: space-between;
     align-items: center;
     border-radius: 0 !important;
+    word-break: break-word;
   }
 
   .products-table td::before {
@@ -182,17 +286,62 @@
     text-transform: uppercase;
     margin-right: 1rem;
     white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .products-table td > *,
+  .products-table td {
+    max-width: 60%; /* ← limita el ancho del valor */
+    text-align: right;
+  }
+
+  .products-table td[data-label='Acciones'] {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    max-width: 100%;
+    text-align: left;
+    gap: 8px;
+  }
+
+  .products-table td[data-label='Acciones']::before {
+    width: 100%;
+    margin-bottom: 4px;
+    max-width: 100%;
+  }
+
+  /* imagen centrada */
+  .products-table td[data-label='Imagen'] {
+    justify-content: space-between;
+  }
+
+  .products-table td[data-label='Imagen'] img {
+    max-width: 60px;
+  }
+
+  .update-btn,
+  .delete-btn,
+  .view-btn {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+    margin-right: 0;
+    margin-bottom: 0;
+  }
+
+  .modal-content {
+    width: 95%;
+    padding: 1.5rem;
   }
 }
 
 @media (max-width: 480px) {
   .modal-content {
-    padding: 1.2rem;
+    padding: 1rem;
   }
 
-  .update-btn, .delete-btn, .view-btn {
-    padding: 0.4rem 0.7rem;
-    font-size: 0.8rem;
-    margin-right: 4px;
+  .update-btn,
+  .delete-btn,
+  .view-btn {
+    padding: 0.35rem 0.6rem;
+    font-size: 0.75rem;
   }
 }

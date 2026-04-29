@@ -21,16 +21,16 @@
     </thead>
     <tbody>
       <tr *ngFor="let order of orders">
-        <td>#{{ order.invoiceNumber || 'N/A' }}</td>
-        <td>{{ order.date | date:'short' }}</td>
-        <td>{{ order.customer.email }}</td>
-        <td>
+        <td data-label="Pedido">#{{ order.invoiceNumber || 'N/A' }}</td>
+        <td data-label="Fecha">{{ order.date | date:'short' }}</td>
+        <td data-label="Cliente">{{ order.customer.email }}</td>
+        <td data-label="Productos">
           <div *ngFor="let prod of order.items">
             {{ prod.name }} (x{{ prod.quantity }})
           </div>
         </td>
-        <td>{{ order.total | currency }}</td>
-        <td>
+        <td data-label="Total">{{ order.total | currency }}</td>
+        <td data-label="Estado">
           <span class="status-badge">
             {{ order.status || 'Completado' }}
           </span>

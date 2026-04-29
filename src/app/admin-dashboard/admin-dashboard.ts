@@ -9,7 +9,7 @@ import { Router, RouterModule } from '@angular/router';
   styleUrl: './admin-dashboard.css',
 })
 export class AdminDashboard {
-
+  sidebarOpen = false;
   constructor(private router: Router) {}
 
   logout() {

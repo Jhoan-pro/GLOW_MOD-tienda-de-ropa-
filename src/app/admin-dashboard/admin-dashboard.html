@@ -1,31 +1,30 @@
 <div class="admin-body">
 
+  <!-- Overlay móvil -->
+  <div class="sidebar-overlay" [class.active]="sidebarOpen" (click)="sidebarOpen = false"></div>
+
   <!-- SIDEBAR -->
-  <nav class="sidebar">
+  <nav class="sidebar" [class.open]="sidebarOpen">
     <div class="sidebar-header">
       <h2 class="brand">Admin Ropa</h2>
     </div>
 
-
     <ul class="nav-links">
-
       <li routerLinkActive="active">
-        <a routerLink="/admin-dashboard/dashBoard">Vista general </a>
+        <a routerLink="/admin-dashboard/dashBoard" (click)="sidebarOpen = false">Vista general</a>
       </li>
       <li routerLinkActive="active">
-        <a routerLink="/admin-dashboard/admin">Resumen del negocio </a>
+        <a routerLink="/admin-dashboard/admin" (click)="sidebarOpen = false">Resumen del negocio</a>
       </li>
       <li routerLinkActive="active">
-        <a routerLink="/admin-dashboard/products">Productos</a>
+        <a routerLink="/admin-dashboard/products" (click)="sidebarOpen = false">Productos</a>
       </li>
       <li routerLinkActive="active">
-        <a routerLink="/admin-dashboard/users">Usuarios</a>
+        <a routerLink="/admin-dashboard/users" (click)="sidebarOpen = false">Usuarios</a>
       </li>
-
       <li routerLinkActive="active">
-        <a routerLink="/admin-dashboard/admin-orders">pedidos</a>
+        <a routerLink="/admin-dashboard/admin-orders" (click)="sidebarOpen = false">Pedidos</a>
       </li>
-
     </ul>
   </nav>
 
@@ -33,12 +32,19 @@
   <main class="main-content">
 
     <header class="top-header">
+      <button class="menu-toggle" (click)="sidebarOpen = !sidebarOpen">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
       <h1>Panel de administrador</h1>
       <button class="logout-btn" (click)="logout()">Salir</button>
     </header>
+
     <div class="scrollable-content">
       <router-outlet></router-outlet>
     </div>
+
   </main>
 
 </div>

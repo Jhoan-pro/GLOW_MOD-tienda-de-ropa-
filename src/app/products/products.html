@@ -28,16 +28,15 @@
 
     <tbody>
       <tr *ngFor="let p of products; let i = index">
-
-        <td><input type="checkbox" [(ngModel)]="p.selected"></td>
-        <td><img [src]="p.image" width="60" height="60" *ngIf="p.image"></td>
-        <td>{{ p.name }}</td>
-        <td>{{ p.price }}</td>
-        <td>{{ p.stock }}</td>
-        <td>{{ p.category }}</td>
-        <td>
+        <td data-label=""><input type="checkbox" [(ngModel)]="p.selected"></td>
+        <td data-label="Imagen"><img [src]="p.image" width="60" height="60" *ngIf="p.image"></td>
+        <td data-label="Nombre">{{ p.name }}</td>
+        <td data-label="Precio">{{ p.price }}</td>
+        <td data-label="Stock">{{ p.stock }}</td>
+        <td data-label="Categoría">{{ p.category }}</td>
+        <td data-label="Acciones">
           <button class="update-btn" (click)="openEdit(i)">Editar</button>
-          <button class="view-btn" (click)="openView(i)">Ver </button>
+          <button class="view-btn" (click)="openView(i)">Ver</button>
         </td>
       </tr>
     </tbody>
@@ -46,16 +45,12 @@
   <div class="modal" *ngIf="showModal">
     <div class="modal-content">
 
-      <app-product-form 
-      [viewMode]="viewMode"
-      [product]="currentProduct" 
-      [isEditing]="editingIndex !== null"
-      (save)="saveProduct($event)"
-      (cancel)="closeModal()">
-      
+      <app-product-form [viewMode]="viewMode" [product]="currentProduct" [isEditing]="editingIndex !== null"
+        (save)="saveProduct($event)" (cancel)="closeModal()">
+
       </app-product-form>
-      
+
     </div>
   </div>
-  
+
 </section>

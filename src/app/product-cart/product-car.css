@@ -251,3 +251,133 @@ scroll-padding-top:140px;
 .product-carousel{
 gap:24px;
 }
+/* Overlay */
+.login-alert-overlay{
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.65);
+backdrop-filter:blur(6px);
+display:flex;
+justify-content:center;
+align-items:center;
+z-index:5000;
+animation:fadeIn .3s ease;
+}
+
+/* Card modal */
+.login-alert-card{
+width:420px;
+max-width:90%;
+padding:32px;
+border-radius:24px;
+text-align:center;
+
+background:rgba(15,23,42,.95);
+backdrop-filter:blur(18px);
+
+border:1px solid rgba(255,255,255,.08);
+box-shadow:
+0 25px 60px rgba(0,0,0,.65),
+0 0 30px rgba(6,182,212,.12);
+
+animation:modalPop .35s ease;
+font-family:"Poppins",sans-serif;
+}
+
+/* Título */
+.login-alert-card h3{
+margin:0 0 14px;
+font-size:28px;
+font-weight:800;
+background:linear-gradient(45deg,#7c3aed,#06b6d4);
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+}
+
+/* Texto */
+.login-alert-card p{
+margin:0;
+line-height:1.6;
+font-size:15px;
+color:#cbd5e1;
+}
+
+/* Botones */
+.login-alert-actions{
+display:flex;
+gap:14px;
+margin-top:28px;
+}
+
+/* Base botones */
+.login-alert-actions button{
+flex:1;
+padding:14px;
+border:none;
+border-radius:30px;
+font-weight:700;
+font-size:14px;
+cursor:pointer;
+transition:.3s ease;
+font-family:"Poppins",sans-serif;
+}
+
+/* Botón login */
+.go-login-btn{
+background:linear-gradient(45deg,#7c3aed,#06b6d4);
+color:white;
+box-shadow:0 0 15px rgba(6,182,212,.2);
+}
+
+.go-login-btn:hover{
+transform:translateY(-3px);
+box-shadow:0 0 25px rgba(6,182,212,.45);
+}
+
+/* Cancelar */
+.cancel-btn{
+background:rgba(239,68,68,.12);
+color:#f87171;
+border:1px solid rgba(239,68,68,.35);
+}
+
+.cancel-btn:hover{
+background:#ef4444;
+color:white;
+transform:translateY(-3px);
+box-shadow:0 0 18px rgba(239,68,68,.35);
+}
+
+/* Animaciones */
+@keyframes fadeIn{
+from{
+opacity:0;
+}
+to{
+opacity:1;
+}
+}
+
+@keyframes modalPop{
+from{
+opacity:0;
+transform:translateY(-20px) scale(.94);
+}
+to{
+opacity:1;
+transform:translateY(0) scale(1);
+}
+}
+
+/* Responsive */
+@media(max-width:500px){
+
+.login-alert-card{
+padding:24px;
+}
+
+.login-alert-actions{
+flex-direction:column;
+}
+
+}

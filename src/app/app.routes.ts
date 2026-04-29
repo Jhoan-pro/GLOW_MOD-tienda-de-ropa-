@@ -27,7 +27,7 @@ export const routes: Routes = [
   // Inicio
   { path: 'Home', component: Home },
   { path: 'Navbar', component: Navbar },
-
+  {path: 'cashier', component:Cashier},
   // Autenticación
   { path: 'login', component: Login },
   { path: 'register', component: RegisterUser },

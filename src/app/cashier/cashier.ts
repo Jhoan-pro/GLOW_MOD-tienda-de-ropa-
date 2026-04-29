@@ -1,10 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CartService } from '../services/cart.service';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { UserService } from '../services/user.service';
 import { OrderHistoryService } from '../services/order-history.service';
+import { isPlatformBrowser } from '@angular/common';
 
 type ErrorKeys =
   | 'customerName'
@@ -30,6 +31,8 @@ type ErrorKeys =
   styleUrls: ['./cashier.css'],
 })
 export class Cashier {
+  private platformId = inject(PLATFORM_ID);
+  private draftKeyPrefix = 'checkout_draft';
   items: any[] = [];
 
   customerName = '';
@@ -65,7 +68,7 @@ export class Cashier {
   ];
   reference = '';
   phoneWallet = '';
-
+  private draftKey = 'checkout_draft';
   submitted = false;
   errors: Partial<Record<ErrorKeys, string>> = {};
 
@@ -77,16 +80,42 @@ export class Cashier {
   ) {}
 
   ngOnInit() {
-    this.cartService.cart$.subscribe((data) => {
-      this.items = data;
-    });
+  this.cartService.loadCart();
 
-    const user = this.userService.getCurrentUser();
-    if (user) {
-      this.customerEmail = user.email;
-      this.customerName = user.name;
-    }
+  this.cartService.cart$.subscribe((data) => {
+    this.items = data;
+  });
+
+  const user = this.userService.getCurrentUser();
+  if (user) {
+    this.customerEmail = user.email;
+    this.customerName = user.name;
   }
+
+  if (!this.isBrowser()) return;
+
+  const draft = localStorage.getItem(this.getDraftKey());
+
+  if (draft) {
+    const data = JSON.parse(draft);
+
+    this.customerName = data.customerName || this.customerName;
+    this.customerEmail = data.customerEmail || this.customerEmail;
+    this.phone = data.phone || '';
+    this.address = data.address || '';
+    this.city = data.city || '';
+    this.documentId = data.documentId || '';
+    this.paymentMethod = data.paymentMethod || '';
+    this.cardName = data.cardName || '';
+    this.cardNumber = data.cardNumber || '';
+    this.expiry = data.expiry || '';
+    this.cvv = data.cvv || '';
+    this.bank = data.bank || '';
+    this.reference = data.reference || '';
+    this.phoneWallet = data.phoneWallet || '';
+  }
+}
+  
 
   getTotal() {
     return this.cartService.getTotal();
@@ -114,9 +143,7 @@ export class Cashier {
   }
 
   normalizeLetters(value: string): string {
-    return value
-      .replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '')
-      .replace(/\s{2,}/g, ' ');
+    return value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '').replace(/\s{2,}/g, ' ');
   }
 
   normalizeDigits(value: string): string {
@@ -128,15 +155,7 @@ export class Cashier {
   }
 
   allowOnlyLetters(event: KeyboardEvent) {
-    const allowed = [
-      'Backspace',
-      'Delete',
-      'Tab',
-      'ArrowLeft',
-      'ArrowRight',
-      'Home',
-      'End',
-    ];
+    const allowed = ['Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight', 'Home', 'End'];
 
     if (allowed.includes(event.key) || event.ctrlKey || event.metaKey) return;
 
@@ -147,15 +166,7 @@ export class Cashier {
   }
 
   allowOnlyDigits(event: KeyboardEvent) {
-    const allowed = [
-      'Backspace',
-      'Delete',
-      'Tab',
-      'ArrowLeft',
-      'ArrowRight',
-      'Home',
-      'End',
-    ];
+    const allowed = ['Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight', 'Home', 'End'];
 
     if (allowed.includes(event.key) || event.ctrlKey || event.metaKey) return;
 
@@ -296,61 +307,66 @@ export class Cashier {
   }
 
   pagar() {
-    if (this.loading) return;
+  if (this.loading) return;
 
-    this.submitted = true;
-    this.loading = true;
+  this.submitted = true;
 
-    if (!this.validarFormulario()) {
-      this.mostrarAlerta('Revisa los campos marcados en rojo', 'error');
-      this.enfocarPrimerError();
-      this.loading = false;
-      return;
-    }
-
-    const user = this.userService.getCurrentUser();
-
-    const invoice = {
-      invoiceNumber: 'INV-' + Date.now(),
-      date: new Date(),
-      customer: {
-        name: this.customerName.trim(),
-        email: this.customerEmail.trim(),
-        phone: this.phone.trim(),
-        address: this.address.trim(),
-        city: this.city.trim(),
-        documentId: this.documentId.trim(),
-      },
-      notes: this.notes.trim(),
-      userId: user?.email,
-      paymentMethod: this.paymentMethod,
-      paymentDetails: {
-        walletNumber: this.paymentMethod === 'wallet' ? this.phoneWallet.trim() : null,
-        bank: this.paymentMethod === 'transfer' ? this.bank : null,
-        reference: this.paymentMethod === 'transfer' ? this.reference.trim() : null,
-        cardName: this.paymentMethod === 'card' ? this.cardName.trim() : null,
-        cardNumberLast4: this.paymentMethod === 'card' ? this.cardNumber.slice(-4) : null,
-      },
-      items: this.items.map((item) => ({
-        name: item.product.name,
-        quantity: item.cantidad,
-        price: item.product.price,
-      })),
-      total: this.getTotal(),
-    };
-
-    localStorage.setItem('lastInvoice', JSON.stringify(invoice));
-    this.orderHistory.addOrder(invoice);
-
-    this.cartService.finalizePurchase();
-
-    this.mostrarAlerta('Pago realizado con éxito', 'success');
-
-    setTimeout(() => {
-      this.loading = false;
-      this.router.navigate(['/invoice']);
-    }, 1500);
+  if (!this.validarFormulario()) {
+    this.mostrarAlerta('Revisa los campos marcados en rojo', 'error');
+    this.enfocarPrimerError();
+    this.loading = false;
+    return;
   }
+
+  this.loading = true;
+
+  const user = this.userService.getCurrentUser();
+
+  const invoice = {
+    invoiceNumber: 'INV-' + Date.now(),
+    date: new Date(),
+    customer: {
+      name: this.customerName.trim(),
+      email: this.customerEmail.trim(),
+      phone: this.phone.trim(),
+      address: this.address.trim(),
+      city: this.city.trim(),
+      documentId: this.documentId.trim(),
+    },
+    notes: this.notes.trim(),
+    userId: user?.email,
+    paymentMethod: this.paymentMethod,
+    paymentDetails: {
+      walletNumber: this.paymentMethod === 'wallet' ? this.phoneWallet.trim() : null,
+      bank: this.paymentMethod === 'transfer' ? this.bank : null,
+      reference: this.paymentMethod === 'transfer' ? this.reference.trim() : null,
+      cardName: this.paymentMethod === 'card' ? this.cardName.trim() : null,
+      cardNumberLast4: this.paymentMethod === 'card' ? this.cardNumber.slice(-4) : null,
+    },
+    items: this.items.map((item) => ({
+      name: item.product.name,
+      quantity: item.cantidad,
+      price: item.product.price,
+    })),
+    total: this.getTotal(),
+  };
+
+  if (this.isBrowser()) {
+    localStorage.setItem('lastInvoice', JSON.stringify(invoice));
+  }
+
+  this.orderHistory.addOrder(invoice);
+
+  this.clearDraft();
+  this.cartService.finalizePurchase();
+
+  this.mostrarAlerta('Pago realizado con éxito', 'success');
+
+  setTimeout(() => {
+    this.loading = false;
+    this.router.navigate(['/invoice']);
+  }, 1500);
+}
 
   enfocarPrimerError() {
     setTimeout(() => {
@@ -376,5 +392,40 @@ export class Cashier {
 
   cerrar() {
     this.router.navigate(['/home']);
+  }
+  saveDraft() {
+    if (!this.isBrowser()) return;
+
+    const draft = {
+      customerName: this.customerName,
+      customerEmail: this.customerEmail,
+      phone: this.phone,
+      address: this.address,
+      city: this.city,
+      documentId: this.documentId,
+      paymentMethod: this.paymentMethod,
+      cardName: this.cardName,
+      cardNumber: this.cardNumber,
+      expiry: this.expiry,
+      cvv: this.cvv,
+      bank: this.bank,
+      reference: this.reference,
+      phoneWallet: this.phoneWallet,
+    };
+
+    localStorage.setItem(this.getDraftKey(), JSON.stringify(draft));
+  }
+  private isBrowser(): boolean {
+    return isPlatformBrowser(this.platformId);
+  }
+
+  private getDraftKey(): string {
+    const user = this.userService.getCurrentUser();
+    const userKey = user?.id ?? user?.email ?? 'guest';
+    return `${this.draftKeyPrefix}_${userKey}`;
+  }
+  private clearDraft() {
+    if (!this.isBrowser()) return;
+    localStorage.removeItem(this.getDraftKey());
   }
 }

@@ -10,6 +10,7 @@
   <input
     name="customerName"
     [(ngModel)]="customerName"
+    (ngModelChange)="saveDraft()"
     (input)="customerName = normalizeLetters(customerName)"
     (keypress)="allowOnlyLetters($event)"
     [ngClass]="{'input-error': submitted && errors.customerName}"
@@ -23,6 +24,7 @@
   <input
     name="customerEmail"
     [(ngModel)]="customerEmail"
+    (ngModelChange)="saveDraft()"
     [ngClass]="{'input-error': submitted && errors.customerEmail}"
     placeholder="Correo electrónico *"
     autocomplete="email"
@@ -34,6 +36,7 @@
   <input
     name="phone"
     [(ngModel)]="phone"
+    (ngModelChange)="saveDraft()"
     (input)="phone = normalizeDigits(phone)"
     (keypress)="allowOnlyDigits($event)"
     [ngClass]="{'input-error': submitted && errors.phone}"
@@ -49,6 +52,7 @@
   <input
     name="address"
     [(ngModel)]="address"
+    (ngModelChange)="saveDraft()"
     (input)="address = normalizeAddress(address)"
     [ngClass]="{'input-error': submitted && errors.address}"
     placeholder="Dirección *"
@@ -61,6 +65,7 @@
   <input
     name="city"
     [(ngModel)]="city"
+    (ngModelChange)="saveDraft()"
     (input)="city = normalizeLetters(city)"
     (keypress)="allowOnlyLetters($event)"
     [ngClass]="{'input-error': submitted && errors.city}"
@@ -75,6 +80,7 @@
   <input
     name="documentId"
     [(ngModel)]="documentId"
+    (ngModelChange)="saveDraft()"
     (input)="documentId = normalizeDigits(documentId)"
     (keypress)="allowOnlyDigits($event)"
     [ngClass]="{'input-error': submitted && errors.documentId}"
@@ -113,6 +119,7 @@
     <input
       name="cardName"
       [(ngModel)]="cardName"
+      (ngModelChange)="saveDraft()"
       (input)="cardName = normalizeLetters(cardName)"
       (keypress)="allowOnlyLetters($event)"
       [ngClass]="{'input-error': submitted && errors.cardName}"
@@ -126,6 +133,7 @@
     <input
       name="cardNumber"
       [(ngModel)]="cardNumber"
+      (ngModelChange)="saveDraft()"
       (input)="cardNumber = normalizeDigits(cardNumber)"
       (keypress)="allowOnlyDigits($event)"
       [ngClass]="{'input-error': submitted && errors.cardNumber}"
@@ -151,6 +159,7 @@
     <input
       name="cvv"
       [(ngModel)]="cvv"
+      
       (input)="cvv = normalizeDigits(cvv)"
       (keypress)="allowOnlyDigits($event)"
       [ngClass]="{'input-error': submitted && errors.cvv}"

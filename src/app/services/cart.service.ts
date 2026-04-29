@@ -34,9 +34,10 @@ export class CartService {
   }
 
   private getCartKey(): string {
-    const user = this.userService.getCurrentUser();
-    return user ? `cart_${user.email}` : 'cart_guest';
-  }
+  const user = this.userService.getCurrentUser();
+  const userKey = user?.id ?? user?.email ?? 'guest';
+  return `cart_${userKey}`;
+}
 
   private getCurrentProduct(productId: number): Product | undefined {
     return this.productService.getProducts().find((p) => p.id === productId);
@@ -52,15 +53,15 @@ export class CartService {
   }
 
   loadCart() {
-    if (!isPlatformBrowser(this.platformId)) return;
+  if (!isPlatformBrowser(this.platformId)) return;
 
-    const key = this.getCartKey();
-    const data = localStorage.getItem(key);
+  const key = this.getCartKey();
+  const data = localStorage.getItem(key);
 
-    this.items = data ? JSON.parse(data) : [];
-    this.syncItemSnapshots();
-    this.cartSubject.next([...this.items]);
-  }
+  this.items = data ? JSON.parse(data) : [];
+  this.syncItemSnapshots();
+  this.cartSubject.next([...this.items]);
+}
 
   getItems() {
     return this.items;
@@ -122,6 +123,7 @@ export class CartService {
     this.cartSubject.next([...this.items]);
     this.saveCart();
   }
+  
 
   decrease(item: CartItem) {
     if (!item.product.id) return;
@@ -170,9 +172,9 @@ export class CartService {
   }
 
   private saveCart() {
-    if (!isPlatformBrowser(this.platformId)) return;
+  if (!isPlatformBrowser(this.platformId)) return;
 
-    const key = this.getCartKey();
-    localStorage.setItem(key, JSON.stringify(this.items));
-  }
+  const key = this.getCartKey();
+  localStorage.setItem(key, JSON.stringify(this.items));
+}
 }

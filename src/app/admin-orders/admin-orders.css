@@ -1,76 +1,131 @@
 .admin-orders-container {
-    padding: 20px;
+  padding: 20px;
 }
 
 .header-stats {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 2rem;
 }
 
 .stat-card {
-    background: rgba(6, 182, 212, 0.1);
-    padding: 1rem 2rem;
-    border-radius: 12px;
-    border: 1px solid #06b6d4;
+  background: rgba(6, 182, 212, 0.1);
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  border: 1px solid #06b6d4;
+  flex: 1 1 140px;
 }
 
 .stat-card .value {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: #06b6d4;
-    margin-left: 10px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #06b6d4;
+  margin-left: 10px;
 }
 
+/* TABLA */
 .products-table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0 10px; 
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 8px;
 }
 
 .products-table th {
-    padding: 1rem;
-    color: #94a3b8;
-    font-weight: 600;
-    text-transform: uppercase;
-    font-size: 0.8rem;
-    text-align: left;
+  padding: 1rem;
+  color: #94a3b8;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  text-align: left;
 }
 
 .products-table tbody tr {
-    background: rgba(30, 41, 59, 0.8);
-    transition: transform 0.2s, box-shadow 0.2s;
+  background: rgba(30, 41, 59, 0.8);
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .products-table tbody tr:hover {
-    transform: scale(1.01);
-    background: rgba(51, 65, 85, 0.9);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+  transform: scale(1.01);
+  background: rgba(51, 65, 85, 0.9);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
 }
 
 .products-table td {
-    padding: 1.2rem 1rem;
+  padding: 1.2rem 1rem;
 }
-
 
 .products-table td:first-child { border-radius: 12px 0 0 12px; }
-.products-table td:last-child { border-radius: 0 12px 12px 0; }
-
+.products-table td:last-child  { border-radius: 0 12px 12px 0; }
 
 .status-badge {
-    padding: 6px 12px;
-    border-radius: 8px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
 }
 
-
-
-
 .empty-msg {
-    text-align: center;
-    padding: 3rem;
+  text-align: center;
+  padding: 3rem;
+  color: #94a3b8;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  .admin-orders-container {
+    padding: 12px;
+  }
+
+  .products-table thead { display: none; }
+
+  .products-table,
+  .products-table tbody,
+  .products-table tr,
+  .products-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .products-table tbody tr {
+    margin-bottom: 1rem;
+    border-radius: 12px;
+    padding: 0.5rem 0;
+  }
+
+  .products-table td {
+    padding: 0.6rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 0 !important;
+  }
+
+  .products-table td::before {
+    content: attr(data-label);
     color: #94a3b8;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-right: 1rem;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .stat-card {
+    padding: 0.8rem 1rem;
+  }
+
+  .stat-card .value {
+    font-size: 1.2rem;
+  }
+
+  .status-badge {
+    padding: 4px 8px;
+    font-size: 0.7rem;
+  }
 }

@@ -13,6 +13,7 @@
 .actions {
   display: flex;
   gap: 10px;
+  flex-wrap: wrap;
 }
 
 .add-btn {
@@ -24,63 +25,60 @@
   font-weight: 600;
   cursor: pointer;
   transition: 0.3s;
-  justify-content: left;
 }
-
-.add-btn:hover {
-  background: linear-gradient(45deg, #8e61f7, #10b4d1);
-}
+.add-btn:hover { background: linear-gradient(45deg, #8e61f7, #10b4d1); }
 
 /* TABLA */
 .products-table {
   width: 100%;
-  border-collapse: collapse;
-  background-color: #1e293b;
-}
-
-.products-table th,
-.products-table td {
-  padding: 1rem;
-  border-bottom: 1px solid #334155;
-  text-align: left;
+  border-collapse: separate;
+  border-spacing: 0 8px;
 }
 
 .products-table th {
+  padding: 1rem;
   color: #94a3b8;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  text-align: left;
 }
 
-.products-table tr:hover {
-  background-color: #334155;
+.products-table tbody tr {
+  background: rgba(30, 41, 59, 0.8);
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
-/* Botones eliminar-editar */
-.update-btn {
-  background-color: #44d5ef;
+.products-table tbody tr:hover {
+  transform: scale(1.01);
+  background: rgba(51, 65, 85, 0.9);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+.products-table td {
+  padding: 1.2rem 1rem;
+}
+
+.products-table td:first-child { border-radius: 12px 0 0 12px; }
+.products-table td:last-child  { border-radius: 0 12px 12px 0; }
+
+/* Botones */
+.update-btn, .delete-btn, .view-btn {
   color: white;
   border: none;
   padding: 0.4rem 1rem;
   border-radius: 6px;
   cursor: pointer;
-  margin-right: 15px;
+  margin-right: 8px;
+  margin-bottom: 4px;
+  transition: background 0.2s;
 }
-
-.update-btn:hover {
-  background-color: #35d2ee;
-}
-
-.delete-btn {
-  background-color: #ec1f1f;
-  color: white;
-  border: none;
-  padding: 0.4rem 1rem;
-  border-radius: 6px;
-  cursor: pointer;
-  margin-right: 15px;
-}
-
-.delete-btn:hover {
-  background-color: #eb3131;
-}
+.update-btn       { background-color: #44d5ef; }
+.update-btn:hover { background-color: #35d2ee; }
+.delete-btn       { background-color: #ec1f1f; }
+.delete-btn:hover { background-color: #eb3131; }
+.view-btn         { background-color: #eb3bd3; }
+.view-btn:hover   { background-color: #eb1bcf; }
 
 .deleteSelected-btn {
   background-color: #ec1f1f;
@@ -92,24 +90,7 @@
   cursor: pointer;
   transition: 0.3s;
 }
-
-.deleteSelected-btn:hover {
-  background: #eb3333;
-}
-
-.view-btn {
-  background-color: #eb3bd3;
-  color: white;
-  border: none;
-  padding: 0.4rem 1rem;
-  border-radius: 6px;
-  cursor: pointer;
-  margin-right: 15px;
-}
-
-.view-btn:hover {
-  background: #eb1bcf;
-}
+.deleteSelected-btn:hover { background: #eb3333; }
 
 /* MODAL */
 .modal {
@@ -123,45 +104,95 @@
   justify-content: center;
   align-items: center;
   z-index: 1000;
-  /* Añadimos esto por si el contenido es demasiado grande incluso para el modal */
   overflow-y: hidden;
+  padding: 1rem;
+  box-sizing: border-box;
 }
 
 .modal-content {
   background: #1e293b;
   padding: 2rem;
-  border-radius: 10px;
+  border-radius: 12px;
   width: 400px;
-  max-width: 95%; 
-
-  /* ESTO ES LO CRÍTICO */
+  max-width: 100%;
   display: flex;
   flex-direction: column;
   gap: 0.8rem;
-
-  /* Forzamos el scroll interno */
-  max-height: 85vh; /* Altura máxima relativa a la pantalla */
-  overflow-y: auto; /* Habilita el scroll vertical */
-  overflow-x: hidden; /* Evita scroll horizontal innecesario */
+  max-height: 85vh;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
-.modal-content::-webkit-scrollbar {
-    width: 6px; /* Barra más delgada */
-}
-
+.modal-content::-webkit-scrollbar { width: 6px; }
 
 .modal-content input,
 .modal-content textarea,
 .modal-content select {
   width: 100%;
-  box-sizing: border-box; 
+  box-sizing: border-box;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  background: #0f172a;
+  color: white;
 }
 
 .modal-actions {
   display: flex;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .cancel {
   background-color: #ef4444;
   color: white;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  .products-table thead { display: none; }
+
+  .products-table,
+  .products-table tbody,
+  .products-table tr,
+  .products-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .products-table tbody tr {
+    margin-bottom: 1rem;
+    border-radius: 12px;
+    padding: 0.5rem 0;
+  }
+
+  .products-table td {
+    padding: 0.6rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 0 !important;
+  }
+
+  .products-table td::before {
+    content: attr(data-label);
+    color: #94a3b8;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-right: 1rem;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-content {
+    padding: 1.2rem;
+  }
+
+  .update-btn, .delete-btn, .view-btn {
+    padding: 0.4rem 0.7rem;
+    font-size: 0.8rem;
+    margin-right: 4px;
+  }
 }

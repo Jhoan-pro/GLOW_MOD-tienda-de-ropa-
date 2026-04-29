@@ -38,8 +38,20 @@
         <span></span>
       </button>
       <h1>Panel de administrador</h1>
-      <button class="logout-btn" (click)="logout()">Salir</button>
+      <button class="logout-btn" (click)="logout()">Cerrar sesión</button>
     </header>
+    <div class="logout-modal" *ngIf="mostrarConfirmLogout">
+      <div class="logout-box">
+        <h3>¿Cerrar sesión?</h3>
+        <p>Tu sesión se cerrará.</p>
+
+        <div class="acciones">
+          <button class="cerrar-btn" (click)="mostrarConfirmLogout = false">Cancelar</button>
+
+          <button class="confirmar" (click)="confirmarLogout()">Sí, salir</button>
+        </div>
+      </div>
+    </div>
 
     <div class="scrollable-content">
       <router-outlet></router-outlet>

@@ -31,7 +31,7 @@ export class AdminOrders implements OnInit {
   // Para ver detalles de un pedido específico
   viewOrderDetails(order: any) {
     console.log('Detalles del pedido:', order);
-    // Aquí podrías abrir un modal similar al de "Ver Producto"
+    
   }
 
   getStatusClass(status: string) {

@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Product } from '../models/product.model';
@@ -10,20 +10,11 @@ import { Product } from '../models/product.model';
   templateUrl: './product-form.html',
   styleUrl: './product-form.css',
 })
+export class ProductForm implements OnInit {
 
+  errors: any = {};
 
-export class ProductForm {
-  categories: string[] = [
-    'Camisetas',
-    'Pantalones',
-    'Zapatos',
-    'Chaquetas',
-    'Sudaderas',
-    'Camisas',
- 
-  ];
-
-  
+  categories: string[] = ['Camisetas', 'Pantalones', 'Zapatos', 'Chaquetas', 'Sudaderas', 'Camisas'];
 
   @Input() product!: Product;
   @Input() viewMode: boolean = false;
@@ -33,24 +24,59 @@ export class ProductForm {
   @Output() cancel = new EventEmitter<void>();
 
   ngOnInit() {
-    // Si el producto es nuevo y no tiene categoría, inicializamos el valor
     if (!this.product.category) {
-      this.product.category = "";
+      this.product.category = '';
     }
-    
+    this.resetErrors();
+  }
+
+  private resetErrors() {
+    this.errors = {
+      name: '',
+      price: '',
+      stock: '',
+      category: '',
+      image: ''
+    };
   }
 
   onSubmit() {
-    if (!this.product.category) {
-  alert('Debes seleccionar una categoría');
-  return;
-}
+    this.resetErrors();
+    let isValid = true;
 
-    if (!this.product.name || this.product.price <= 0) {
-      alert('Por favor, ingresa un nombre y un precio válido.');
-      return;
+    // Validación de Nombre
+    if (!this.product.name || this.product.name.trim() === '') {
+      this.errors.name = 'El nombre es obligatorio.';
+      isValid = false;
     }
-    this.save.emit(this.product);
+
+    // Validación de Precio
+    if (!this.product.price || this.product.price <= 0) {
+      this.errors.price = 'El precio debe ser mayor a 0.';
+      isValid = false;
+    }
+
+    // Validación de Stock
+if (this.product.stock <= 0) {
+    this.errors.stock = 'El stock debe ser mayor a 0.';
+    isValid = false;
+  }
+
+    // Validación de Categoría
+    if (!this.product.category) {
+      this.errors.category = 'Debes seleccionar una categoría.';
+      isValid = false;
+    }
+
+    // Validación de Imagen
+    if (!this.product.image) {
+      this.errors.image = 'La imagen es obligatoria.';
+      isValid = false;
+    }
+
+    if (isValid) {
+      this.save.emit(this.product);
+    }
   }
 
   onCancel() {
@@ -63,6 +89,7 @@ export class ProductForm {
       const reader = new FileReader();
       reader.onload = () => {
         this.product.image = reader.result as string;
+        this.errors.image = ''; 
       };
       reader.readAsDataURL(file);
     }

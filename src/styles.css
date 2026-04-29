@@ -1,4 +1,8 @@
-html, body {
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Montserrat:wght@600;700&display=swap');
+
+html,
+body {
   margin-top: 80px;
   margin: 0;
   padding: 0;
@@ -8,4 +12,10 @@ html, body {
     radial-gradient(circle at 80% 70%, rgba(139, 92, 246, 0.2), transparent 40%),
     radial-gradient(circle at 50% 90%, rgba(59, 130, 246, 0.15), transparent 50%),
     linear-gradient(180deg, #0f172a 0%, #020617 100%);
+}
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif;
 }

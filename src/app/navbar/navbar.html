@@ -1,16 +1,18 @@
 <header class="navbar">
-
-  <div class="logo">
-    <span class="logo-glow">GLOW</span><span class="logo-mod">_MOD</span>
-  </div>
+  <div class="logo"><span class="logo-glow">GLOW</span><span class="logo-mod">_MOD</span></div>
 
   <div class="actions">
-    <div class="cart-icon" (click)="toggleCarrito()"><img src="img/carrito.png" alt="Car" class="cart-img"><span class="badge" *ngIf="getCantidadTotal() > 0">{{
-        getCantidadTotal() }}</span></div>
+    <div class="cart-icon" (click)="toggleCarrito()">
+      <img src="img/carrito.png" alt="Car" class="cart-img" /><span
+        class="badge"
+        *ngIf="getCantidadTotal() > 0"
+        >{{ getCantidadTotal() }}</span
+      >
+    </div>
     <!-- LUPA / FILTROS -->
     <div class="search-box">
       <button id="btn-lupa" (click)="toggleFiltros()">
-        <i class="fas fa-search"><img src="img/search.png" alt="Buscar" class="search-icon"></i>
+        <img src="img/search.png" alt="Buscar" class="search-icon" />
       </button>
 
       <div class="filtros-panel" *ngIf="mostrarFiltros">
@@ -22,19 +24,16 @@
         <button class="filtro-item" (click)="selectCategory('Pantalones')">Pantalones</button>
         <button class="filtro-item" (click)="selectCategory('Zapatos')">Zapatos</button>
         <button class="filtro-item" (click)="selectCategory('Sudaderas')">Sudaderas</button>
-
-
-
-
       </div>
     </div>
 
     <!-- Usuario -->
-    <div class="user-dropdown">
-      <div class="user-icon" (click)="toggleMenuUsuario()"><img src="img/user.png" alt="Perfilus"></div>
+    <div class="user-dropdown"#userPanel>
+      <div class="user-icon" (click)="toggleMenuUsuario()">
+        <img src="img/user.png" alt="Perfilus" />
+      </div>
 
       <div class="dropdown-menu" *ngIf="menuUsuarioAbierto">
-
         <!-- No logueado -->
         <ng-container *ngIf="!isLoggedIn">
           <a routerLink="/login">Iniciar sesión</a>
@@ -42,14 +41,11 @@
 
         <!-- Logueado -->
         <ng-container *ngIf="isLoggedIn">
-
           <a routerLink="/user">Administrar cuenta</a>
           <button class="logout-btn" (click)="logout()">Cerrar sesión</button>
         </ng-container>
-
       </div>
     </div>
-
   </div>
 </header>
 
@@ -58,44 +54,34 @@
 </div>
 
 <div class="cart-panel" [class.open]="carritoAbierto">
-
-  <h3>Tu carrito
+  <h3>
+    Tu carrito
     <span class="vaciar-top" (click)="vaciar()">Vaciar</span>
   </h3>
 
   <div class="cart-content">
-
     <div *ngIf="items.length === 0">
       <p>El carrito está vacío</p>
     </div>
 
-    <div class="cart-item" *ngFor="let item of items; let i = index"><img [src]="item.product.image" />
+    <div class="cart-item" *ngFor="let item of items; let i = index">
+      <img [src]="item.product.image" />
       <div class="info">
         <p class="name">{{ item.product.name }}</p>
 
-        <span class="price">
-          Precio unidad: ${{ item.product.price }}
-        </span>
+        <span class="price"> Precio unidad: ${{ item.product.price }} </span>
 
-        <p class="subtotal">
-          Subtotal: ${{ item.product.price * item.cantidad }}
-        </p>
+        <p class="subtotal">Subtotal: ${{ item.product.price * item.cantidad }}</p>
 
         <div class="cantidad">
           <button (click)="disminuir(item)">-</button>
           <span>{{ item.cantidad }}</span>
-<button (click)="aumentar(item)" [disabled]="item.product.stock === 0">
-  +
-</button>
+          <button (click)="aumentar(item)" [disabled]="item.product.stock === 0">+</button>
         </div>
 
-        <div class="eliminar" (click)="eliminar(i)">
-          Eliminar
-        </div>
+        <div class="eliminar" (click)="eliminar(i)">Eliminar</div>
       </div>
-
     </div>
-
   </div>
 
   <!-- Footer -->
@@ -113,7 +99,6 @@
       </button>
     </div>
   </div>
-
 </div>
 <div class="overlay" *ngIf="carritoAbierto" (click)="cerrarCarrito()"></div>
 <!--confirmacion de logout-->
@@ -123,13 +108,9 @@
     <p>Tu sesión se cerrará.</p>
 
     <div class="acciones">
-      <button class="cerrar-btn" (click)="mostrarConfirmLogout = false">
-        Cancelar
-      </button>
+      <button class="cerrar-btn" (click)="mostrarConfirmLogout = false">Cancelar</button>
 
-      <button class="confirmar" (click)="confirmarLogout()">
-        Sí, salir
-      </button>
+      <button class="confirmar" (click)="confirmarLogout()">Sí, salir</button>
     </div>
   </div>
 </div>

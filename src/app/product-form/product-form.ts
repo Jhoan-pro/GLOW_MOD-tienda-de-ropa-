@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, NgZone } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Product } from '../models/product.model';
@@ -11,10 +11,16 @@ import { Product } from '../models/product.model';
   styleUrl: './product-form.css',
 })
 export class ProductForm implements OnInit {
-
   errors: any = {};
 
-  categories: string[] = ['Camisetas', 'Pantalones', 'Zapatos', 'Chaquetas', 'Sudaderas', 'Camisas'];
+  categories: string[] = [
+    'Camisetas',
+    'Pantalones',
+    'Zapatos',
+    'Chaquetas',
+    'Sudaderas',
+    'Camisas',
+  ];
 
   @Input() product!: Product;
   @Input() viewMode: boolean = false;
@@ -22,6 +28,7 @@ export class ProductForm implements OnInit {
 
   @Output() save = new EventEmitter<Product>();
   @Output() cancel = new EventEmitter<void>();
+  constructor(private zone: NgZone) {}
 
   ngOnInit() {
     if (!this.product.category) {
@@ -36,7 +43,7 @@ export class ProductForm implements OnInit {
       price: '',
       stock: '',
       category: '',
-      image: ''
+      image: '',
     };
   }
 
@@ -57,10 +64,10 @@ export class ProductForm implements OnInit {
     }
 
     // Validación de Stock
-if (this.product.stock <= 0) {
-    this.errors.stock = 'El stock debe ser mayor a 0.';
-    isValid = false;
-  }
+    if (this.product.stock <= 0) {
+      this.errors.stock = 'El stock debe ser mayor a 0.';
+      isValid = false;
+    }
 
     // Validación de Categoría
     if (!this.product.category) {
@@ -88,8 +95,10 @@ if (this.product.stock <= 0) {
     if (file) {
       const reader = new FileReader();
       reader.onload = () => {
-        this.product.image = reader.result as string;
-        this.errors.image = ''; 
+        this.zone.run(() => {
+          this.product.image = reader.result as string;
+          this.errors.image = ''; // Limpiamos error si lo había
+        });
       };
       reader.readAsDataURL(file);
     }

@@ -19,7 +19,7 @@ export class Navbar {
   items:any[]=[];
 
 
-
+  mostrarConfirmLogout = false;
   isLoggedIn: boolean = false;
   mostrarFiltros = false;
   menuUsuarioAbierto: boolean = false;
@@ -55,14 +55,14 @@ export class Navbar {
 
 
   logout() {
-  const confirmacion = window.confirm('¿Cerrar sesión?');
+  this.mostrarConfirmLogout = true;
+}
 
-  if (confirmacion) {
-    this.userService.logout();
-    this.cartService.loadCart();
-    this.isLoggedIn = false;
-    this.router.navigate(['/login']);
-  }
+confirmarLogout() {
+  this.userService.logout();
+  this.cartService.loadCart();
+  this.isLoggedIn = false;
+  this.router.navigate(['/login']);
 }
   carritoAbierto = false;
 

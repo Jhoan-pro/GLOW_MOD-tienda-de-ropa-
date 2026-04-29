@@ -5,12 +5,12 @@
   </div>
 
   <div class="actions">
-    <div class="cart-icon" (click)="toggleCarrito()">🛒<span class="badge" *ngIf="getCantidadTotal() > 0">{{
+    <div class="cart-icon" (click)="toggleCarrito()"><img src="img/carrito.png" alt="Car" class="cart-img"><span class="badge" *ngIf="getCantidadTotal() > 0">{{
         getCantidadTotal() }}</span></div>
     <!-- LUPA / FILTROS -->
     <div class="search-box">
       <button id="btn-lupa" (click)="toggleFiltros()">
-        <i class="fas fa-search">🔍</i>
+        <i class="fas fa-search"><img src="img/search.png" alt="Buscar" class="search-icon"></i>
       </button>
 
       <div class="filtros-panel" *ngIf="mostrarFiltros">
@@ -21,6 +21,7 @@
         <button class="filtro-item" (click)="selectCategory('Chaquetas')">Chaquetas</button>
         <button class="filtro-item" (click)="selectCategory('Pantalones')">Pantalones</button>
         <button class="filtro-item" (click)="selectCategory('Zapatos')">Zapatos</button>
+        <button class="filtro-item" (click)="selectCategory('Sudaderas')">Sudaderas</button>
 
 
 
@@ -30,7 +31,7 @@
 
     <!-- Usuario -->
     <div class="user-dropdown">
-      <div class="user-icon" (click)="toggleMenuUsuario()">👤</div>
+      <div class="user-icon" (click)="toggleMenuUsuario()"><img src="img/user.png" alt="Perfilus"></div>
 
       <div class="dropdown-menu" *ngIf="menuUsuarioAbierto">
 
@@ -115,3 +116,20 @@
 
 </div>
 <div class="overlay" *ngIf="carritoAbierto" (click)="cerrarCarrito()"></div>
+<!--confirmacion de logout-->
+<div class="logout-modal" *ngIf="mostrarConfirmLogout">
+  <div class="logout-box">
+    <h3>¿Cerrar sesión?</h3>
+    <p>Tu sesión se cerrará.</p>
+
+    <div class="acciones">
+      <button class="cerrar-btn" (click)="mostrarConfirmLogout = false">
+        Cancelar
+      </button>
+
+      <button class="confirmar" (click)="confirmarLogout()">
+        Sí, salir
+      </button>
+    </div>
+  </div>
+</div>

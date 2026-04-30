@@ -26,6 +26,7 @@
   cursor: pointer;
   transition: 0.3s;
 }
+
 .add-btn:hover {
   background: linear-gradient(45deg, #8e61f7, #10b4d1);
 }
@@ -66,6 +67,7 @@
 .products-table td:first-child {
   border-radius: 12px 0 0 12px;
 }
+
 .products-table td:last-child {
   border-radius: 0 12px 12px 0;
 }
@@ -103,6 +105,7 @@
   background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.4), transparent);
   transition: 0.5s;
 }
+
 .update-btn:hover::before,
 .delete-btn:hover::before,
 .view-btn:hover::before,
@@ -117,6 +120,7 @@
   padding: 8px 28px;
   border-radius: 20px;
 }
+
 .add-btn:hover {
   transform: translateY(-3px) scale(1.03);
   box-shadow: 0 10px 25px rgba(6, 182, 212, 0.45);
@@ -128,6 +132,7 @@
   margin-right: 8px;
   margin-bottom: 4px;
 }
+
 .update-btn:hover {
   transform: translateY(-2px) scale(1.02);
   box-shadow: 0 8px 20px rgba(6, 182, 212, 0.4);
@@ -139,6 +144,7 @@
   margin-right: 8px;
   margin-bottom: 4px;
 }
+
 .delete-btn:hover {
   transform: translateY(-2px) scale(1.02);
   box-shadow: 0 8px 20px rgba(236, 31, 31, 0.45);
@@ -150,6 +156,7 @@
   margin-right: 8px;
   margin-bottom: 4px;
 }
+
 .view-btn:hover {
   transform: translateY(-2px) scale(1.02);
   box-shadow: 0 8px 20px rgba(235, 59, 211, 0.45);
@@ -159,6 +166,7 @@
   background: linear-gradient(135deg, #b91c1c, #ec1f1f);
   padding: 4px 15px;
 }
+
 .deleteSelected-btn:hover {
   transform: translateY(-2px) scale(1.02);
   box-shadow: 0 8px 20px rgba(236, 31, 31, 0.45);
@@ -203,8 +211,23 @@
   overflow-y: auto;
   overflow-x: hidden;
 }
+
 .modal-content::-webkit-scrollbar {
   width: 6px;
+  height: 6px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+  background: #475569;
 }
 
 .modal-content input,
@@ -231,7 +254,6 @@
   color: white;
 }
 
-/* RESPONSIVE */
 /* RESPONSIVE */
 @media (max-width: 768px) {
   .header {
@@ -289,9 +311,10 @@
     flex-shrink: 0;
   }
 
-  .products-table td > *,
+  .products-table td>*,
   .products-table td {
-    max-width: 60%; /* ← limita el ancho del valor */
+    max-width: 60%;
+    /* ← limita el ancho del valor */
     text-align: right;
   }
 

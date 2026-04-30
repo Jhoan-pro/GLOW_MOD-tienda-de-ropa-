@@ -27,10 +27,10 @@ export class Login {
     private router: Router,
     private UserService: UserService,
     private cartService: CartService,
-  ) {}
+  ) { }
 
   login() {
-    this.errors = '';
+    this.errors = { email: '', password: '', general: '' };
 
     // Validación: campos vacíos
     if (!this.email || !this.password) {
@@ -38,32 +38,25 @@ export class Login {
       return;
     }
 
-    this.errors = { email: '', password: '', general: '' };
-    // Validación: campos vacíos
-    if (!this.email) {
-      this.errors.email = 'El correo es obligatorio';
-    }
-    if (!this.password) {
-      this.errors.password = 'La contraseña es obligatoria';
-    }
-
+    // Campos vacíos
+    if (!this.email) this.errors.email = 'El correo es obligatorio';
+    if (!this.password) this.errors.password = 'La contraseña es obligatoria';
     if (this.errors.email || this.errors.password) return;
 
-    // Validación: formato de correo
+    // Formato de correo
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
     if (!emailRegex.test(this.email)) {
-      this.errors.email = 'Correo electrónico inválido. ej: ejemplo@gmail.com';
+      this.errors.email = 'Correo inválido. ej: ejemplo@gmail.com';
       return;
     }
 
-    // Validación: longitud de contraseña
+    // Longitud de contraseña
     if (this.password.length < 6) {
       this.errors.password = 'La contraseña debe tener mínimo 6 caracteres';
       return;
     }
 
-    // Simulación de login (administrador)
+    // Usuario administrador predefinido 
     if (this.email === 'admin@gmail.com' && this.password === '123456') {
       this.errors = '';
 
@@ -72,52 +65,22 @@ export class Login {
     } else {
       this.errors.general = 'Credenciales incorrectas';
     }
-
-    // validacion de usuarios
+    // Buscar usuario
     const users = this.UserService.getUsers();
-
-    const userFound = users.find((u) => u.email === this.email && u.password === this.password);
+    const userFound = users.find(
+      (u) => u.email === this.email && u.password === this.password
+    );
 
     if (userFound) {
-      this.errors.general = '';
-
-      this.UserService.login(userFound);
-      if (userFound.role === 'admin') {
-        this.router.navigate(['/admin-dashboard/admin']);
-      } else if (userFound.role === 'cashier') {
-        this.router.navigate(['/dashboard/cashier']);
-      } else {
-        this.router.navigate(['/']);
+      if (!userFound.active) {
+        this.errors.general = 'Tu cuenta ha sido deshabilitada. Contacta al admin.';
+        return;
       }
+      this.UserService.login(userFound);
+      this.cartService.loadCart();
+      this.redirectByRole(userFound.role);
     } else {
       this.errors.general = 'Correo o contraseña incorrectos';
-
-      if (this.email === 'cli@gmail.com' && this.password === '123456') {
-        this.errors = '';
-
-        // REDIRECCIÓN
-        this.router.navigate(['/']);
-      } else {
-        this.errors.general = 'Credenciales incorrectas';
-      }
-
-      // validacion de usuarios
-      const users = this.UserService.getUsers();
-      const userFound = users.find((u) => u.email === this.email && u.password === this.password);
-
-      if (userFound) {
-        if (!userFound.active) {
-          this.errors.general = 'Tu cuenta ha sido deshabilitada. Contacta al admin.';
-          return;
-        }
-
-        // Redirección según rol
-        this.UserService.login(userFound);
-        this.cartService.loadCart();
-        this.redirectByRole(userFound.role);
-      } else {
-        this.errors.general = 'Credenciales incorrectas';
-      }
     }
   }
   private redirectByRole(role: string) {
@@ -125,6 +88,7 @@ export class Login {
     else if (role === 'cashier') this.router.navigate(['/dashboard/cashier']);
     else this.router.navigate(['/']);
   }
+
 
   volver() {
     this.router.navigate(['/register']);

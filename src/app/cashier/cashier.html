@@ -198,12 +198,12 @@
   </div>
 </div>
 
-    <!-- PAYPAL -->
+    <!-- Paypal -->
     <div *ngIf="paymentMethod === 'paypal'" class="payment-form">
       <p>Serás redirigido a PayPal</p>
     </div>
 
-    <!-- WALLET -->
+    <!-- telefon -->
     <div *ngIf="paymentMethod === 'wallet'" class="payment-form">
   <div class="input-group">
     <input
@@ -221,7 +221,7 @@
   </div>
 </div>
 
-    <!-- RESUMEN -->
+    <!-- Resumen -->
     <div class="resumen">
       <div class="item" *ngFor="let item of items">
         <span>{{ item.product.name }} x {{ item.cantidad }}</span>
@@ -231,7 +231,7 @@
       <h3>Total: ${{ getTotal() }}</h3>
     </div>
 
-    <!-- BOTONES -->
+    <!-- Botones-->
     <div class="acciones">
   <button class="back" type="button" (click)="cerrar()">Cancelar</button>
 

@@ -21,8 +21,11 @@
           </span>
         </td>
         <td data-label="Acciones">
-          <button class="update-btn" (click)="openEdit(user)">Editar</button>
-          <button [class]="user.active ? 'delete-btn' : 'view-btn'" (click)="toggleStatus(i)">
+          
+          <button *ngIf="user.active" class="update-btn" (click)="openEdit(user)">Editar</button>
+
+          
+          <button [ngClass]="user.active ? 'delete-btn' : 'view-btn'" (click)="toggleStatus(i)">
             {{ user.active ? 'Deshabilitar' : 'Habilitar' }}
           </button>
         </td>
@@ -33,8 +36,8 @@
   <div class="modal" *ngIf="showEditModal">
     <div class="modal-content">
       <h3>Editar Usuario</h3>
-      <input type="text" [(ngModel)]="editingUser!.name" placeholder="Nombre">
-      <input type="text" [(ngModel)]="editingUser!.email" placeholder="Correo">
+      <input type="text" [(ngModel)]="editingUser!.name" placeholder="Nombre" />
+      <input type="text" [(ngModel)]="editingUser!.email" placeholder="Correo" />
       <span class="error-text" *ngIf="errors.email">{{ errors.email }}</span>
       <span class="error-text" *ngIf="errors.general">{{ errors.general }}</span>
       <select [(ngModel)]="editingUser!.role">

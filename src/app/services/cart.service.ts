@@ -42,7 +42,7 @@ export class CartService {
   private getCurrentProduct(productId: number): Product | undefined {
     return this.productService.getProducts().find((p) => p.id === productId);
   }
-
+  //syncItemSnapshots() sirve para actualizar la información de los productos que ya están en el carrito
   private syncItemSnapshots() {
     const products = this.productService.getProducts();
 

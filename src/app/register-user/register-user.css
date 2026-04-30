@@ -1,82 +1,117 @@
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
 }
 
 .register-container {
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background:linear-gradient(135deg,#0f172a,#1e293b);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+  padding: 1rem;
 }
 
 .register-box {
-    background-color: #1e293b;
-    padding: 2.5rem;
-    border-radius: 12px;
-    width: 320px;
-    text-align: center;
-    border: 1px solid #334155;
-    box-shadow:0 20px 60px rgba(0,0,0,0.6);
+  background-color: #1e293b;
+  padding: 2.5rem;
+  border-radius: 20px;
+  width: 380px;
+  max-width: 100%;
+  text-align: center;
+  border: 1px solid #334155;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .register-box h2 {
-    margin-bottom: 1.5rem;
-    color: white;
+  margin-bottom: 1rem;
+  color: white;
 }
 
 .register-box input {
-    width: 100%;
-    padding: 0.7rem;
-    margin-bottom: 1rem;
-    border: none;
-    border-radius: 6px;
-    background-color: #334155;
-    color: white;
-    outline: none;
-    margin-top: 10px;
+  width: 100%;
+  padding: 12px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background-color: #0f172a;
+  color: white;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.25s ease;
 }
 
 .register-box input::placeholder {
-    color: #94a3b8;
+  color: #94a3b8;
 }
 
+.register-box input:focus {
+  border-color: #06b6d4;
+}
+
+.register-box input.ng-invalid.ng-touched {
+  border-color: #ef4444;
+}
+
+/* ── BOTÓN PRINCIPAL ── */
 .primary-btn {
-    width: 100%;
-    padding: 0.7rem;
-    background: linear-gradient(45deg, #8b5cf6, #06b6d4);
-    border: none;
-    border-radius: 6px;
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-    margin-top: 1.5rem;
+  width: 100%;
+  color: white;
+  border: none;
+  border-radius: 30px;
+  padding: 12px 28px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 1rem;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #7c3aed, #06b6d4);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
+.primary-btn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(120deg, transparent, rgba(255,255,255,0.4), transparent);
+  transition: 0.5s;
+}
+
+.primary-btn:hover::before { left: 100%; }
 .primary-btn:hover {
-    opacity: 0.9;
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 10px 25px rgba(6, 182, 212, 0.45);
 }
+.primary-btn:active { transform: scale(0.95); }
 
-
+/* ── LINK ── */
 .login-link {
-    display: block;
-    margin-top: 1rem;
-    font-size: 0.85rem;
-    color: #06b6d4;
-    text-decoration: none;
-    justify-content: center;
-    cursor: pointer;
+  display: block;
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  color: #06b6d4;
+  text-decoration: none;
+  text-align: center;
+  cursor: pointer;
+  transition: color 0.2s;
 }
+.login-link:hover { color: #22d3ee; }
+
+/* ── ERRORES ── */
 .error-text {
-color: #ef4444;
-    font-size: 0.72rem;
-    text-align: left;
-    margin-bottom: 5px;
-    margin-left: 5px;
-    display: block;
+  color: #ef4444;
+  font-size: 0.72rem;
+  text-align: left;
+  margin-bottom: 4px;
+  margin-left: 5px;
+  display: block;
 }
 
 .error-msg {
@@ -84,8 +119,28 @@ color: #ef4444;
   background: rgba(239, 68, 68, 0.1);
   padding: 0.8rem;
   border-radius: 6px;
-  margin-top: 1rem;
+  margin-top: 0.5rem;
   font-size: 0.9rem;
   border: 1px solid #ef4444;
   display: block;
+  text-align: center;
+}
+
+/* variante éxito */
+.error-msg.success {
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.1);
+  border-color: #10b981;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 480px) {
+  .register-box {
+    padding: 1.8rem 1.2rem;
+  }
+
+  .primary-btn {
+    padding: 11px 20px;
+    font-size: 0.95rem;
+  }
 }

@@ -1,10 +1,8 @@
 <div class="register-container">
-
   <div class="register-box">
     <h2>Crear Cuenta</h2>
 
     <input type="text" placeholder="Nombre completo" [(ngModel)]="name">
-    
 
     <input type="email" placeholder="Correo electrónico" [(ngModel)]="email">
     <span class="error-text" *ngIf="errors.email">{{ errors.email }}</span>
@@ -15,16 +13,11 @@
     <input type="password" placeholder="Confirmar contraseña" [(ngModel)]="confirmPassword">
     <span class="error-text" *ngIf="errors.confirmPassword">{{ errors.confirmPassword }}</span>
 
-    <button class="primary-btn" (click)="register()">
-      Registrarse
-    </button>
+    <button class="primary-btn" (click)="register()">Registrarse</button>
 
     <span class="error-msg" *ngIf="errors.general">{{ errors.general }}</span>
+    <span class="error-msg success" *ngIf="successMsg">{{ successMsg }}</span>
 
-    <a routerLink="/login" class="login-link">
-      ¿Ya tienes cuenta? Inicia sesión
-    </a>
-
+    <a routerLink="/login" class="login-link">¿Ya tienes cuenta? Inicia sesión</a>
   </div>
-
 </div>

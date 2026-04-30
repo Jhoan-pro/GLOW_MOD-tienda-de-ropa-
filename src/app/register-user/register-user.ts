@@ -17,6 +17,7 @@ export class RegisterUser {
   email: string = '';
   password: string = '';
   confirmPassword: string = '';
+  successMsg: string = ''; 
 
   errors: any = {
     email: '',
@@ -32,38 +33,34 @@ export class RegisterUser {
 
   register() {
     this.errors = { email: '', password: '', confirmPassword: '', general: '' };
+    this.successMsg = ''; 
 
-    // Campos vacíos
     if (!this.name || !this.email || !this.password || !this.confirmPassword) {
       this.errors.general = 'Todos los campos son obligatorios';
       return;
     }
 
-    // Validar email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
     if (!emailRegex.test(this.email)) {
       this.errors.email = 'Correo inválido. ej: ejemplo@gmail.com';
       return;
     }
 
-    // Validar contraseña
     if (this.password.length < 6) {
       this.errors.password = 'La contraseña debe tener mínimo 6 caracteres';
       return;
     }
 
-    // Confirmar contraseña
     if (this.password !== this.confirmPassword) {
       this.errors.confirmPassword = 'Las contraseñas no coinciden';
       return;
     }
-    
+
     const usuarios = this.userService.getUsers();
     const existe = usuarios.some((u) => u.email.toLowerCase() === this.email.toLowerCase());
 
     if (existe) {
-      this.errors.email = 'Este correo ya está registrado';
+      this.errors.general = 'Este correo ya está registrado';
       return;
     }
 
@@ -76,9 +73,8 @@ export class RegisterUser {
     };
 
     this.userService.addUser(newUser);
-    this.errors.general = 'Registro exitoso';
+    this.successMsg = '¡Registro exitoso!'; 
 
-    // Redirigir al login
     setTimeout(() => {
       this.router.navigate(['/login']);
     }, 1500);

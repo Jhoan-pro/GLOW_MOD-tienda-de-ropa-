@@ -1,5 +1,4 @@
 <div *ngIf="invoice; else noData" class="invoice-container">
-
   <div class="invoice-header">
     <div class="brand">
       <h1><span class="glows">GLOW</span>_MOD</h1>
@@ -7,8 +6,10 @@
     </div>
 
     <div class="meta">
-      <p><strong>#{{ invoice.invoiceNumber }}</strong></p>
-      <p>{{ invoice.date | date:'medium' }}</p>
+      <p>
+        <strong>#{{ invoice.invoiceNumber }}</strong>
+      </p>
+      <p>{{ invoice.date | date: 'medium' }}</p>
     </div>
   </div>
 
@@ -29,9 +30,13 @@
     <ng-container *ngIf="invoice.paymentDetails as payment">
       <p *ngIf="payment.bank"><strong>Banco:</strong> {{ payment.bank }}</p>
       <p *ngIf="payment.reference"><strong>Referencia:</strong> {{ payment.reference }}</p>
-      <p *ngIf="payment.walletNumber"><strong>Nequi / Daviplata:</strong> {{ payment.walletNumber }}</p>
+      <p *ngIf="payment.walletNumber">
+        <strong>Nequi / Daviplata:</strong> {{ payment.walletNumber }}
+      </p>
       <p *ngIf="payment.cardName"><strong>Tarjeta:</strong> {{ payment.cardName }}</p>
-      <p *ngIf="payment.cardNumberLast4"><strong>Tarjeta terminada en:</strong> **** {{ payment.cardNumberLast4 }}</p>
+      <p *ngIf="payment.cardNumberLast4">
+        <strong>Tarjeta terminada en:</strong> **** {{ payment.cardNumberLast4 }}
+      </p>
     </ng-container>
   </div>
 
@@ -50,8 +55,8 @@
         <tr *ngFor="let item of invoice.items">
           <td>{{ item.name }}</td>
           <td>{{ item.quantity }}</td>
-          <td>{{ item.price | currency:'COP' }}</td>
-          <td>{{ getSubtotal(item) | currency:'COP' }}</td>
+          <td>{{ item.price | currency: 'COP' }}</td>
+          <td>{{ getSubtotal(item) | currency: 'COP' }}</td>
         </tr>
       </tbody>
     </table>
@@ -59,7 +64,7 @@
 
   <div class="total-box">
     <h2>Total</h2>
-    <span>{{ getTotal() | currency:'COP' }}</span>
+    <span>{{ getTotal() | currency: 'COP' }}</span>
   </div>
 
   <div class="acciones">

@@ -9,7 +9,6 @@ import { Router } from '@angular/router';
   styleUrls: ['./invoice.css'],
 })
 export class Invoice {
-
   invoice: any;
   constructor(private router: Router) {}
 
@@ -25,27 +24,31 @@ export class Invoice {
   }
 
   getTotal(): number {
-    return this.invoice?.items?.reduce(
-      (acc: number, item: any) => acc + this.getSubtotal(item),
-      0
-    ) || 0;
+    return (
+      this.invoice?.items?.reduce((acc: number, item: any) => acc + this.getSubtotal(item), 0) || 0
+    );
   }
 
   getMetodoPago() {
     switch (this.invoice?.paymentMethod) {
-      case 'card': return 'Tarjeta';
-      case 'transfer': return 'Transferencia';
-      case 'paypal': return 'PayPal';
-      case 'wallet': return 'Nequi / Daviplata';
-      default: return '';
+      case 'card':
+        return 'Tarjeta';
+      case 'transfer':
+        return 'Transferencia';
+      case 'paypal':
+        return 'PayPal';
+      case 'wallet':
+        return 'Nequi / Daviplata';
+      default:
+        return '';
     }
   }
 
   imprimirFactura() {
     window.print();
   }
-  
-irHome() {
-  this.router.navigate(['/Navbar']);
-}
+
+  irHome() {
+    this.router.navigate(['/Navbar']);
+  }
 }

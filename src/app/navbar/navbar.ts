@@ -6,116 +6,111 @@ import { UserService } from '../services/user.service';
 import { FilterService } from '../services/filter.service';
 import { Home } from '../home/home';
 
-
 @Component({
   selector: 'app-navbar',
   standalone: true,
   imports: [RouterLink, NgIf, RouterModule, NgForOf, Home],
   templateUrl: './navbar.html',
   styleUrls: ['./navbar.css'],
-  encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.None,
 })
 export class Navbar {
-  items:any[]=[];
-
+  items: any[] = [];
 
   mostrarConfirmLogout = false;
   isLoggedIn: boolean = false;
   mostrarFiltros = false;
   menuUsuarioAbierto: boolean = false;
-  constructor(private eRef: ElementRef, private router:Router,private cartService: CartService, private userService: UserService,private filterService: FilterService){
-
-  }
+  constructor(
+    private eRef: ElementRef,
+    private router: Router,
+    private cartService: CartService,
+    private userService: UserService,
+    private filterService: FilterService,
+  ) {}
   toggleFiltros() {
-  this.mostrarFiltros = !this.mostrarFiltros;
+    this.mostrarFiltros = !this.mostrarFiltros;
 
-  if (this.mostrarFiltros) {
-    this.menuUsuarioAbierto = false;
-    this.carritoAbierto = false;
+    if (this.mostrarFiltros) {
+      this.menuUsuarioAbierto = false;
+      this.carritoAbierto = false;
+    }
   }
-}
 
   toggleMenuUsuario() {
-  this.menuUsuarioAbierto = !this.menuUsuarioAbierto;
+    this.menuUsuarioAbierto = !this.menuUsuarioAbierto;
 
-  if (this.menuUsuarioAbierto) {
-    this.mostrarFiltros = false;
-    this.carritoAbierto = false;
+    if (this.menuUsuarioAbierto) {
+      this.mostrarFiltros = false;
+      this.carritoAbierto = false;
+    }
   }
-}
   slugify(text: string): string {
-  return text
-    .toLowerCase()
-    .trim()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-}
-
+    return text
+      .toLowerCase()
+      .trim()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+  }
 
   logout() {
-  this.mostrarConfirmLogout = true;
-}
+    this.mostrarConfirmLogout = true;
+  }
 
-confirmarLogout() {
-  this.userService.logout();
-  this.cartService.loadCart();
-  this.isLoggedIn = false;
-  this.router.navigate(['/login']);
-}
+  confirmarLogout() {
+    this.userService.logout();
+    this.cartService.loadCart();
+    this.isLoggedIn = false;
+    this.router.navigate(['/login']);
+  }
   carritoAbierto = false;
 
   toggleCarrito() {
-  this.carritoAbierto = !this.carritoAbierto;
+    this.carritoAbierto = !this.carritoAbierto;
 
-  if (this.carritoAbierto) {
-    this.mostrarFiltros = false;
-    this.menuUsuarioAbierto = false;
+    if (this.carritoAbierto) {
+      this.mostrarFiltros = false;
+      this.menuUsuarioAbierto = false;
+    }
   }
-}
-  cerrarCarrito(){
-    this.carritoAbierto=false;
+  cerrarCarrito() {
+    this.carritoAbierto = false;
   }
   //Detecta clics
   @HostListener('document:click', ['$event'])
-clickFuera(event: MouseEvent) {
+  clickFuera(event: MouseEvent) {
+    const target = event.target as HTMLElement;
 
-  const target = event.target as HTMLElement;
+    const clickDentroFiltros = target.closest('.search-box');
+    const clickDentroUsuario = target.closest('.user-dropdown');
+    const clickDentroCarrito = target.closest('.cart-panel');
+    const clickIconCarrito = target.closest('.cart-icon');
 
-  const clickDentroFiltros = target.closest('.search-box');
-  const clickDentroUsuario = target.closest('.user-dropdown');
-  const clickDentroCarrito = target.closest('.cart-panel');
-  const clickIconCarrito = target.closest('.cart-icon');
-
-  if (
-    !clickDentroFiltros &&
-    !clickDentroUsuario &&
-    !clickDentroCarrito &&
-    !clickIconCarrito
-  ) {
-    this.mostrarFiltros = false;
-    this.menuUsuarioAbierto = false;
-    this.carritoAbierto = false;
+    if (!clickDentroFiltros && !clickDentroUsuario && !clickDentroCarrito && !clickIconCarrito) {
+      this.mostrarFiltros = false;
+      this.menuUsuarioAbierto = false;
+      this.carritoAbierto = false;
+    }
   }
-}
   ngOnInit() {
-  this.cartService.loadCart();
+    this.cartService.loadCart();
 
-  this.cartService.cart$.subscribe(data => {
-    this.items = data;
-  });
+    this.cartService.cart$.subscribe((data) => {
+      this.items = data;
+    });
 
-  this.checkLogin();
-}
+    this.checkLogin();
+  }
 
-checkLogin() {
-  this.isLoggedIn = this.userService.isLoggedIn();
-}
-  eliminar(index: number){
+  checkLogin() {
+    this.isLoggedIn = this.userService.isLoggedIn();
+  }
+  eliminar(index: number) {
     this.cartService.removeItem(index);
   }
-  aumentar(item: any){
+  aumentar(item: any) {
     this.cartService.increase(item);
   }
   disminuir(item: any) {
@@ -130,36 +125,35 @@ checkLogin() {
     this.cartService.clearCart();
   }
   getCantidadTotal() {
-  return this.items.reduce((acc, item) => acc + item.cantidad, 0);
-}
-ngDoCheck() {
-  this.checkLogin();
-}
-selectCategory(category: string) {
-  this.scrollToCategory(category);
-}
-scrollToCategory(category: string) {
-  this.mostrarFiltros = false;
+    return this.items.reduce((acc, item) => acc + item.cantidad, 0);
+  }
+  ngDoCheck() {
+    this.checkLogin();
+  }
+  selectCategory(category: string) {
+    this.scrollToCategory(category);
+  }
+  scrollToCategory(category: string) {
+    this.mostrarFiltros = false;
 
-  const targetId =
-    category === 'Todos'
-      ? 'catalogo'
-      : category
-          .toLowerCase()
-          .trim()
-          .normalize('NFD')
-          .replace(/[\u0300-\u036f]/g, '')
-          .replace(/[^a-z0-9]+/g, '-')
-          .replace(/^-+|-+$/g, '');
+    const targetId =
+      category === 'Todos'
+        ? 'catalogo'
+        : category
+            .toLowerCase()
+            .trim()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-+|-+$/g, '');
 
-  this.router.navigate(['/']).then(() => {
-    setTimeout(() => {
-      document.getElementById(targetId)?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start'
-      });
-    }, 80);
-  });
-}
-
+    this.router.navigate(['/']).then(() => {
+      setTimeout(() => {
+        document.getElementById(targetId)?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
+      }, 80);
+    });
+  }
 }

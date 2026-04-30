@@ -9,7 +9,7 @@ import { Subscription } from 'rxjs';
   imports: [ProductCar],
   templateUrl: './home.html',
   styleUrls: ['./home.css'],
-  standalone: true
+  standalone: true,
 })
 export class Home implements OnInit, OnDestroy {
   products: Product[] = [];
@@ -29,7 +29,7 @@ export class Home implements OnInit, OnDestroy {
 
   irCatalogo() {
     document.getElementById('catalogo')?.scrollIntoView({
-      behavior: 'smooth'
+      behavior: 'smooth',
     });
   }
 }

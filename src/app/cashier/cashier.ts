@@ -80,42 +80,41 @@ export class Cashier {
   ) {}
 
   ngOnInit() {
-  this.cartService.loadCart();
+    this.cartService.loadCart();
 
-  this.cartService.cart$.subscribe((data) => {
-    this.items = data;
-  });
+    this.cartService.cart$.subscribe((data) => {
+      this.items = data;
+    });
 
-  const user = this.userService.getCurrentUser();
-  if (user) {
-    this.customerEmail = user.email;
-    this.customerName = user.name;
+    const user = this.userService.getCurrentUser();
+    if (user) {
+      this.customerEmail = user.email;
+      this.customerName = user.name;
+    }
+
+    if (!this.isBrowser()) return;
+
+    const draft = localStorage.getItem(this.getDraftKey());
+
+    if (draft) {
+      const data = JSON.parse(draft);
+
+      this.customerName = data.customerName || this.customerName;
+      this.customerEmail = data.customerEmail || this.customerEmail;
+      this.phone = data.phone || '';
+      this.address = data.address || '';
+      this.city = data.city || '';
+      this.documentId = data.documentId || '';
+      this.paymentMethod = data.paymentMethod || '';
+      this.cardName = data.cardName || '';
+      this.cardNumber = data.cardNumber || '';
+      this.expiry = data.expiry || '';
+      this.cvv = data.cvv || '';
+      this.bank = data.bank || '';
+      this.reference = data.reference || '';
+      this.phoneWallet = data.phoneWallet || '';
+    }
   }
-
-  if (!this.isBrowser()) return;
-
-  const draft = localStorage.getItem(this.getDraftKey());
-
-  if (draft) {
-    const data = JSON.parse(draft);
-
-    this.customerName = data.customerName || this.customerName;
-    this.customerEmail = data.customerEmail || this.customerEmail;
-    this.phone = data.phone || '';
-    this.address = data.address || '';
-    this.city = data.city || '';
-    this.documentId = data.documentId || '';
-    this.paymentMethod = data.paymentMethod || '';
-    this.cardName = data.cardName || '';
-    this.cardNumber = data.cardNumber || '';
-    this.expiry = data.expiry || '';
-    this.cvv = data.cvv || '';
-    this.bank = data.bank || '';
-    this.reference = data.reference || '';
-    this.phoneWallet = data.phoneWallet || '';
-  }
-}
-  
 
   getTotal() {
     return this.cartService.getTotal();
@@ -307,66 +306,66 @@ export class Cashier {
   }
 
   pagar() {
-  if (this.loading) return;
+    if (this.loading) return;
 
-  this.submitted = true;
+    this.submitted = true;
 
-  if (!this.validarFormulario()) {
-    this.mostrarAlerta('Revisa los campos marcados en rojo', 'error');
-    this.enfocarPrimerError();
-    this.loading = false;
-    return;
+    if (!this.validarFormulario()) {
+      this.mostrarAlerta('Revisa los campos marcados en rojo', 'error');
+      this.enfocarPrimerError();
+      this.loading = false;
+      return;
+    }
+
+    this.loading = true;
+
+    const user = this.userService.getCurrentUser();
+
+    const invoice = {
+      invoiceNumber: 'INV-' + Date.now(),
+      date: new Date(),
+      customer: {
+        name: this.customerName.trim(),
+        email: this.customerEmail.trim(),
+        phone: this.phone.trim(),
+        address: this.address.trim(),
+        city: this.city.trim(),
+        documentId: this.documentId.trim(),
+      },
+      notes: this.notes.trim(),
+      userId: user?.email,
+      paymentMethod: this.paymentMethod,
+      paymentDetails: {
+        walletNumber: this.paymentMethod === 'wallet' ? this.phoneWallet.trim() : null,
+        bank: this.paymentMethod === 'transfer' ? this.bank : null,
+        reference: this.paymentMethod === 'transfer' ? this.reference.trim() : null,
+        cardName: this.paymentMethod === 'card' ? this.cardName.trim() : null,
+        cardNumberLast4: this.paymentMethod === 'card' ? this.cardNumber.slice(-4) : null,
+      },
+      items: this.items.map((item) => ({
+        name: item.product.name,
+        quantity: item.cantidad,
+        price: item.product.price,
+      })),
+      total: this.getTotal(),
+    };
+
+    if (this.isBrowser()) {
+      localStorage.setItem('lastInvoice', JSON.stringify(invoice));
+    }
+
+    this.orderHistory.addOrder(invoice);
+
+    this.clearDraft();
+    this.cartService.finalizePurchase();
+
+    this.mostrarAlerta('Pago realizado con éxito', 'success');
+
+    setTimeout(() => {
+      this.loading = false;
+      this.router.navigate(['/invoice']);
+    }, 1500);
   }
-
-  this.loading = true;
-
-  const user = this.userService.getCurrentUser();
-
-  const invoice = {
-    invoiceNumber: 'INV-' + Date.now(),
-    date: new Date(),
-    customer: {
-      name: this.customerName.trim(),
-      email: this.customerEmail.trim(),
-      phone: this.phone.trim(),
-      address: this.address.trim(),
-      city: this.city.trim(),
-      documentId: this.documentId.trim(),
-    },
-    notes: this.notes.trim(),
-    userId: user?.email,
-    paymentMethod: this.paymentMethod,
-    paymentDetails: {
-      walletNumber: this.paymentMethod === 'wallet' ? this.phoneWallet.trim() : null,
-      bank: this.paymentMethod === 'transfer' ? this.bank : null,
-      reference: this.paymentMethod === 'transfer' ? this.reference.trim() : null,
-      cardName: this.paymentMethod === 'card' ? this.cardName.trim() : null,
-      cardNumberLast4: this.paymentMethod === 'card' ? this.cardNumber.slice(-4) : null,
-    },
-    items: this.items.map((item) => ({
-      name: item.product.name,
-      quantity: item.cantidad,
-      price: item.product.price,
-    })),
-    total: this.getTotal(),
-  };
-
-  if (this.isBrowser()) {
-    localStorage.setItem('lastInvoice', JSON.stringify(invoice));
-  }
-
-  this.orderHistory.addOrder(invoice);
-
-  this.clearDraft();
-  this.cartService.finalizePurchase();
-
-  this.mostrarAlerta('Pago realizado con éxito', 'success');
-
-  setTimeout(() => {
-    this.loading = false;
-    this.router.navigate(['/invoice']);
-  }, 1500);
-}
 
   enfocarPrimerError() {
     setTimeout(() => {

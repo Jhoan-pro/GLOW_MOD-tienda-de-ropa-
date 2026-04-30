@@ -4,21 +4,16 @@ import { CommonModule } from '@angular/common';
 import { UserService } from '../services/user.service';
 import { Router } from '@angular/router';
 
-type ErrorKeys =
-  | 'address'
-  | 'birthDate'
-  | 'idNumber'
-  | 'country';
+type ErrorKeys = 'address' | 'birthDate' | 'idNumber' | 'country';
 
 @Component({
   selector: 'app-user-profile',
   standalone: true,
   imports: [FormsModule, CommonModule],
   templateUrl: './user-profile.html',
-  styleUrls: ['./user-profile.css']
+  styleUrls: ['./user-profile.css'],
 })
 export class UserProfile implements OnInit {
-
   user: any = {};
   editMode = false;
   hasExtraInfo = false;
@@ -26,35 +21,34 @@ export class UserProfile implements OnInit {
   errors: Partial<Record<ErrorKeys, string>> = {};
   submitted = false;
 
-  constructor(private userService: UserService, private router: Router) {}
+  constructor(
+    private userService: UserService,
+    private router: Router,
+  ) {}
 
   ngOnInit() {
-  const currentUser = this.userService.getCurrentUser();
+    const currentUser = this.userService.getCurrentUser();
 
-  if (!currentUser) {
-    this.router.navigate(['/login']);
-    return;
+    if (!currentUser) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    const users = this.userService.getUsers();
+    const savedUser = users.find((u) => u.email === currentUser.email || u.id === currentUser.id);
+
+    this.user = savedUser ? { ...savedUser } : { ...currentUser };
+
+    this.hasExtraInfo = !!this.user.address;
   }
-
-  const users = this.userService.getUsers();
-  const savedUser = users.find(
-    u => u.email === currentUser.email || u.id === currentUser.id
-  );
-
-  this.user = savedUser ? { ...savedUser } : { ...currentUser };
-
-  this.hasExtraInfo = !!this.user.address;
-}
 
   enableEdit() {
     this.editMode = true;
   }
 
-  // 🔹 NORMALIZADORES
+  //Normalizadores
   normalizeLetters(value: string): string {
-    return value
-      .replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '')
-      .replace(/\s{2,}/g, ' ');
+    return value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '').replace(/\s{2,}/g, ' ');
   }
 
   normalizeDigits(value: string): string {
@@ -65,22 +59,26 @@ export class UserProfile implements OnInit {
     return value.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ#\-\.,\s]/g, '');
   }
 
-  // 🔹 BLOQUEO DE TECLAS
+  // Bloqueo de teclas
   allowOnlyLetters(event: KeyboardEvent) {
-    if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]$/.test(event.key) &&
-        !['Backspace','Delete','ArrowLeft','ArrowRight','Tab'].includes(event.key)) {
+    if (
+      !/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]$/.test(event.key) &&
+      !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(event.key)
+    ) {
       event.preventDefault();
     }
   }
 
   allowOnlyDigits(event: KeyboardEvent) {
-    if (!/^\d$/.test(event.key) &&
-        !['Backspace','Delete','ArrowLeft','ArrowRight','Tab'].includes(event.key)) {
+    if (
+      !/^\d$/.test(event.key) &&
+      !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(event.key)
+    ) {
       event.preventDefault();
     }
   }
 
-  // 🔹 VALIDAR EDAD
+  // Valiidar edad
   validarEdad(fecha: string): boolean {
     const birth = new Date(fecha);
     const today = new Date();
@@ -92,10 +90,9 @@ export class UserProfile implements OnInit {
       edad--;
     }
 
-    return edad >= 13; // puedes cambiar a 18 si quieres
+    return edad >= 18;
   }
 
- 
   validarFormulario(): boolean {
     this.errors = {};
 
@@ -134,7 +131,7 @@ export class UserProfile implements OnInit {
     this.submitted = true;
 
     if (!this.validarFormulario()) return;
-    
+
     // Normalizar antes de guardar
     this.user.address = this.user.address.trim();
     this.user.country = this.user.country.trim();

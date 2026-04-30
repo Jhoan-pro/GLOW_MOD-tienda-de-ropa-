@@ -10,7 +10,7 @@ import { Router } from '@angular/router';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './product-car.html',
-  styleUrls: ['./product-car.css']
+  styleUrls: ['./product-car.css'],
 })
 export class ProductCar implements OnInit, OnChanges {
   showLoginAlert = false;
@@ -21,7 +21,7 @@ export class ProductCar implements OnInit, OnChanges {
   constructor(
     private cartService: CartService,
     private userService: UserService,
-    private router: Router
+    private router: Router,
   ) {}
 
   slugify(text: string): string {
@@ -51,14 +51,14 @@ export class ProductCar implements OnInit, OnChanges {
   }
 
   get categories(): string[] {
-    return [...new Set(this.products.map(p => p.category).filter(Boolean))].sort((a, b) =>
-      a.localeCompare(b)
+    return [...new Set(this.products.map((p) => p.category).filter(Boolean))].sort((a, b) =>
+      a.localeCompare(b),
     );
   }
 
   getProductsByCategory(category: string) {
     return this.products.filter(
-      p => p.category?.toLowerCase().trim() === category.toLowerCase().trim()
+      (p) => p.category?.toLowerCase().trim() === category.toLowerCase().trim(),
     );
   }
 
@@ -95,7 +95,7 @@ export class ProductCar implements OnInit, OnChanges {
     if (container) {
       container.scrollBy({
         left: amount,
-        behavior: 'smooth'
+        behavior: 'smooth',
       });
     }
   }

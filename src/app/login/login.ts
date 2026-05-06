@@ -56,15 +56,6 @@ export class Login {
       return;
     }
 
-    // Usuario administrador predefinido 
-    if (this.email === 'admin@gmail.com' && this.password === '123456') {
-      this.errors = '';
-
-      // REDIRECCIÓN
-      this.router.navigate(['/admin-dashboard/admin']);
-    } else {
-      this.errors.general = 'Credenciales incorrectas';
-    }
     // Buscar usuario
     const users = this.UserService.getUsers();
     const userFound = users.find(
@@ -84,9 +75,10 @@ export class Login {
     }
   }
   private redirectByRole(role: string) {
-    if (role === 'admin') this.router.navigate(['/admin-dashboard/admin']);
-    else if (role === 'cashier') this.router.navigate(['/dashboard/cashier']);
-    else this.router.navigate(['/']);
+  if (role === 'admin') this.router.navigate(['/admin-dashboard/admin']);
+  else if (role === 'sub-admin') this.router.navigate(['/admin-dashboard/admin']);
+  else if (role === 'cashier') this.router.navigate(['/dashboard/cashier']);
+  else this.router.navigate(['/']);
   }
 
 

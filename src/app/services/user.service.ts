@@ -7,6 +7,29 @@ import { isPlatformBrowser } from '@angular/common';
 })
 export class UserService {
 
+  constructor() {
+  if (isPlatformBrowser(this.platformid)) {
+    this.ensureDefaultAdmin();
+  }
+}
+
+private ensureDefaultAdmin() {
+  const users = this.getUsers();
+  const adminExists = users.some(u => u.email === 'admin@gmail.com');
+
+  if (!adminExists) {
+    const defaultAdmin: User = {
+      id: 1,
+      name: 'Administrador',
+      email: 'admin@gmail.com',
+      password: '123456',
+      role: 'admin',
+      active: true,
+    };
+    users.push(defaultAdmin);
+    localStorage.setItem(this.usersStorageKey, JSON.stringify(users));
+  }
+}
   // usuarios
   private usersStorageKey = 'app_users';
 

@@ -23,6 +23,7 @@ export class UserManagement implements OnInit {
     admin: 'Administrador',
     cashier: 'Cajero',
     client: 'Cliente',
+    'sub-admin': 'Sub Administrador',
   };
 
   errors: any = {
@@ -32,7 +33,7 @@ export class UserManagement implements OnInit {
     general: '',
   };
 
-  constructor(private userService: UserService) {}
+  constructor(private userService: UserService) { }
 
   ngOnInit() {
     this.loadUsers();
@@ -61,6 +62,18 @@ export class UserManagement implements OnInit {
       this.errors.email = '';
       this.errors.general = '';
       const allUsers = this.userService.getUsers();
+
+      if (!this.editingUser.name?.trim() || !this.editingUser.email?.trim()) {
+        this.errors.general = 'El nombre y el correo no pueden estar vacíos.';
+        return;
+      }
+
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(this.editingUser.email)) {  
+        this.errors.email = 'Correo electrónico inválido. ej: ejemplo@gmail.com';
+        return;
+      }
+
       const emailExiste = allUsers.some(
         (u) =>
           u.email.toLowerCase() === this.editingUser?.email.toLowerCase() &&
@@ -69,18 +82,6 @@ export class UserManagement implements OnInit {
 
       if (emailExiste) {
         this.errors.email = 'Este correo ya está en uso por otro usuario.';
-        return;
-      }
-
-      if (!this.editingUser.name?.trim() || !this.editingUser.email?.trim()) {
-        this.errors.general = 'El nombre y el correo no pueden estar vacíos.';
-        return;
-      }
-
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-      if (!emailRegex.test(this.email)) {
-        this.errors.email = 'Correo electrónico inválido. ej: ejemplo@gmail.com';
         return;
       }
 
@@ -100,7 +101,7 @@ export class UserManagement implements OnInit {
 
   changeRole(index: number, newRole: string) {
     const allUsers = this.userService.getUsers();
-    allUsers[index].role = newRole;
+    allUsers[index].role = newRole as 'admin' | 'sub-admin' | 'cashier' | 'client';
     localStorage.setItem('app_users', JSON.stringify(allUsers));
     this.loadUsers();
   }

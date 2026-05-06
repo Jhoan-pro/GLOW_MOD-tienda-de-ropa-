@@ -50,6 +50,15 @@ export class ProductService {
     this.saveProducts(products);
   }
 
+  getProductsByOwner(ownerId: number): Product[] {
+    return this.getProducts().filter(p => p.ownerId === ownerId);
+  }
+
+  getProductsForStore(): Product[] {
+    // todos los productos van a la tienda principal
+    return this.getProducts();
+  }
+  
   addProduct(product: Product) {
     const products = this.getProducts();
     const newId =

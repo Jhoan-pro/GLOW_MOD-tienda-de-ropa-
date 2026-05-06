@@ -56,15 +56,6 @@ export class Login {
       return;
     }
 
-    // Usuario administrador predefinido 
-    if (this.email === 'admin@gmail.com' && this.password === '123456') {
-      this.errors = '';
-
-      // REDIRECCIÓN
-      this.router.navigate(['/admin-dashboard/admin']);
-    } else {
-      this.errors.general = 'Credenciales incorrectas';
-    }
     // Buscar usuario
     const users = this.UserService.getUsers();
     const userFound = users.find(

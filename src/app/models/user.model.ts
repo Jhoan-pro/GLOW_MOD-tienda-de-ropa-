@@ -2,9 +2,9 @@ export interface User {
   id?: number;
   name: string;
   email: string;
-  password?: string; 
-  role: string;    
-  active : boolean;  
+  password?: string;
+  role: 'admin' | 'sub-admin' | 'cashier' | 'client';
+  active: boolean;
 
   fullName?: string;
   address?: string;

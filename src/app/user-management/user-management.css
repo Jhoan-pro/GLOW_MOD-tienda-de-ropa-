@@ -103,10 +103,12 @@
   padding: 0.4rem 1rem;
   margin-right: 8px;
   margin-bottom: 4px;
+  opacity: 2.0;
 }
 .view-btn:hover {
-  transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 8px 20px rgba(235, 59, 211, 0.45);
+  transform: translateY(6px) scale(3.0);
+  box-shadow: 0 8px 20px rgb(235, 59, 212);
+  opacity: 2.0;
 }
 
 .cancel {

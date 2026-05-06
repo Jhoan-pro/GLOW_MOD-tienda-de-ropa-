@@ -48,6 +48,7 @@ export class UserManagement implements OnInit {
 
     allUsers[index].active = !allUsers[index].active;
     this.saveAndRefresh(allUsers);
+  
   }
 
   openEdit(user: User) {

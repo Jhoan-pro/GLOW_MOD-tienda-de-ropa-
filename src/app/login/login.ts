@@ -76,7 +76,7 @@ export class Login {
   }
   private redirectByRole(role: string) {
   if (role === 'admin') this.router.navigate(['/admin-dashboard/admin']);
-  else if (role === 'sub-admin') this.router.navigate(['/admin-dashboard/admin']);
+  else if (role === 'sub-admin') this.router.navigate(['/admin-dashboard/dashBoard']);
   else if (role === 'cashier') this.router.navigate(['/dashboard/cashier']);
   else this.router.navigate(['/']);
   }

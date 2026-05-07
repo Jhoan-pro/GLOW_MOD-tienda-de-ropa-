@@ -68,16 +68,20 @@
       <img [src]="item.product.image" />
       <div class="info">
         <p class="name">{{ item.product.name }}</p>
-
+        
         <span class="price"> Precio unidad: ${{ item.product.price }} </span>
 
         <p class="subtotal">Subtotal: ${{ item.product.price * item.cantidad }}</p>
+        <p class="stock">Cantidad Stock: {{item.product.stock}}</p>
 
         <div class="cantidad">
           <button (click)="disminuir(item)">-</button>
           <span>{{ item.cantidad }}</span>
+          
           <button (click)="aumentar(item)" [disabled]="item.product.stock === 0">+</button>
+
         </div>
+        
 
         <div class="eliminar" (click)="eliminar(i)">Eliminar</div>
       </div>

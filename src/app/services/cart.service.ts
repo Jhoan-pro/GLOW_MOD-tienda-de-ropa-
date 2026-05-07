@@ -20,7 +20,7 @@ export class CartService {
   private cartSubject = new BehaviorSubject<CartItem[]>([]);
   cart$ = this.cartSubject.asObservable();
 
-  private readonly CART_TTL_MS = 10 * 60 * 1000; // 15 minutos
+  private readonly CART_TTL_MS = 30* 60 * 1000; // minutos el numero inicial
   private expiryTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(

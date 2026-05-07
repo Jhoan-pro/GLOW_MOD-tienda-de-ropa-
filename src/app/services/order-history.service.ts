@@ -39,4 +39,11 @@ export class OrderHistoryService {
     const data = localStorage.getItem(this.ADMIN_KEY);
     return data ? JSON.parse(data) : [];
   }
+
+  //filtra pedidos que contengan productos del sub-admin
+  getOrdersByOwner(ownerId: number): any[] {
+    return this.getAllOrdersForAdmin().filter((order) =>
+      order.items?.some((item: any) => item.ownerId === ownerId),
+    );
+  }
 }

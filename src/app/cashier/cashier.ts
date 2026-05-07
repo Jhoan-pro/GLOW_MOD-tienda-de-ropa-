@@ -346,6 +346,7 @@ export class Cashier {
         name: item.product.name,
         quantity: item.cantidad,
         price: item.product.price,
+        ownerId: item.product.ownerId ?? null, 
       })),
       total: this.getTotal(),
     };

@@ -269,6 +269,13 @@
   margin-bottom: 20px;
 }
 
+.current-user {
+  font-size: 0.9rem;
+  color: #94a3b8;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
 .confirmar {
   flex: 1;
   background: linear-gradient(45deg, #7c3aed, #06b6d4);

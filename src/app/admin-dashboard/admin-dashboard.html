@@ -13,13 +13,13 @@
       <li routerLinkActive="active">
         <a routerLink="/admin-dashboard/dashBoard" (click)="sidebarOpen = false">Vista general</a>
       </li>
-      <li routerLinkActive="active">
+      <li routerLinkActive="active" *ngIf="!isSubAdmin">
         <a routerLink="/admin-dashboard/admin" (click)="sidebarOpen = false">Resumen del negocio</a>
       </li>
       <li routerLinkActive="active">
         <a routerLink="/admin-dashboard/products" (click)="sidebarOpen = false">Productos</a>
       </li>
-      <li routerLinkActive="active">
+      <li routerLinkActive="active" *ngIf="!isSubAdmin">
         <a routerLink="/admin-dashboard/users" (click)="sidebarOpen = false">Usuarios</a>
       </li>
       <li routerLinkActive="active">
@@ -38,6 +38,7 @@
         <span></span>
       </button>
       <h1>Panel de administrador</h1>
+      <span class="current-user">Usuario: {{ currentUserName }}</span>
       <button class="logout-btn" (click)="logout()">Cerrar sesión</button>
     </header>
     <div class="logout-modal" *ngIf="mostrarConfirmLogout">

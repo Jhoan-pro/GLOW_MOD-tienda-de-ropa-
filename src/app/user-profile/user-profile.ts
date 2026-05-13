@@ -122,12 +122,10 @@ export class UserProfile implements OnInit {
 
     // País
     if (!this.user.country?.trim()) {
-      this.errors.country = 'País obligatorio';
-    } else if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(this.user.country)) {
-      this.errors.country = 'Solo letras';
+      this.errors.country = 'Selecciona un país';
     }
 
-   
+
     return Object.keys(this.errors).length === 0;
   }
 

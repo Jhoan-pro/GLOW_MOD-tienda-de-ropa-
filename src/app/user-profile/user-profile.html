@@ -28,6 +28,8 @@
     <!-- Fecha-->
     <label>Fecha de nacimiento</label>
     <input type="date" [(ngModel)]="user.birthDate" [disabled]="!editMode" />
+    <!-- validacion de fecha-->
+    <span class="error" *ngIf="submitted && errors.birthDate">{{ errors.birthDate }}</span>
 
     <!-- Identificaciòn-->
     <label>Identificación</label>
@@ -52,17 +54,17 @@
     />
     <span class="error" *ngIf="submitted && errors.country">{{ errors.country }}</span>
     <!-- Botones -->
-    <div class="actions">
-      <!-- Si no tiene info-->
-      <button *ngIf="!hasExtraInfo" (click)="enableEdit()">Agregar info</button>
+<div class="actions">
+  <!-- Si no tiene info -->
+  <button *ngIf="!hasExtraInfo && !editMode" (click)="enableEdit()">Agregar info</button>
 
-      <!-- Si ya tiene info-->
-      <button *ngIf="hasExtraInfo && !editMode" (click)="enableEdit()">Editar</button>
+  <!-- Si ya tiene info  -->
+  <button *ngIf="hasExtraInfo && !editMode" (click)="enableEdit()">Editar</button>
 
-      <!-- Guardar -->
-      <button *ngIf="editMode" (click)="save()">Guardar</button>
+  <!-- Guardar-->
+  <button *ngIf="editMode" (click)="save()">Guardar</button>
 
-      <button class="back" (click)="volver()">Volver</button>
-    </div>
+  <button class="back" (click)="volver()">Volver</button>
+</div>
   </div>
 </div>

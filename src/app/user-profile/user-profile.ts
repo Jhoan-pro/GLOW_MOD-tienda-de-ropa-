@@ -24,7 +24,7 @@ export class UserProfile implements OnInit {
   constructor(
     private userService: UserService,
     private router: Router,
-  ) {}
+  ) { }
 
   ngOnInit() {
     const currentUser = this.userService.getCurrentUser();
@@ -43,7 +43,10 @@ export class UserProfile implements OnInit {
   }
 
   enableEdit() {
+    // limpiar errores y guardado
     this.editMode = true;
+    this.submitted = false;
+    this.errors = {};
   }
 
   //Normalizadores
@@ -107,7 +110,7 @@ export class UserProfile implements OnInit {
     if (!this.user.birthDate) {
       this.errors.birthDate = 'Fecha obligatoria';
     } else if (!this.validarEdad(this.user.birthDate)) {
-      this.errors.birthDate = 'Debes tener al menos 13 años';
+      this.errors.birthDate = 'Debes tener al menos 18 años';
     }
 
     // Documento
@@ -124,24 +127,28 @@ export class UserProfile implements OnInit {
       this.errors.country = 'Solo letras';
     }
 
+   
     return Object.keys(this.errors).length === 0;
   }
 
   save() {
     this.submitted = true;
-
     if (!this.validarFormulario()) return;
 
-    // Normalizar antes de guardar
-    this.user.address = this.user.address.trim();
-    this.user.country = this.user.country.trim();
+    this.user.address = this.user.address?.trim();
+    this.user.country = this.user.country?.trim();
+
+    // agregar id siempre presente
+    const currentUser = this.userService.getCurrentUser();
+    if (!this.user.id && currentUser?.id) {
+      this.user.id = currentUser.id;
+    }
 
     this.userService.updateUserProfile(this.user);
-
     this.userService.login(this.user);
 
     this.editMode = false;
-    this.hasExtraInfo = true;
+    this.hasExtraInfo = !!(this.user.address && this.user.idNumber && this.user.country && this.user.birthDate);
   }
 
   volver() {

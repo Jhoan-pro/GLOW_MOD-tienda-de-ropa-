@@ -58,13 +58,14 @@ export class Navbar {
   logout() {
     this.mostrarConfirmLogout = true;
   }
-
+  //aqui se llama a este metodo para cerrar sesion, limpiar el carrito y redirigir al login
   confirmarLogout() {
-    this.userService.logout();
-    this.cartService.loadCart();
-    this.isLoggedIn = false;
-    this.router.navigate(['/login']);
-  }
+  this.userService.logout();
+  this.cartService.clearCart();
+  this.isLoggedIn = false;
+  this.mostrarConfirmLogout = false;
+  this.router.navigate(['/login']);
+}
   carritoAbierto = false;
 
   toggleCarrito() {

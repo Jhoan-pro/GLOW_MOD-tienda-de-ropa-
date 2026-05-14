@@ -309,7 +309,11 @@ export class Cashier {
     if (this.loading) return;
 
     this.submitted = true;
-
+    if (this.items.length === 0) {
+  this.mostrarAlerta('Tu carrito está vacío o expiró por inactividad', 'error');
+  this.loading;
+  return;
+}
     if (!this.validarFormulario()) {
       this.mostrarAlerta('Revisa los campos marcados en rojo', 'error');
       this.enfocarPrimerError();

@@ -1,11 +1,20 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { UserService } from './user.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class OrderHistoryService {
+  private readonly platformId = inject(PLATFORM_ID);
+
   constructor(private userService: UserService) {}
+
+  private readonly ADMIN_KEY = 'all_orders_global';
+
+  private isBrowser(): boolean {
+    return isPlatformBrowser(this.platformId);
+  }
 
   // Llave del usuario
   private getPersonalKey(): string {
@@ -13,16 +22,13 @@ export class OrderHistoryService {
     return user ? `orderHistory_${user.email}` : 'orderHistory_guest';
   }
 
-  // Llave  para el Administrador
-  private readonly ADMIN_KEY = 'all_orders_global';
-
   addOrder(order: any) {
-    //  Guardar en su historial personal
+    if (!this.isBrowser()) return;
+
     const personalHistory = this.getHistory();
     personalHistory.push(order);
     localStorage.setItem(this.getPersonalKey(), JSON.stringify(personalHistory));
 
-    // Guardar en el historial de administrador
     const globalHistory = this.getAllOrdersForAdmin();
     globalHistory.push(order);
     localStorage.setItem(this.ADMIN_KEY, JSON.stringify(globalHistory));
@@ -30,17 +36,21 @@ export class OrderHistoryService {
 
   // Historial de cliente
   getHistory(): any[] {
+    if (!this.isBrowser()) return [];
+
     const data = localStorage.getItem(this.getPersonalKey());
     return data ? JSON.parse(data) : [];
   }
 
   // Historial admin (todos los pedidos)
   getAllOrdersForAdmin(): any[] {
+    if (!this.isBrowser()) return [];
+
     const data = localStorage.getItem(this.ADMIN_KEY);
     return data ? JSON.parse(data) : [];
   }
 
-  //filtra pedidos que contengan productos del sub-admin
+  // Filtra pedidos que contengan productos del sub-admin
   getOrdersByOwner(ownerId: number): any[] {
     return this.getAllOrdersForAdmin().filter((order) =>
       order.items?.some((item: any) => item.ownerId === ownerId),

@@ -1,6 +1,15 @@
-import { Component, ViewEncapsulation, HostListener, ElementRef } from '@angular/core';
+import {
+  Component,
+  ViewEncapsulation,
+  HostListener,
+  ElementRef,
+  OnInit,
+  OnDestroy,
+  inject,
+  PLATFORM_ID,
+} from '@angular/core';
 import { RouterLink, RouterModule, Router } from '@angular/router';
-import { NgForOf, NgIf } from '@angular/common';
+import { NgForOf, NgIf, isPlatformBrowser } from '@angular/common';
 import { CartService } from '../services/cart.service';
 import { UserService } from '../services/user.service';
 import { FilterService } from '../services/filter.service';
@@ -14,13 +23,17 @@ import { Home } from '../home/home';
   styleUrls: ['./navbar.css'],
   encapsulation: ViewEncapsulation.None,
 })
-export class Navbar {
+export class Navbar implements OnInit, OnDestroy {
+  private readonly platformId = inject(PLATFORM_ID);
+
   items: any[] = [];
 
   mostrarConfirmLogout = false;
-  isLoggedIn: boolean = false;
+  isLoggedIn = false;
   mostrarFiltros = false;
-  menuUsuarioAbierto: boolean = false;
+  menuUsuarioAbierto = false;
+  carritoAbierto = false;
+
   constructor(
     private eRef: ElementRef,
     private router: Router,
@@ -28,6 +41,33 @@ export class Navbar {
     private userService: UserService,
     private filterService: FilterService,
   ) {}
+
+  private onStorageChange = (event: StorageEvent) => {
+    if (event.key === 'app_session_lock') {
+      this.checkLogin();
+    }
+  };
+
+  ngOnInit() {
+    this.cartService.loadCart();
+
+    this.cartService.cart$.subscribe((data) => {
+      this.items = data;
+    });
+
+    this.checkLogin();
+
+    if (isPlatformBrowser(this.platformId)) {
+      window.addEventListener('storage', this.onStorageChange);
+    }
+  }
+
+  ngOnDestroy() {
+    if (isPlatformBrowser(this.platformId)) {
+      window.removeEventListener('storage', this.onStorageChange);
+    }
+  }
+
   toggleFiltros() {
     this.mostrarFiltros = !this.mostrarFiltros;
 
@@ -45,6 +85,7 @@ export class Navbar {
       this.carritoAbierto = false;
     }
   }
+
   slugify(text: string): string {
     return text
       .toLowerCase()
@@ -58,15 +99,16 @@ export class Navbar {
   logout() {
     this.mostrarConfirmLogout = true;
   }
-  //aqui se llama a este metodo para cerrar sesion, limpiar el carrito y redirigir al login
+
   confirmarLogout() {
-  this.userService.logout();
-  this.cartService.clearCart();
-  this.isLoggedIn = false;
-  this.mostrarConfirmLogout = false;
-  this.router.navigate(['/login']);
-}
-  carritoAbierto = false;
+    this.userService.logout();
+    this.cartService.clearCart();
+    this.isLoggedIn = false;
+    this.mostrarConfirmLogout = false;
+    this.router.navigate(['/login']);
+  }
+
+  
 
   toggleCarrito() {
     this.carritoAbierto = !this.carritoAbierto;
@@ -76,10 +118,11 @@ export class Navbar {
       this.menuUsuarioAbierto = false;
     }
   }
+
   cerrarCarrito() {
     this.carritoAbierto = false;
   }
-  //Detecta clics
+
   @HostListener('document:click', ['$event'])
   clickFuera(event: MouseEvent) {
     const target = event.target as HTMLElement;
@@ -89,31 +132,30 @@ export class Navbar {
     const clickDentroCarrito = target.closest('.cart-panel');
     const clickIconCarrito = target.closest('.cart-icon');
 
-    if (!clickDentroFiltros && !clickDentroUsuario && !clickDentroCarrito && !clickIconCarrito) {
+    if (
+      !clickDentroFiltros &&
+      !clickDentroUsuario &&
+      !clickDentroCarrito &&
+      !clickIconCarrito
+    ) {
       this.mostrarFiltros = false;
       this.menuUsuarioAbierto = false;
       this.carritoAbierto = false;
     }
   }
-  ngOnInit() {
-    this.cartService.loadCart();
-
-    this.cartService.cart$.subscribe((data) => {
-      this.items = data;
-    });
-
-    this.checkLogin();
-  }
 
   checkLogin() {
     this.isLoggedIn = this.userService.isLoggedIn();
   }
+
   eliminar(index: number) {
     this.cartService.removeItem(index);
   }
+
   aumentar(item: any) {
     this.cartService.increase(item);
   }
+
   disminuir(item: any) {
     this.cartService.decrease(item);
   }
@@ -125,15 +167,15 @@ export class Navbar {
   vaciar() {
     this.cartService.clearCart();
   }
+
   getCantidadTotal() {
     return this.items.reduce((acc, item) => acc + item.cantidad, 0);
   }
-  ngDoCheck() {
-    this.checkLogin();
-  }
+
   selectCategory(category: string) {
     this.scrollToCategory(category);
   }
+
   scrollToCategory(category: string) {
     this.mostrarFiltros = false;
 

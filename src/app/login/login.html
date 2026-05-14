@@ -1,7 +1,5 @@
 <div class="login-container">
-
   <div class="login-box">
-
     <h2>Iniciar Sesión</h2>
 
     <input type="email" placeholder="Correo electrónico" [(ngModel)]="email">
@@ -19,30 +17,31 @@
     </button>
 
     <a routerLink="/register" class="register-link">
-      ¿No tienes cuenta? Registrate
+      ¿No tienes cuenta? Regístrate
     </a>
 
-    <span class="error-msg" *ngIf="errors.general">{{ errors.general }}</span>
+    <div class="session-alert" *ngIf="errors.general">
+      <div class="alert-icon">⚠️</div>
+      <div class="alert-content">
+        <strong>Sesión activa detectada</strong>
+        <p>{{ errors.general }}</p>
+      </div>
+    </div>
 
     <div class="divider">Continuar con:</div>
 
     <div class="social-login">
       <button class="google-btn">
         <img src="img/logoGoogle.png" alt="Google">
-       
       </button>
 
       <button class="apple-btn">
         <img src="img/logoApple.png" alt="Apple">
-   
       </button>
 
       <button class="facebook-btn">
         <img src="img/logoFacebook.png" alt="Facebook">
-   
       </button>
     </div>
-
   </div>
-
 </div>

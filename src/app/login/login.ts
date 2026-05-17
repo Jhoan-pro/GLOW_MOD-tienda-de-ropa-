@@ -1,9 +1,10 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { UserService } from '../services/user.service';
 import { CommonModule } from '@angular/common';
+import { UserService } from '../services/user.service';
 import { CartService } from '../services/cart.service';
+
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -12,8 +13,8 @@ import { CartService } from '../services/cart.service';
   styleUrl: './login.css',
 })
 export class Login {
-  email: string = '';
-  password: string = '';
+  email = '';
+  password = '';
 
   errors: any = {
     email: '',
@@ -21,66 +22,80 @@ export class Login {
     general: '',
   };
 
-
-
   constructor(
     private router: Router,
-    private UserService: UserService,
+    private userService: UserService,
     private cartService: CartService,
-  ) { }
+  ) {}
 
   login() {
     this.errors = { email: '', password: '', general: '' };
 
-    // Validación: campos vacíos
-    if (!this.email || !this.password) {
+    const email = this.email.trim();
+    const emailLower = email.toLowerCase();
+
+    if (!email || !this.password) {
       this.errors.general = 'Todos los campos son obligatorios';
       return;
     }
 
-    // Campos vacíos
-    if (!this.email) this.errors.email = 'El correo es obligatorio';
-    if (!this.password) this.errors.password = 'La contraseña es obligatoria';
-    if (this.errors.email || this.errors.password) return;
-
-    // Formato de correo
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(this.email)) {
-      this.errors.email = 'Correo inválido. ej: ejemplo@gmail.com';
+    if (!email) {
+      this.errors.email = 'El correo es obligatorio';
       return;
     }
 
-    // Longitud de contraseña
+    if (!this.password) {
+      this.errors.password = 'La contraseña es obligatoria';
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      this.errors.email = 'Correo inválido. Ej: ejemplo@gmail.com';
+      return;
+    }
+
     if (this.password.length < 6) {
       this.errors.password = 'La contraseña debe tener mínimo 6 caracteres';
       return;
     }
 
-    // Buscar usuario
-    const users = this.UserService.getUsers();
+    const users = this.userService.getUsers();
     const userFound = users.find(
-      (u) => u.email === this.email && u.password === this.password
+      (u) =>
+        u.email.toLowerCase() === emailLower &&
+        u.password === this.password
     );
 
-    if (userFound) {
-      if (!userFound.active) {
-        this.errors.general = 'Tu cuenta ha sido deshabilitada. Contacta al admin.';
-        return;
-      }
-      this.UserService.login(userFound);
-      this.cartService.loadCart();
-      this.redirectByRole(userFound.role);
-    } else {
+    if (!userFound) {
       this.errors.general = 'Correo o contraseña incorrectos';
+      return;
     }
-  }
-  private redirectByRole(role: string) {
-  if (role === 'admin') this.router.navigate(['/admin-dashboard/admin']);
-  else if (role === 'sub-admin') this.router.navigate(['/admin-dashboard/dashBoard']);
-  else if (role === 'cashier') this.router.navigate(['/dashboard/cashier']);
-  else this.router.navigate(['/']);
+
+    if (!userFound.active) {
+      this.errors.general =
+        'Tu cuenta ha sido deshabilitada. Contacta al admin.';
+      return;
+    }
+
+    const loginSuccess = this.userService.login(userFound);
+
+    if (!loginSuccess) {
+      this.errors.general =
+        'Sesión activa detectada. Ya tienes una sesión iniciada en este dispositivo. Cierra la sesión anterior para continuar.';
+      return;
+    }
+
+    this.cartService.loadCart();
+    this.redirectByRole(userFound.role);
   }
 
+  private redirectByRole(role: string) {
+    if (role === 'admin') this.router.navigate(['/admin-dashboard/admin']);
+    else if (role === 'sub-admin') this.router.navigate(['/admin-dashboard/dashBoard']);
+    else if (role === 'cashier') this.router.navigate(['/dashboard/cashier']);
+    else this.router.navigate(['/']);
+  }
 
   volver() {
     this.router.navigate(['/register']);

@@ -22,7 +22,7 @@ export class Products implements OnInit, OnDestroy {
 
   constructor(
     private productService: ProductService,
-    private userService: UserService
+    private userService: UserService,
   ) {}
 
   ngOnInit() {
@@ -97,9 +97,7 @@ export class Products implements OnInit, OnDestroy {
   }
 
   deleteSelected() {
-    const ids = this.products
-      .filter((p) => p.selected && p.id)
-      .map((p) => p.id as number);
+    const ids = this.products.filter((p) => p.selected && p.id).map((p) => p.id as number);
 
     if (ids.length === 0) {
       alert('No has seleccionado ningún producto para eliminar.');
@@ -116,6 +114,24 @@ export class Products implements OnInit, OnDestroy {
     this.currentProduct = { ...this.products[index] };
     this.viewMode = true;
     this.showModal = true;
+  }
+
+  allSelected: boolean = false;
+
+  toggleAll(event: any) {
+    const checked = event.target.checked;
+    this.allSelected = checked;
+
+    this.products.forEach((p) => (p.selected = checked));
+  }
+
+  toggleOne() {
+    this.allSelected = this.products.every((p) => p.selected);
+  }
+
+  clearSelection() {
+    this.products.forEach((p) => (p.selected = false));
+    this.allSelected = false;
   }
 
   closeModal() {

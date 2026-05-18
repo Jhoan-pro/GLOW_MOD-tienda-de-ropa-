@@ -19,6 +19,11 @@ export class Products implements OnInit, OnDestroy {
   private sub?: Subscription;
   isSubAdmin: boolean = false;
   currentUserId?: number;
+  allSelected: boolean = false;
+  showConfirmModal: boolean = false;
+  confirmMessage: string = '';
+  confirmAction: () => void = () => {};
+  isOnlyInfo: boolean = false;
 
   constructor(
     private productService: ProductService,
@@ -100,14 +105,35 @@ export class Products implements OnInit, OnDestroy {
     const ids = this.products.filter((p) => p.selected && p.id).map((p) => p.id as number);
 
     if (ids.length === 0) {
-      alert('No has seleccionado ningún producto para eliminar.');
+      this.openConfirm(
+        'No has seleccionado ningún producto.',
+        () => {},
+        true, 
+      );
       return;
     }
 
-    const confirmacion = confirm('¿Eliminar los productos seleccionados?');
-    if (!confirmacion) return;
+    this.openConfirm('¿Eliminar los productos seleccionados?', () => {
+      this.productService.deleteProductsByIds(ids);
+      this.clearSelection();
+    });
+  }
 
-    this.productService.deleteProductsByIds(ids);
+  // confirmar eliminar productos
+  openConfirm(message: string, action: () => void, onlyInfo: boolean = false) {
+    this.confirmMessage = message;
+    this.confirmAction = action;
+    this.isOnlyInfo = onlyInfo;
+    this.showConfirmModal = true;
+  }
+
+  confirm() {
+    this.confirmAction();
+    this.showConfirmModal = false;
+  }
+
+  cancelConfirm() {
+    this.showConfirmModal = false;
   }
 
   openView(index: number) {
@@ -116,8 +142,7 @@ export class Products implements OnInit, OnDestroy {
     this.showModal = true;
   }
 
-  allSelected: boolean = false;
-
+  // seleccionar productos
   toggleAll(event: any) {
     const checked = event.target.checked;
     this.allSelected = checked;

@@ -254,8 +254,169 @@
   color: white;
 }
 
+/*MODAL CONFIRMACION*/
+
+.logout-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3000;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+/* CAJA DEL MODAL */
+
+.logout-box {
+  background: rgba(15, 23, 42, 0.95);
+  border-radius: 20px;
+  padding: 25px;
+  width: 320px;
+  max-width: 100%;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+  animation: fadeIn 0.3s ease;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* TITULO*/
+
+.logout-box h3 {
+  font-size: 22px;
+  font-weight: 800;
+  margin-bottom: 10px;
+
+  /* efecto degradado */
+  background: linear-gradient(45deg, #7c3aed, #06b6d4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/*  MENSAJE*/
+
+.logout-box p {
+  color: #94a3b8;
+  font-size: 14px;
+  margin-bottom: 20px;
+  line-height: 1.4;
+}
+
+/* CONTENEDOR BOTONES*/
+
+.acciones {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+/* BOTONES BASE*/
+
+.acciones button {
+  flex: 1;
+  padding: 13px;
+  border-radius: 25px;
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  transition: all 0.3s ease;
+  font-size: 14px;
+  font-family: 'Poppins', sans-serif;
+  position: relative;
+  overflow: hidden;
+}
+
+/* BOTON CONFIRMAR*/
+
+.confirmar {
+  background: linear-gradient(45deg, #7c3aed, #06b6d4);
+  color: white;
+}
+
+.confirmar:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(124, 58, 237, 0.6);
+}
+
+/* BOTON CANCELAR*/
+
+.cerrar-btn {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.35);
+}
+
+.cerrar-btn:hover {
+  background: #ef4444;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.35);
+}
+
+/* EFECTO BRILLO (PRO)*/
+
+.acciones button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  transition: 0.5s;
+}
+
+.acciones button:hover::before {
+  left: 100%;
+}
+
+/* ESTADO ACTIVO*/
+.acciones button:active {
+  transform: scale(0.95);
+}
+
+/* ANIMACION*/
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
 /* RESPONSIVE */
 @media (max-width: 768px) {
+  .logout-box {
+    padding: 20px;
+    border-radius: 15px;
+  }
+
+  .logout-box h3 {
+    font-size: 18px;
+  }
+
+  .logout-box p {
+    font-size: 13px;
+  }
+
+  .acciones {
+    flex-direction: column;
+  }
+
+  .acciones button {
+    width: 100%;
+    padding: 12px;
+  }
+  
   .header {
     flex-direction: column;
     align-items: flex-start;

@@ -290,16 +290,17 @@
     border-radius: 12px;
     padding: 0.5rem 0;
   }
-
   .products-table td {
-    padding: 0.6rem 1rem;
+    padding: 0.8rem 1rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
     border-radius: 0 !important;
     word-break: break-word;
+    gap: 10px;
   }
 
+  /* etiqueta (label) */
   .products-table td::before {
     content: attr(data-label);
     color: #94a3b8;
@@ -309,18 +310,29 @@
     margin-right: 1rem;
     white-space: nowrap;
     flex-shrink: 0;
+    flex: 1;
   }
 
-  .products-table td>*,
-  .products-table td {
-    max-width: 60%;
-    /* ← limita el ancho del valor */
+  /* valor */
+  .products-table td span,
+  .products-table td img,
+  .products-table td input,
+  .products-table td button {
+    flex: 1;
     text-align: right;
   }
 
+  /* texto más natural */
+  .products-table td span {
+    text-align: right;
+  }
+
+  /* acciones */
   .products-table td[data-label='Acciones'] {
+    flex-direction: row;
+    align-items: flex-start;
     flex-wrap: wrap;
-    justify-content: flex-start;
+    justify-content: center;
     max-width: 100%;
     text-align: left;
     gap: 8px;
@@ -332,13 +344,17 @@
     max-width: 100%;
   }
 
-  /* imagen centrada */
-  .products-table td[data-label='Imagen'] {
-    justify-content: space-between;
+  /* Centrar texto de los botones */
+  .products-table td[data-label='Acciones'] button,
+  .products-table td[data-label='Acciones'] a {
+    text-align: center;
+    justify-content: center;
   }
 
+  /* imagen mejor posicionada */
   .products-table td[data-label='Imagen'] img {
-    max-width: 60px;
+    max-width: 70px;
+    border-radius: 8px;
   }
 
   .update-btn,

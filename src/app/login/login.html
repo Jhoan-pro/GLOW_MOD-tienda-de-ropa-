@@ -20,13 +20,8 @@
       ¿No tienes cuenta? Regístrate
     </a>
 
-    <div class="session-alert" *ngIf="errors.general">
-      <div class="alert-icon">⚠️</div>
-      <div class="alert-content">
-        <strong>Sesión activa detectada</strong>
-        <p>{{ errors.general }}</p>
-      </div>
-    </div>
+ 
+      <span class="error-msg" *ngIf="errors.general">{{ errors.general }}</span>
 
     <div class="divider">Continuar con:</div>
 

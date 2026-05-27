@@ -26,7 +26,7 @@ export class Login {
     private router: Router,
     private userService: UserService,
     private cartService: CartService,
-  ) {}
+  ) { }
 
   login() {
     this.errors = { email: '', password: '', general: '' };
@@ -34,33 +34,46 @@ export class Login {
     const email = this.email.trim();
     const emailLower = email.toLowerCase();
 
-    if (!email || !this.password) {
+    // Ambos vacíos
+    if (!email && !this.password) {
       this.errors.general = 'Todos los campos son obligatorios';
       return;
     }
 
+    // Campo correo vacío
     if (!email) {
       this.errors.email = 'El correo es obligatorio';
-      return;
     }
 
+    // Campo contraseña vacío
     if (!this.password) {
       this.errors.password = 'La contraseña es obligatoria';
-      return;
     }
 
+    // Validar formato del correo SI escribió algo
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+
+    if (email && !emailRegex.test(email)) {
       this.errors.email = 'Correo inválido. Ej: ejemplo@gmail.com';
-      return;
     }
 
-    if (this.password.length < 6) {
-      this.errors.password = 'La contraseña debe tener mínimo 6 caracteres';
+    // Validar longitud contraseña SI escribió algo
+    if (this.password && this.password.length < 6) {
+      this.errors.password =
+        'La contraseña debe tener mínimo 6 caracteres';
+    }
+
+    // Si existe cualquier error 
+    if (
+      this.errors.email ||
+      this.errors.password ||
+      this.errors.general
+    ) {
       return;
     }
 
     const users = this.userService.getUsers();
+
     const userFound = users.find(
       (u) =>
         u.email.toLowerCase() === emailLower &&

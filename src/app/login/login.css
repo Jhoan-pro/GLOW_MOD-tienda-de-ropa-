@@ -211,19 +211,6 @@
     font-size: 0.95rem;
   }
 }
-.session-alert {
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
-  background: rgba(251, 191, 36, 0.08);
-  border: 1px solid rgba(251, 191, 36, 0.35);
-  border-left: 4px solid #7cc826;
-  padding: 12px 14px;
-  border-radius: 12px;
-  margin-top: 10px;
-  color: #19c813;
-  animation: fadeIn 0.25s ease;
-}
 
 .alert-icon {
   font-size: 20px;
@@ -242,7 +229,7 @@
   margin: 0;
   font-size: 0.82rem;
   line-height: 1.45;
-  color: #66d60b;
+  color: #d60b0b;
 }
 
 @keyframes fadeIn {

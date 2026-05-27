@@ -17,7 +17,7 @@ export class RegisterUser {
   email: string = '';
   password: string = '';
   confirmPassword: string = '';
-  successMsg: string = ''; 
+  successMsg: string = '';
 
   errors: any = {
     email: '',
@@ -29,54 +29,108 @@ export class RegisterUser {
   constructor(
     private router: Router,
     private userService: UserService,
-  ) {}
+  ) { }
 
   register() {
-    this.errors = { email: '', password: '', confirmPassword: '', general: '' };
-    this.successMsg = ''; 
+    this.errors = {
+      email: '',
+      password: '',
+      confirmPassword: '',
+      general: '',
+    };
 
-    if (!this.name || !this.email || !this.password || !this.confirmPassword) {
+    this.successMsg = '';
+
+    const name = this.name.trim();
+    const email = this.email.trim();
+
+    //Todos vacíos
+    if (!name && !email && !this.password && !this.confirmPassword) {
       this.errors.general = 'Todos los campos son obligatorios';
       return;
     }
 
+    // Validaciones individuales
+    if (!name) {
+      this.errors.general = 'El nombre es obligatorio';
+    }
+
+    if (!email) {
+      this.errors.email = 'El correo es obligatorio';
+    }
+
+    if (!this.password) {
+      this.errors.password = 'La contraseña es obligatoria';
+    }
+
+    if (!this.confirmPassword) {
+      this.errors.confirmPassword =
+        'Debes confirmar la contraseña';
+    }
+
+    //  Validar formato correo
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(this.email)) {
-      this.errors.email = 'Correo inválido. ej: ejemplo@gmail.com';
+
+    if (email && !emailRegex.test(email)) {
+      this.errors.email =
+        'Correo inválido. Ej: ejemplo@gmail.com';
+    }
+
+    //  Validar longitud contraseña
+    if (this.password && this.password.length < 6) {
+      this.errors.password =
+        'La contraseña debe tener mínimo 6 caracteres';
+    }
+
+    //  Validar coincidencia
+    if (
+      this.password &&
+      this.confirmPassword &&
+      this.password !== this.confirmPassword
+    ) {
+      this.errors.confirmPassword =
+        'Las contraseñas no coinciden';
+    }
+
+    //  Si existe cualquier error 
+    if (
+      this.errors.email ||
+      this.errors.password ||
+      this.errors.confirmPassword ||
+      this.errors.general
+    ) {
       return;
     }
 
-    if (this.password.length < 6) {
-      this.errors.password = 'La contraseña debe tener mínimo 6 caracteres';
-      return;
-    }
-
-    if (this.password !== this.confirmPassword) {
-      this.errors.confirmPassword = 'Las contraseñas no coinciden';
-      return;
-    }
-
+    //  Validar si correo ya existe
     const usuarios = this.userService.getUsers();
-    const existe = usuarios.some((u) => u.email.toLowerCase() === this.email.toLowerCase());
+
+    const existe = usuarios.some(
+      (u) => u.email.toLowerCase() === email.toLowerCase()
+    );
 
     if (existe) {
-      this.errors.general = 'Este correo ya está registrado';
+      this.errors.general =
+        'Este correo ya está registrado';
       return;
     }
 
+    //  Crear usuario
     const newUser: User = {
-      name: this.name,
-      email: this.email,
+      name: name,
+      email: email,
       password: this.password,
       role: 'client',
       active: true,
     };
 
     this.userService.addUser(newUser);
-    this.successMsg = '¡Registro exitoso!'; 
+
+    this.successMsg = '¡Registro exitoso!';
 
     setTimeout(() => {
       this.router.navigate(['/login']);
     }, 1500);
   }
+
 }

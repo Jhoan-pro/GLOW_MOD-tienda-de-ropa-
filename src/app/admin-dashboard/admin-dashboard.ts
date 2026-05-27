@@ -13,13 +13,14 @@ import { UserService } from '../services/user.service';
 export class AdminDashboard implements OnInit {
   sidebarOpen = false;
   mostrarConfirmLogout = false;
+  isLoggedIn = false;
   isSubAdmin = false;
-    currentUserName = '';
+  currentUserName = '';
 
   constructor(
     private router: Router,
     private userService: UserService
-  ) {}
+  ) { }
 
   ngOnInit() {
     const currentUser = this.userService.getCurrentUser();
@@ -32,6 +33,10 @@ export class AdminDashboard implements OnInit {
   }
 
   confirmarLogout() {
+    this.userService.logout();
+    this.isLoggedIn = false;
+    this.mostrarConfirmLogout = false;
     this.router.navigate(['/login']);
+    
   }
 }

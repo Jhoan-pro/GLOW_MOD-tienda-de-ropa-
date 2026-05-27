@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, SimpleChanges, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Product } from '../models/product.model';
 import { CartService } from '../services/cart.service';
@@ -15,6 +15,7 @@ import { Router } from '@angular/router';
 export class ProductCar implements OnInit, OnChanges {
   showLoginAlert = false;
   isAdminView = false;
+  isMobileViewport = false;
 
   @Input() products: Product[] = [];
 
@@ -23,6 +24,41 @@ export class ProductCar implements OnInit, OnChanges {
     private userService: UserService,
     private router: Router,
   ) {}
+
+  ngOnInit() {
+    this.checkCurrentRoute();
+    this.updateViewportMode();
+  }
+
+  ngOnChanges(_: SimpleChanges) {
+    this.checkCurrentRoute();
+    this.updateViewportMode();
+  }
+
+  @HostListener('window:resize')
+  onResize() {
+    this.updateViewportMode();
+  }
+
+  @HostListener('window:orientationchange')
+  onOrientationChange() {
+    this.updateViewportMode();
+  }
+
+  private updateViewportMode() {
+    if (typeof window === 'undefined') return;
+    this.isMobileViewport = window.matchMedia('(max-width: 768px)').matches;
+  }
+
+  shouldEnableCarousel(category: string): boolean {
+    const total = this.getProductsByCategory(category).length;
+    return this.isMobileViewport ? total >= 2 : total >= 4;
+  }
+
+  shouldCenterProducts(category: string): boolean {
+    const total = this.getProductsByCategory(category).length;
+    return this.isMobileViewport ? total < 2 : total < 4;
+  }
 
   slugify(text: string): string {
     return text
@@ -40,14 +76,6 @@ export class ProductCar implements OnInit, OnChanges {
 
   private checkCurrentRoute() {
     this.isAdminView = this.router.url.includes('admin-dashboard/dashBoard');
-  }
-
-  ngOnInit() {
-    this.checkCurrentRoute();
-  }
-
-  ngOnChanges(_: SimpleChanges) {
-    this.checkCurrentRoute();
   }
 
   get categories(): string[] {

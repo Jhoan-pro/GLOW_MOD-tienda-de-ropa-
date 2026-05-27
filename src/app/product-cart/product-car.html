@@ -15,7 +15,7 @@
 
     <div class="carousel-wrapper">
       <button
-        *ngIf="getProductsByCategory(category).length > 3"
+        *ngIf="shouldEnableCarousel(category)"
         class="arrow left"
         (click)="scrollCategory(category, -350)"
       >
@@ -25,7 +25,7 @@
       <div
         class="product-carousel"
         [attr.id]="carouselId(category)"
-        [ngClass]="{ 'center-products': getProductsByCategory(category).length <= 3 }"
+        [ngClass]="{ 'center-products': shouldCenterProducts(category) }"
       >
         <article
           class="product-card"
@@ -63,7 +63,7 @@
       </div>
 
       <button
-        *ngIf="getProductsByCategory(category).length > 3"
+        *ngIf="shouldEnableCarousel(category)"
         class="arrow right"
         (click)="scrollCategory(category, 350)"
       >

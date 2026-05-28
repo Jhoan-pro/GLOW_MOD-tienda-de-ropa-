@@ -1,11 +1,10 @@
-import { Component, inject, PLATFORM_ID } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, inject, PLATFORM_ID, OnInit } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { CartService } from '../services/cart.service';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { UserService } from '../services/user.service';
 import { OrderHistoryService } from '../services/order-history.service';
-import { isPlatformBrowser } from '@angular/common';
 
 type ErrorKeys =
   | 'customerName'
@@ -30,9 +29,10 @@ type ErrorKeys =
   templateUrl: './cashier.html',
   styleUrls: ['./cashier.css'],
 })
-export class Cashier {
+export class Cashier implements OnInit {
   private platformId = inject(PLATFORM_ID);
   private draftKeyPrefix = 'checkout_draft';
+
   items: any[] = [];
 
   customerName = '';
@@ -66,9 +66,9 @@ export class Cashier {
     'Itaú',
     'Banco Falabella',
   ];
+
   reference = '';
   phoneWallet = '';
-  private draftKey = 'checkout_draft';
   submitted = false;
   errors: Partial<Record<ErrorKeys, string>> = {};
 
@@ -128,6 +128,7 @@ export class Cashier {
     this.bank = '';
     this.reference = '';
     this.phoneWallet = '';
+
     this.errors = {
       ...this.errors,
       paymentMethod: undefined,
@@ -155,7 +156,6 @@ export class Cashier {
 
   allowOnlyLetters(event: KeyboardEvent) {
     const allowed = ['Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight', 'Home', 'End'];
-
     if (allowed.includes(event.key) || event.ctrlKey || event.metaKey) return;
 
     if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]$/.test(event.key)) {
@@ -166,7 +166,6 @@ export class Cashier {
 
   allowOnlyDigits(event: KeyboardEvent) {
     const allowed = ['Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight', 'Home', 'End'];
-
     if (allowed.includes(event.key) || event.ctrlKey || event.metaKey) return;
 
     if (!/^\d$/.test(event.key)) {
@@ -200,7 +199,6 @@ export class Cashier {
   validarFormulario(): boolean {
     this.errors = {};
 
-    // Nombre
     if (!this.customerName.trim()) {
       this.setError('customerName', 'Nombre completo obligatorio. Ej: Juan Pérez');
     } else if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(this.customerName.trim())) {
@@ -209,21 +207,18 @@ export class Cashier {
       this.setError('customerName', 'Debe tener mínimo 3 caracteres');
     }
 
-    // Email
     if (!this.customerEmail.trim()) {
       this.setError('customerEmail', 'Correo electrónico obligatorio. Ej: correo@dominio.com');
     } else if (!this.isValidEmail(this.customerEmail)) {
       this.setError('customerEmail', 'Correo inválido');
     }
 
-    // Teléfono
     if (!this.phone.trim()) {
       this.setError('phone', 'Teléfono obligatorio. Ej: 3001234567');
     } else if (!/^\d{10}$/.test(this.phone)) {
       this.setError('phone', 'Debe tener exactamente 10 números');
     }
 
-    // Dirección
     if (!this.address.trim()) {
       this.setError('address', 'Dirección obligatoria. Ej: Cra 12 # 34-56');
     } else if (this.address.trim().length < 5) {
@@ -232,26 +227,22 @@ export class Cashier {
       this.setError('address', 'Solo letras, números y # - , .');
     }
 
-    // Ciudad
     if (!this.city.trim()) {
       this.setError('city', 'Ciudad obligatoria. Ej: Popayán');
     } else if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(this.city.trim())) {
       this.setError('city', 'Solo letras y espacios');
     }
 
-    // Documento
     if (!this.documentId.trim()) {
       this.setError('documentId', 'Documento obligatorio. Ej: 123456789');
     } else if (!/^\d{6,12}$/.test(this.documentId)) {
       this.setError('documentId', 'Solo números, entre 6 y 12 dígitos');
     }
 
-    // Método de pago
     if (!this.paymentMethod) {
       this.setError('paymentMethod', 'Selecciona un método de pago');
     }
 
-    // Validaciones por método
     if (this.paymentMethod === 'card') {
       if (!this.cardName.trim()) {
         this.setError('cardName', 'Nombre en la tarjeta obligatorio');
@@ -309,11 +300,13 @@ export class Cashier {
     if (this.loading) return;
 
     this.submitted = true;
+
     if (this.items.length === 0) {
-  this.mostrarAlerta('Tu carrito está vacío o expiró por inactividad', 'error');
-  this.loading;
-  return;
-}
+      this.mostrarAlerta('Tu carrito está vacío o expiró por inactividad', 'error');
+      this.loading = false;
+      return;
+    }
+
     if (!this.validarFormulario()) {
       this.mostrarAlerta('Revisa los campos marcados en rojo', 'error');
       this.enfocarPrimerError();
@@ -350,7 +343,7 @@ export class Cashier {
         name: item.product.name,
         quantity: item.cantidad,
         price: item.product.price,
-        ownerId: item.product.ownerId ?? null, 
+        ownerId: item.product.ownerId ?? null,
       })),
       total: this.getTotal(),
     };
@@ -369,7 +362,7 @@ export class Cashier {
     setTimeout(() => {
       this.loading = false;
       this.router.navigate(['/invoice']);
-    }, 1500);
+    }, 1200);
   }
 
   enfocarPrimerError() {
@@ -397,6 +390,7 @@ export class Cashier {
   cerrar() {
     this.router.navigate(['/home']);
   }
+
   saveDraft() {
     if (!this.isBrowser()) return;
 
@@ -419,6 +413,7 @@ export class Cashier {
 
     localStorage.setItem(this.getDraftKey(), JSON.stringify(draft));
   }
+
   private isBrowser(): boolean {
     return isPlatformBrowser(this.platformId);
   }
@@ -428,6 +423,7 @@ export class Cashier {
     const userKey = user?.id ?? user?.email ?? 'guest';
     return `${this.draftKeyPrefix}_${userKey}`;
   }
+
   private clearDraft() {
     if (!this.isBrowser()) return;
     localStorage.removeItem(this.getDraftKey());

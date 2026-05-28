@@ -1,243 +1,235 @@
 <div class="cashier-container">
   <h2>Finalizar compra</h2>
+
   <div *ngIf="showAlert" class="custom-alert" [ngClass]="alertType">
     {{ alertMessage }}
   </div>
-  <!-- Datos del cliente -->
 
   <div class="form">
     <div class="input-group">
-  <input
-    name="customerName"
-    [(ngModel)]="customerName"
-    (ngModelChange)="saveDraft()"
-    (input)="customerName = normalizeLetters(customerName)"
-    (keypress)="allowOnlyLetters($event)"
-    [ngClass]="{'input-error': submitted && errors.customerName}"
-    placeholder="Nombre completo *"
-    autocomplete="name"
-    maxlength="60"
-  />
-  <small *ngIf="submitted && errors.customerName">{{ errors.customerName }}</small>
-</div>
-    <div class="input-group">
-  <input
-    name="customerEmail"
-    [(ngModel)]="customerEmail"
-    (ngModelChange)="saveDraft()"
-    [ngClass]="{'input-error': submitted && errors.customerEmail}"
-    placeholder="Correo electrónico *"
-    autocomplete="email"
-    maxlength="80"
-  />
-  <small *ngIf="submitted && errors.customerEmail">{{ errors.customerEmail }}</small>
-</div>
-   <div class="input-group">
-  <input
-    name="phone"
-    [(ngModel)]="phone"
-    (ngModelChange)="saveDraft()"
-    (input)="phone = normalizeDigits(phone)"
-    (keypress)="allowOnlyDigits($event)"
-    [ngClass]="{'input-error': submitted && errors.phone}"
-    placeholder="Teléfono *"
-    autocomplete="tel"
-    inputmode="numeric"
-    maxlength="10"
-  />
-  <small *ngIf="submitted && errors.phone">{{ errors.phone }}</small>
-</div>
+      <input
+        name="customerName"
+        [(ngModel)]="customerName"
+        (ngModelChange)="saveDraft()"
+        (input)="customerName = normalizeLetters(customerName)"
+        (keypress)="allowOnlyLetters($event)"
+        [ngClass]="{'input-error': submitted && errors.customerName}"
+        placeholder="Nombre completo *"
+        autocomplete="name"
+        maxlength="60"
+      />
+      <small *ngIf="submitted && errors.customerName">{{ errors.customerName }}</small>
+    </div>
 
     <div class="input-group">
-  <input
-    name="address"
-    [(ngModel)]="address"
-    (ngModelChange)="saveDraft()"
-    (input)="address = normalizeAddress(address)"
-    [ngClass]="{'input-error': submitted && errors.address}"
-    placeholder="Dirección *"
-    autocomplete="street-address"
-    maxlength="80"
-  />
-  <small *ngIf="submitted && errors.address">{{ errors.address }}</small>
-</div>
+      <input
+        name="customerEmail"
+        [(ngModel)]="customerEmail"
+        (ngModelChange)="saveDraft()"
+        [ngClass]="{'input-error': submitted && errors.customerEmail}"
+        placeholder="Correo electrónico *"
+        autocomplete="email"
+        maxlength="80"
+      />
+      <small *ngIf="submitted && errors.customerEmail">{{ errors.customerEmail }}</small>
+    </div>
+
     <div class="input-group">
-  <input
-    name="city"
-    [(ngModel)]="city"
-    (ngModelChange)="saveDraft()"
-    (input)="city = normalizeLetters(city)"
-    (keypress)="allowOnlyLetters($event)"
-    [ngClass]="{'input-error': submitted && errors.city}"
-    placeholder="Ciudad *"
-    autocomplete="address-level2"
-    maxlength="50"
-  />
-  <small *ngIf="submitted && errors.city">{{ errors.city }}</small>
-  
-</div>
+      <input
+        name="phone"
+        [(ngModel)]="phone"
+        (ngModelChange)="saveDraft()"
+        (input)="phone = normalizeDigits(phone)"
+        (keypress)="allowOnlyDigits($event)"
+        [ngClass]="{'input-error': submitted && errors.phone}"
+        placeholder="Teléfono *"
+        autocomplete="tel"
+        inputmode="numeric"
+        maxlength="10"
+      />
+      <small *ngIf="submitted && errors.phone">{{ errors.phone }}</small>
+    </div>
+
     <div class="input-group">
-  <input
-    name="documentId"
-    [(ngModel)]="documentId"
-    (ngModelChange)="saveDraft()"
-    (input)="documentId = normalizeDigits(documentId)"
-    (keypress)="allowOnlyDigits($event)"
-    [ngClass]="{'input-error': submitted && errors.documentId}"
-    placeholder="Documento / Cédula *"
-    inputmode="numeric"
-    maxlength="12"
-  />
-  <small *ngIf="submitted && errors.documentId">{{ errors.documentId }}</small>
-  
-</div>
-   
-    
+      <input
+        name="address"
+        [(ngModel)]="address"
+        (ngModelChange)="saveDraft()"
+        (input)="address = normalizeAddress(address)"
+        [ngClass]="{'input-error': submitted && errors.address}"
+        placeholder="Dirección *"
+        autocomplete="street-address"
+        maxlength="80"
+      />
+      <small *ngIf="submitted && errors.address">{{ errors.address }}</small>
+    </div>
+
+    <div class="input-group">
+      <input
+        name="city"
+        [(ngModel)]="city"
+        (ngModelChange)="saveDraft()"
+        (input)="city = normalizeLetters(city)"
+        (keypress)="allowOnlyLetters($event)"
+        [ngClass]="{'input-error': submitted && errors.city}"
+        placeholder="Ciudad *"
+        autocomplete="address-level2"
+        maxlength="50"
+      />
+      <small *ngIf="submitted && errors.city">{{ errors.city }}</small>
+    </div>
+
+    <div class="input-group">
+      <input
+        name="documentId"
+        [(ngModel)]="documentId"
+        (ngModelChange)="saveDraft()"
+        (input)="documentId = normalizeDigits(documentId)"
+        (keypress)="allowOnlyDigits($event)"
+        [ngClass]="{'input-error': submitted && errors.documentId}"
+        placeholder="Documento / Cédula *"
+        inputmode="numeric"
+        maxlength="12"
+      />
+      <small *ngIf="submitted && errors.documentId">{{ errors.documentId }}</small>
+    </div>
   </div>
 
-  <!-- Metodo de pago -->
   <div class="payment-method">
     <h4>Método de pago</h4>
 
     <select
-  name="paymentMethod"
-  [(ngModel)]="paymentMethod"
-  (change)="onPaymentChange()"
-  [ngClass]="{'input-error': submitted && errors.paymentMethod}"
->
-  <option value="">Seleccionar</option>
-  <option value="card">💳 Tarjeta</option>
-  <option value="transfer">🏦 Transferencia</option>
-  <option value="paypal">🅿️ PayPal</option>
-  <option value="wallet">📱 Nequi / Daviplata</option>
-</select>
-  <small *ngIf="submitted && errors.paymentMethod">{{ errors.paymentMethod }}</small>
-    
+      name="paymentMethod"
+      [(ngModel)]="paymentMethod"
+      (change)="onPaymentChange()"
+      [ngClass]="{'input-error': submitted && errors.paymentMethod}"
+    >
+      <option value="">Seleccionar</option>
+      <option value="card">💳 Tarjeta</option>
+      <option value="transfer">🏦 Transferencia</option>
+      <option value="paypal">🅿️ PayPal</option>
+      <option value="wallet">📱 Nequi / Daviplata</option>
+    </select>
+
+    <small *ngIf="submitted && errors.paymentMethod">{{ errors.paymentMethod }}</small>
 
     <div *ngIf="paymentMethod === 'card'" class="payment-form">
-  <div class="input-group">
-    <input
-      name="cardName"
-      [(ngModel)]="cardName"
-      (ngModelChange)="saveDraft()"
-      (input)="cardName = normalizeLetters(cardName)"
-      (keypress)="allowOnlyLetters($event)"
-      [ngClass]="{'input-error': submitted && errors.cardName}"
-      placeholder="Nombre en la tarjeta"
-      maxlength="60"
-    />
-    <small *ngIf="submitted && errors.cardName">{{ errors.cardName }}</small>
-  </div>
+      <div class="input-group">
+        <input
+          name="cardName"
+          [(ngModel)]="cardName"
+          (ngModelChange)="saveDraft()"
+          (input)="cardName = normalizeLetters(cardName)"
+          (keypress)="allowOnlyLetters($event)"
+          [ngClass]="{'input-error': submitted && errors.cardName}"
+          placeholder="Nombre en la tarjeta"
+          maxlength="60"
+        />
+        <small *ngIf="submitted && errors.cardName">{{ errors.cardName }}</small>
+      </div>
 
-  <div class="input-group">
-    <input
-      name="cardNumber"
-      [(ngModel)]="cardNumber"
-      (ngModelChange)="saveDraft()"
-      (input)="cardNumber = normalizeDigits(cardNumber)"
-      (keypress)="allowOnlyDigits($event)"
-      [ngClass]="{'input-error': submitted && errors.cardNumber}"
-      placeholder="Número de tarjeta"
-      inputmode="numeric"
-      maxlength="16"
-    />
-    <small *ngIf="submitted && errors.cardNumber">{{ errors.cardNumber }}</small>
-  </div>
+      <div class="input-group">
+        <input
+          name="cardNumber"
+          [(ngModel)]="cardNumber"
+          (ngModelChange)="saveDraft()"
+          (input)="cardNumber = normalizeDigits(cardNumber)"
+          (keypress)="allowOnlyDigits($event)"
+          [ngClass]="{'input-error': submitted && errors.cardNumber}"
+          placeholder="Número de tarjeta"
+          inputmode="numeric"
+          maxlength="16"
+        />
+        <small *ngIf="submitted && errors.cardNumber">{{ errors.cardNumber }}</small>
+      </div>
 
-  <div class="input-group">
-    <input
-      name="expiry"
-      [(ngModel)]="expiry"
-      [ngClass]="{'input-error': submitted && errors.expiry}"
-      placeholder="MM/AA"
-      maxlength="5"
-    />
-    <small *ngIf="submitted && errors.expiry">{{ errors.expiry }}</small>
-  </div>
+      <div class="input-group">
+        <input
+          name="expiry"
+          [(ngModel)]="expiry"
+          [ngClass]="{'input-error': submitted && errors.expiry}"
+          placeholder="MM/AA"
+          maxlength="5"
+        />
+        <small *ngIf="submitted && errors.expiry">{{ errors.expiry }}</small>
+      </div>
 
-  <div class="input-group">
-    <input
-      name="cvv"
-      [(ngModel)]="cvv"
-      
-      (input)="cvv = normalizeDigits(cvv)"
-      (keypress)="allowOnlyDigits($event)"
-      [ngClass]="{'input-error': submitted && errors.cvv}"
-      placeholder="CVV"
-      inputmode="numeric"
-      maxlength="3"
-    />
-    <small *ngIf="submitted && errors.cvv">{{ errors.cvv }}</small>
-  </div>
-</div>
+      <div class="input-group">
+        <input
+          name="cvv"
+          [(ngModel)]="cvv"
+          (input)="cvv = normalizeDigits(cvv)"
+          (keypress)="allowOnlyDigits($event)"
+          [ngClass]="{'input-error': submitted && errors.cvv}"
+          placeholder="CVV"
+          inputmode="numeric"
+          maxlength="3"
+        />
+        <small *ngIf="submitted && errors.cvv">{{ errors.cvv }}</small>
+      </div>
+    </div>
 
-    <!-- Tranferencia-->
     <div *ngIf="paymentMethod === 'transfer'" class="payment-form">
-  <div class="input-group">
-    <select
-      name="bank"
-      [(ngModel)]="bank"
-      [ngClass]="{'input-error': submitted && errors.bank}"
-    >
-      <option value="">Selecciona un banco</option>
-      <option *ngFor="let b of banks" [value]="b">{{ b }}</option>
-    </select>
-    <small *ngIf="submitted && errors.bank">{{ errors.bank }}</small>
-  </div>
+      <div class="input-group">
+        <select
+          name="bank"
+          [(ngModel)]="bank"
+          [ngClass]="{'input-error': submitted && errors.bank}"
+        >
+          <option value="">Selecciona un banco</option>
+          <option *ngFor="let b of banks" [value]="b">{{ b }}</option>
+        </select>
+        <small *ngIf="submitted && errors.bank">{{ errors.bank }}</small>
+      </div>
 
-  <div class="input-group">
-    <input
-      name="reference"
-      [(ngModel)]="reference"
-      [ngClass]="{'input-error': submitted && errors.reference}"
-      placeholder="Referencia"
-      maxlength="25"
-    />
-    <small *ngIf="submitted && errors.reference">{{ errors.reference }}</small>
-    <small class="hint">Ej: TRF-45872</small>
-  </div>
-</div>
+      <div class="input-group">
+        <input
+          name="reference"
+          [(ngModel)]="reference"
+          [ngClass]="{'input-error': submitted && errors.reference}"
+          placeholder="Referencia"
+          maxlength="25"
+        />
+        <small *ngIf="submitted && errors.reference">{{ errors.reference }}</small>
+        <small class="hint">Ej: TRF-45872</small>
+      </div>
+    </div>
 
-    <!-- Paypal -->
     <div *ngIf="paymentMethod === 'paypal'" class="payment-form">
       <p>Serás redirigido a PayPal</p>
     </div>
 
-    <!-- telefon -->
     <div *ngIf="paymentMethod === 'wallet'" class="payment-form">
-  <div class="input-group">
-    <input
-      name="phoneWallet"
-      [(ngModel)]="phoneWallet"
-      (input)="phoneWallet = normalizeDigits(phoneWallet)"
-      (keypress)="allowOnlyDigits($event)"
-      [ngClass]="{'input-error': submitted && errors.phoneWallet}"
-      placeholder="Número de Nequi / Daviplata"
-      inputmode="numeric"
-      maxlength="10"
-    />
-    <small *ngIf="submitted && errors.phoneWallet">{{ errors.phoneWallet }}</small>
-    <small class="hint">Ej: 3001234567</small>
-  </div>
-</div>
-
-    <!-- Resumen -->
-    <div class="resumen">
-      <div class="item" *ngFor="let item of items">
-        <span>{{ item.product.name }} x {{ item.cantidad }}</span>
-        <span>${{ item.product.price * item.cantidad }}</span>
+      <div class="input-group">
+        <input
+          name="phoneWallet"
+          [(ngModel)]="phoneWallet"
+          (input)="phoneWallet = normalizeDigits(phoneWallet)"
+          (keypress)="allowOnlyDigits($event)"
+          [ngClass]="{'input-error': submitted && errors.phoneWallet}"
+          placeholder="Número de Nequi / Daviplata"
+          inputmode="numeric"
+          maxlength="10"
+        />
+        <small *ngIf="submitted && errors.phoneWallet">{{ errors.phoneWallet }}</small>
+        <small class="hint">Ej: 3001234567</small>
       </div>
+    </div>
+  </div>
 
-      <h3>Total: ${{ getTotal() }}</h3>
+  <div class="resumen">
+    <div class="item" *ngFor="let item of items">
+      <span>{{ item.product.name }} x {{ item.cantidad }}</span>
+      <span>${{ item.product.price * item.cantidad }}</span>
     </div>
 
-    <!-- Botones-->
-    <div class="acciones">
-  <button class="back" type="button" (click)="cerrar()">Cancelar</button>
+    <h3>Total: ${{ getTotal() }}</h3>
+  </div>
 
-  <button class="pagar" type="button" [disabled]="loading" (click)="pagar()">
-    {{ loading ? 'Procesando pago...' : 'Pagar' }}
-  </button>
-</div>
+  <div class="acciones">
+    <button class="back" type="button" (click)="cerrar()">Cancelar</button>
+    <button class="pagar" type="button" [disabled]="loading" (click)="pagar()">
+      {{ loading ? 'Procesando pago...' : 'Pagar' }}
+    </button>
   </div>
 </div>

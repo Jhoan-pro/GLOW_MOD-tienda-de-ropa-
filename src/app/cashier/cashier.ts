@@ -88,8 +88,12 @@ export class Cashier implements OnInit {
 
     const user = this.userService.getCurrentUser();
     if (user) {
-      this.customerEmail = user.email;
-      this.customerName = user.name;
+      this.customerName = user.name || '';
+      this.customerEmail = user.email || '';
+      this.phone = user.phone || '';
+      this.address = user.address || '';
+      this.city = user.city || '';
+      this.documentId = user.idNumber || '';
     }
 
     if (!this.isBrowser()) return;
@@ -101,11 +105,11 @@ export class Cashier implements OnInit {
 
       this.customerName = data.customerName || this.customerName;
       this.customerEmail = data.customerEmail || this.customerEmail;
-      this.phone = data.phone || '';
-      this.address = data.address || '';
-      this.city = data.city || '';
-      this.documentId = data.documentId || '';
-      this.paymentMethod = data.paymentMethod || '';
+      this.phone = data.phone || this.phone;
+      this.address = data.address || this.address;
+      this.city = data.city || this.city;
+      this.documentId = data.documentId || this.documentId;
+      this.paymentMethod = data.paymentMethod || this.paymentMethod;
       this.cardName = data.cardName || '';
       this.cardNumber = data.cardNumber || '';
       this.expiry = data.expiry || '';
@@ -143,15 +147,15 @@ export class Cashier implements OnInit {
   }
 
   normalizeLetters(value: string): string {
-    return value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '').replace(/\s{2,}/g, ' ');
+    return (value || '').replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '').replace(/\s{2,}/g, ' ');
   }
 
   normalizeDigits(value: string): string {
-    return value.replace(/\D/g, '');
+    return (value || '').replace(/\D/g, '');
   }
 
   normalizeAddress(value: string): string {
-    return value.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ#\-\.,\s]/g, '');
+    return (value || '').replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ#\-\.,\s]/g, '');
   }
 
   allowOnlyLetters(event: KeyboardEvent) {

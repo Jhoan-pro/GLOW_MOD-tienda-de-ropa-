@@ -2,20 +2,34 @@
   <div class="profile-card">
     <h2>Mi Perfil</h2>
 
-    <!-- Foto -->
     <div class="photo-section">
       <img [src]="user.photo || 'img/user.png'" alt="foto" />
     </div>
 
-    <!-- Email -->
     <label>Email</label>
     <input type="text" [value]="user.email" disabled />
 
-    <!-- Nombre -->
     <label>Nombre</label>
     <input type="text" [value]="user.name" disabled />
 
-    <!-- Direccion -->
+    <label>Teléfono</label>
+    <input
+      [(ngModel)]="user.phone"
+      name="phone"
+      (input)="user.phone = normalizeDigits(user.phone)"
+      (keypress)="allowOnlyDigits($event)"
+      [disabled]="!editMode"
+    />
+
+    <label>Ciudad</label>
+    <input
+      [(ngModel)]="user.city"
+      name="city"
+      (input)="user.city = normalizeLetters(user.city)"
+      (keypress)="allowOnlyLetters($event)"
+      [disabled]="!editMode"
+    />
+
     <label>Dirección</label>
     <input
       [(ngModel)]="user.address"
@@ -25,13 +39,11 @@
       [ngClass]="{ 'input-error': submitted && errors.address }"
     />
     <span class="error" *ngIf="submitted && errors.address">{{ errors.address }}</span>
-    <!-- Fecha-->
+
     <label>Fecha de nacimiento</label>
     <input type="date" [(ngModel)]="user.birthDate" [disabled]="!editMode" />
-    <!-- validacion de fecha-->
     <span class="error" *ngIf="submitted && errors.birthDate">{{ errors.birthDate }}</span>
 
-    <!-- Identificaciòn-->
     <label>Identificación</label>
     <input
       [(ngModel)]="user.idNumber"
@@ -42,52 +54,44 @@
       [ngClass]="{ 'input-error': submitted && errors.idNumber }"
     />
     <span class="error" *ngIf="submitted && errors.idNumber">{{ errors.idNumber }}</span>
-    <!-- Pais ->
--
-    <!-- cambio de formato aun menu de opcioines -->
-   <label>País / Región</label>
-<select
-  [(ngModel)]="user.country"
-  name="country"
-  [disabled]="!editMode"
-  [ngClass]="{ 'input-error': submitted && errors.country }"
->
-  <option value="">Selecciona un país</option>
-  <option value="Argentina">Argentina</option>
-  <option value="Bolivia">Bolivia</option>
-  <option value="Chile">Chile</option>
-  <option value="Colombia">Colombia</option>
-  <option value="Costa Rica">Costa Rica</option>
-  <option value="Cuba">Cuba</option>
-  <option value="Ecuador">Ecuador</option>
-  <option value="El Salvador">El Salvador</option>
-  <option value="España">España</option>
-  <option value="Estados Unidos">Estados Unidos</option>
-  <option value="Guatemala">Guatemala</option>
-  <option value="Honduras">Honduras</option>
-  <option value="México">México</option>
-  <option value="Nicaragua">Nicaragua</option>
-  <option value="Panamá">Panamá</option>
-  <option value="Paraguay">Paraguay</option>
-  <option value="Perú">Perú</option>
-  <option value="Puerto Rico">Puerto Rico</option>
-  <option value="República Dominicana">República Dominicana</option>
-  <option value="Uruguay">Uruguay</option>
-  <option value="Venezuela">Venezuela</option>
-</select>
-<span class="error" *ngIf="submitted && errors.country">{{ errors.country }}</span>
-    <!-- Botones -->
-<div class="actions">
-  <!-- Si no tiene info -->
-  <button *ngIf="!hasExtraInfo && !editMode" (click)="enableEdit()">Agregar info</button>
 
-  <!-- Si ya tiene info  -->
-  <button *ngIf="hasExtraInfo && !editMode" (click)="enableEdit()">Editar</button>
+    <label>País / Región</label>
+    <select
+      [(ngModel)]="user.country"
+      name="country"
+      [disabled]="!editMode"
+      [ngClass]="{ 'input-error': submitted && errors.country }"
+    >
+      <option value="">Selecciona un país</option>
+      <option value="Argentina">Argentina</option>
+      <option value="Bolivia">Bolivia</option>
+      <option value="Chile">Chile</option>
+      <option value="Colombia">Colombia</option>
+      <option value="Costa Rica">Costa Rica</option>
+      <option value="Cuba">Cuba</option>
+      <option value="Ecuador">Ecuador</option>
+      <option value="El Salvador">El Salvador</option>
+      <option value="España">España</option>
+      <option value="Estados Unidos">Estados Unidos</option>
+      <option value="Guatemala">Guatemala</option>
+      <option value="Honduras">Honduras</option>
+      <option value="México">México</option>
+      <option value="Nicaragua">Nicaragua</option>
+      <option value="Panamá">Panamá</option>
+      <option value="Paraguay">Paraguay</option>
+      <option value="Perú">Perú</option>
+      <option value="Puerto Rico">Puerto Rico</option>
+      <option value="República Dominicana">República Dominicana</option>
+      <option value="Uruguay">Uruguay</option>
+      <option value="Venezuela">Venezuela</option>
+    </select>
+    <span class="error" *ngIf="submitted && errors.country">{{ errors.country }}</span>
 
-  <!-- Guardar-->
-  <button *ngIf="editMode" (click)="save()">Guardar</button>
-
-  <button class="back" (click)="volver()">Volver</button>
-</div>
+    <div class="actions">
+      <button *ngIf="!hasExtraInfo && !editMode" (click)="enableEdit()">Agregar info</button>
+      <button *ngIf="hasExtraInfo && !editMode" (click)="enableEdit()">Editar</button>
+      <button *ngIf="editMode" (click)="save()">Guardar</button>
+      <button class="back" (click)="volver()">Volver</button>
+    </div>
   </div>
 </div>

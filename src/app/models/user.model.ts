@@ -7,8 +7,11 @@ export interface User {
   active: boolean;
 
   fullName?: string;
+  phone?: string;
+  city?: string;
   address?: string;
   birthDate?: string;
   idNumber?: string;
   country?: string;
+  photo?: string;
 }

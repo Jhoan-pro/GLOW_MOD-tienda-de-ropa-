@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { UserService } from '../services/user.service';
 import { Router } from '@angular/router';
+import { User } from '../models/user.model';
 
 type ErrorKeys = 'address' | 'birthDate' | 'idNumber' | 'country';
 
@@ -14,7 +15,19 @@ type ErrorKeys = 'address' | 'birthDate' | 'idNumber' | 'country';
   styleUrls: ['./user-profile.css'],
 })
 export class UserProfile implements OnInit {
-  user: any = {};
+  user: User = {
+    name: '',
+    email: '',
+    role: 'client',
+    active: true,
+    address: '',
+    birthDate: '',
+    idNumber: '',
+    country: '',
+    phone: '',
+    city: '',
+  };
+
   editMode = false;
   hasExtraInfo = false;
 
@@ -24,7 +37,7 @@ export class UserProfile implements OnInit {
   constructor(
     private userService: UserService,
     private router: Router,
-  ) { }
+  ) {}
 
   ngOnInit() {
     const currentUser = this.userService.getCurrentUser();
@@ -39,49 +52,46 @@ export class UserProfile implements OnInit {
 
     this.user = savedUser ? { ...savedUser } : { ...currentUser };
 
-    this.hasExtraInfo = !!this.user.address;
+    this.hasExtraInfo = !!(
+      this.user.address &&
+      this.user.birthDate &&
+      this.user.idNumber &&
+      this.user.country
+    );
   }
 
   enableEdit() {
-    // limpiar errores y guardado
     this.editMode = true;
     this.submitted = false;
     this.errors = {};
   }
 
-  //Normalizadores
-  normalizeLetters(value: string): string {
+  normalizeLetters(value: string = ''): string {
     return value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '').replace(/\s{2,}/g, ' ');
   }
 
-  normalizeDigits(value: string): string {
+  normalizeDigits(value: string = ''): string {
     return value.replace(/\D/g, '');
   }
 
-  normalizeAddress(value: string): string {
+  normalizeAddress(value: string = ''): string {
     return value.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ#\-\.,\s]/g, '');
   }
 
-  // Bloqueo de teclas
   allowOnlyLetters(event: KeyboardEvent) {
-    if (
-      !/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]$/.test(event.key) &&
-      !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(event.key)
-    ) {
+    const allowed = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Home', 'End'];
+    if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]$/.test(event.key) && !allowed.includes(event.key)) {
       event.preventDefault();
     }
   }
 
   allowOnlyDigits(event: KeyboardEvent) {
-    if (
-      !/^\d$/.test(event.key) &&
-      !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(event.key)
-    ) {
+    const allowed = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Home', 'End'];
+    if (!/^\d$/.test(event.key) && !allowed.includes(event.key)) {
       event.preventDefault();
     }
   }
 
-  // Valiidar edad
   validarEdad(fecha: string): boolean {
     const birth = new Date(fecha);
     const today = new Date();
@@ -99,32 +109,27 @@ export class UserProfile implements OnInit {
   validarFormulario(): boolean {
     this.errors = {};
 
-    // Dirección
     if (!this.user.address?.trim()) {
       this.errors.address = 'Dirección obligatoria. Ej: Cra 12 # 34-56';
-    } else if (this.user.address.length < 5) {
+    } else if (this.user.address.trim().length < 5) {
       this.errors.address = 'Dirección muy corta';
     }
 
-    // Fecha nacimiento
     if (!this.user.birthDate) {
       this.errors.birthDate = 'Fecha obligatoria';
     } else if (!this.validarEdad(this.user.birthDate)) {
       this.errors.birthDate = 'Debes tener al menos 18 años';
     }
 
-    // Documento
     if (!this.user.idNumber?.trim()) {
       this.errors.idNumber = 'Documento obligatorio';
     } else if (!/^\d{6,12}$/.test(this.user.idNumber)) {
       this.errors.idNumber = 'Solo números (6 a 12 dígitos)';
     }
 
-    // País
     if (!this.user.country?.trim()) {
       this.errors.country = 'Selecciona un país';
     }
-
 
     return Object.keys(this.errors).length === 0;
   }
@@ -135,18 +140,23 @@ export class UserProfile implements OnInit {
 
     this.user.address = this.user.address?.trim();
     this.user.country = this.user.country?.trim();
+    this.user.phone = this.user.phone?.trim();
+    this.user.city = this.user.city?.trim();
 
-    // agregar id siempre presente
-    const currentUser = this.userService.getCurrentUser();
-    if (!this.user.id && currentUser?.id) {
-      this.user.id = currentUser.id;
+    if (!this.user.id) {
+      const currentUser = this.userService.getCurrentUser();
+      if (currentUser?.id) this.user.id = currentUser.id;
     }
 
     this.userService.updateUserProfile(this.user);
-    this.userService.login(this.user);
 
     this.editMode = false;
-    this.hasExtraInfo = !!(this.user.address && this.user.idNumber && this.user.country && this.user.birthDate);
+    this.hasExtraInfo = !!(
+      this.user.address &&
+      this.user.birthDate &&
+      this.user.idNumber &&
+      this.user.country
+    );
   }
 
   volver() {

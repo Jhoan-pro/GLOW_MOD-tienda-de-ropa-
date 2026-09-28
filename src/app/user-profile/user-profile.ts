@@ -1,98 +1,124 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
-import { UserService } from '../services/user.service';
 import { Router } from '@angular/router';
 import { User } from '../models/user.model';
+import { UserService } from '../services/user.service';
 
 type ErrorKeys = 'address' | 'birthDate' | 'idNumber' | 'country';
+type ProfileErrors = Partial<Record<ErrorKeys, string>>;
+
+const COUNTRIES = [
+  'Argentina',
+  'Bolivia',
+  'Chile',
+  'Colombia',
+  'Costa Rica',
+  'Cuba',
+  'Ecuador',
+  'El Salvador',
+  'España',
+  'Estados Unidos',
+  'Guatemala',
+  'Honduras',
+  'México',
+  'Nicaragua',
+  'Panamá',
+  'Paraguay',
+  'Perú',
+  'Puerto Rico',
+  'República Dominicana',
+  'Uruguay',
+  'Venezuela',
+] as const;
+
+const NAVIGATION_KEYS = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Home', 'End'];
+
+const EMPTY_USER: User = {
+  name: '',
+  email: '',
+  role: 'client',
+  active: true,
+  address: '',
+  birthDate: '',
+  idNumber: '',
+  country: '',
+  phone: '',
+  city: '',
+};
 
 @Component({
   selector: 'app-user-profile',
-  standalone: true,
-  imports: [FormsModule, CommonModule],
+  imports: [FormsModule],
   templateUrl: './user-profile.html',
-  styleUrls: ['./user-profile.css'],
+  styleUrl: './user-profile.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UserProfile implements OnInit {
-  user: User = {
-    name: '',
-    email: '',
-    role: 'client',
-    active: true,
-    address: '',
-    birthDate: '',
-    idNumber: '',
-    country: '',
-    phone: '',
-    city: '',
-  };
+  private readonly userService = inject(UserService);
+  private readonly router = inject(Router);
 
-  editMode = false;
-  hasExtraInfo = false;
+  protected readonly countries = COUNTRIES;
 
-  errors: Partial<Record<ErrorKeys, string>> = {};
-  submitted = false;
+  protected readonly user = signal<User>(EMPTY_USER);
+  protected readonly editMode = signal(false);
+  protected readonly submitted = signal(false);
+  protected readonly errors = signal<ProfileErrors>({});
 
-  constructor(
-    private userService: UserService,
-    private router: Router,
-  ) {}
+  protected readonly hasExtraInfo = computed(() => {
+    const { address, birthDate, idNumber, country } = this.user();
+    return !!(address && birthDate && idNumber && country);
+  });
 
-  ngOnInit() {
-    const currentUser = this.userService.getCurrentUser();
+  ngOnInit(): void {
+    const currentUser = this.userService.currentUser();
 
     if (!currentUser) {
       this.router.navigate(['/login']);
       return;
     }
 
-    const users = this.userService.getUsers();
-    const savedUser = users.find((u) => u.email === currentUser.email || u.id === currentUser.id);
+    const savedUser = this.userService
+      .users()
+      .find((u) => u.email === currentUser.email || u.id === currentUser.id);
 
-    this.user = savedUser ? { ...savedUser } : { ...currentUser };
-
-    this.hasExtraInfo = !!(
-      this.user.address &&
-      this.user.birthDate &&
-      this.user.idNumber &&
-      this.user.country
-    );
+    this.user.set(savedUser ? { ...savedUser } : { ...currentUser });
   }
 
-  enableEdit() {
-    this.editMode = true;
-    this.submitted = false;
-    this.errors = {};
+  protected patch<K extends keyof User>(key: K, value: User[K]): void {
+    this.user.update((user) => ({ ...user, [key]: value }));
   }
 
-  normalizeLetters(value: string = ''): string {
+  protected enableEdit(): void {
+    this.editMode.set(true);
+    this.submitted.set(false);
+    this.errors.set({});
+  }
+
+  protected normalizeLetters(value = ''): string {
     return value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '').replace(/\s{2,}/g, ' ');
   }
 
-  normalizeDigits(value: string = ''): string {
+  protected normalizeDigits(value = ''): string {
     return value.replace(/\D/g, '');
   }
 
-  normalizeAddress(value: string = ''): string {
+  protected normalizeAddress(value = ''): string {
     return value.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ#\-\.,\s]/g, '');
   }
 
-  allowOnlyLetters(event: KeyboardEvent) {
-    const allowed = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Home', 'End'];
-    if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]$/.test(event.key) && !allowed.includes(event.key)) {
+  protected allowOnlyLetters(event: KeyboardEvent): void {
+    if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]$/.test(event.key) && !NAVIGATION_KEYS.includes(event.key)) {
       event.preventDefault();
     }
   }
 
-  allowOnlyDigits(event: KeyboardEvent) {
-    const allowed = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Home', 'End'];
-    if (!/^\d$/.test(event.key) && !allowed.includes(event.key)) {
+  protected allowOnlyDigits(event: KeyboardEvent): void {
+    if (!/^\d$/.test(event.key) && !NAVIGATION_KEYS.includes(event.key)) {
       event.preventDefault();
     }
   }
 
-  validarEdad(fecha: string): boolean {
+  protected validarEdad(fecha: string): boolean {
     const birth = new Date(fecha);
     const today = new Date();
 
@@ -106,60 +132,59 @@ export class UserProfile implements OnInit {
     return edad >= 18;
   }
 
-  validarFormulario(): boolean {
-    this.errors = {};
+  protected validarFormulario(): boolean {
+    const user = this.user();
+    const errors: ProfileErrors = {};
 
-    if (!this.user.address?.trim()) {
-      this.errors.address = 'Dirección obligatoria. Ej: Cra 12 # 34-56';
-    } else if (this.user.address.trim().length < 5) {
-      this.errors.address = 'Dirección muy corta';
+    if (!user.address?.trim()) {
+      errors.address = 'Dirección obligatoria. Ej: Cra 12 # 34-56';
+    } else if (user.address.trim().length < 5) {
+      errors.address = 'Dirección muy corta';
     }
 
-    if (!this.user.birthDate) {
-      this.errors.birthDate = 'Fecha obligatoria';
-    } else if (!this.validarEdad(this.user.birthDate)) {
-      this.errors.birthDate = 'Debes tener al menos 18 años';
+    if (!user.birthDate) {
+      errors.birthDate = 'Fecha obligatoria';
+    } else if (!this.validarEdad(user.birthDate)) {
+      errors.birthDate = 'Debes tener al menos 18 años';
     }
 
-    if (!this.user.idNumber?.trim()) {
-      this.errors.idNumber = 'Documento obligatorio';
-    } else if (!/^\d{6,12}$/.test(this.user.idNumber)) {
-      this.errors.idNumber = 'Solo números (6 a 12 dígitos)';
+    if (!user.idNumber?.trim()) {
+      errors.idNumber = 'Documento obligatorio';
+    } else if (!/^\d{6,12}$/.test(user.idNumber)) {
+      errors.idNumber = 'Solo números (6 a 12 dígitos)';
     }
 
-    if (!this.user.country?.trim()) {
-      this.errors.country = 'Selecciona un país';
+    if (!user.country?.trim()) {
+      errors.country = 'Selecciona un país';
     }
 
-    return Object.keys(this.errors).length === 0;
+    this.errors.set(errors);
+    return Object.keys(errors).length === 0;
   }
 
-  save() {
-    this.submitted = true;
+  protected save(): void {
+    this.submitted.set(true);
     if (!this.validarFormulario()) return;
 
-    this.user.address = this.user.address?.trim();
-    this.user.country = this.user.country?.trim();
-    this.user.phone = this.user.phone?.trim();
-    this.user.city = this.user.city?.trim();
+    const user: User = {
+      ...this.user(),
+      address: this.user().address?.trim(),
+      country: this.user().country?.trim(),
+      phone: this.user().phone?.trim(),
+      city: this.user().city?.trim(),
+    };
 
-    if (!this.user.id) {
-      const currentUser = this.userService.getCurrentUser();
-      if (currentUser?.id) this.user.id = currentUser.id;
+    if (!user.id) {
+      const currentId = this.userService.currentUser()?.id;
+      if (currentId) user.id = currentId;
     }
 
-    this.userService.updateUserProfile(this.user);
-
-    this.editMode = false;
-    this.hasExtraInfo = !!(
-      this.user.address &&
-      this.user.birthDate &&
-      this.user.idNumber &&
-      this.user.country
-    );
+    this.user.set(user);
+    this.userService.updateUserProfile(user);
+    this.editMode.set(false);
   }
 
-  volver() {
+  protected volver(): void {
     this.router.navigate(['/home']);
   }
 }

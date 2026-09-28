@@ -1,165 +1,146 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { Product } from '../models/product.model';
 import { ProductForm } from '../product-form/product-form';
 import { ProductService } from '../services/product';
 import { UserService } from '../services/user.service';
-import { Product } from '../models/product.model';
-import { FormsModule } from '@angular/forms';
-import { Subscription } from 'rxjs';
+
+interface ConfirmState {
+  message: string;
+  action: () => void;
+  onlyInfo: boolean;
+}
+
+const EMPTY_PRODUCT: Product = {
+  name: '',
+  price: 0,
+  stock: 0,
+  category: '',
+  description: '',
+};
 
 @Component({
   selector: 'app-products',
-  standalone: true,
-  imports: [CommonModule, ProductForm, FormsModule],
+  imports: [ProductForm],
   templateUrl: './products.html',
   styleUrl: './products.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class Products implements OnInit, OnDestroy {
-  products: Product[] = [];
-  private sub?: Subscription;
-  isSubAdmin: boolean = false;
-  currentUserId?: number;
-  allSelected: boolean = false;
-  showConfirmModal: boolean = false;
-  confirmMessage: string = '';
-  confirmAction: () => void = () => {};
-  isOnlyInfo: boolean = false;
+export class Products {
+  private readonly productService = inject(ProductService);
+  private readonly userService = inject(UserService);
 
-  constructor(
-    private productService: ProductService,
-    private userService: UserService,
-  ) {}
+  private readonly currentUser = this.userService.currentUser;
+  private readonly currentUserId = computed(() => this.currentUser()?.id);
+  protected readonly isSubAdmin = computed(() => this.currentUser()?.role === 'sub-admin');
 
-  ngOnInit() {
-    const currentUser = this.userService.getCurrentUser();
-    this.isSubAdmin = currentUser?.role === 'sub-admin';
-    this.currentUserId = currentUser?.id;
+  /** Sub-admin ve solo sus productos; el admin principal ve todos. */
+  protected readonly products = computed(() => {
+    const all = this.productService.products();
+    const ownerId = this.currentUserId();
+    return this.isSubAdmin() && ownerId ? all.filter((p) => p.ownerId === ownerId) : all;
+  });
 
-    this.sub = this.productService.products$.subscribe(() => {
-      if (this.isSubAdmin && this.currentUserId) {
-        // sub-admin solo ve sus productos
-        this.products = this.productService.getProductsByOwner(this.currentUserId);
-      } else {
-        // admin principal ve todos
-        this.products = this.productService.getProducts();
-      }
+  // Selección
+  private readonly selectedIds = signal<ReadonlySet<number>>(new Set());
+  protected readonly allSelected = computed(() => {
+    const products = this.products();
+    return products.length > 0 && products.every((p) => this.isSelected(p));
+  });
+
+  // Modales
+  protected readonly confirmState = signal<ConfirmState | null>(null);
+  protected readonly showModal = signal(false);
+  protected readonly viewMode = signal(false);
+  protected readonly isEditing = signal(false);
+  protected readonly currentProduct = signal<Product>({ ...EMPTY_PRODUCT });
+
+  protected isSelected(product: Product): boolean {
+    return product.id !== undefined && this.selectedIds().has(product.id);
+  }
+
+  protected toggleAll(event: Event): void {
+    const checked = (event.target as HTMLInputElement).checked;
+    this.selectedIds.set(
+      checked ? new Set(this.products().flatMap((p) => (p.id !== undefined ? [p.id] : []))) : new Set(),
+    );
+  }
+
+  protected toggleOne(product: Product, event: Event): void {
+    if (product.id === undefined) return;
+
+    const id = product.id;
+    const checked = (event.target as HTMLInputElement).checked;
+
+    this.selectedIds.update((ids) => {
+      const next = new Set(ids);
+      if (checked) next.add(id);
+      else next.delete(id);
+      return next;
     });
   }
 
-  ngOnDestroy(): void {
-    this.sub?.unsubscribe();
+  protected openCreate(): void {
+    this.currentProduct.set({ ...EMPTY_PRODUCT });
+    this.isEditing.set(false);
+    this.viewMode.set(false);
+    this.showModal.set(true);
   }
 
-  showModal: boolean = false;
-  viewMode: boolean = false;
-  editingIndex: number | null = null;
-  currentProduct: Product = this.getEmptyProduct();
-
-  getEmptyProduct(): Product {
-    return {
-      name: '',
-      price: 0,
-      stock: 0,
-      category: '',
-      description: '',
-    };
+  protected openEdit(product: Product): void {
+    this.currentProduct.set({ ...product });
+    this.isEditing.set(true);
+    this.viewMode.set(false);
+    this.showModal.set(true);
   }
 
-  openCreate() {
-    this.currentProduct = this.getEmptyProduct();
-    this.editingIndex = null;
-    this.viewMode = false;
-    this.showModal = true;
+  protected openView(product: Product): void {
+    this.currentProduct.set({ ...product });
+    this.viewMode.set(true);
+    this.showModal.set(true);
   }
 
-  openEdit(index: number) {
-    this.currentProduct = { ...this.products[index] };
-    this.editingIndex = index;
-    this.viewMode = false;
-    this.showModal = true;
+  protected closeModal(): void {
+    this.showModal.set(false);
   }
 
-  saveProduct(product: Product) {
-    // si es sub-admin le asigna su id como dueño
-    if (this.isSubAdmin && this.currentUserId) {
-      product.ownerId = this.currentUserId;
-    }
+  protected saveProduct(product: Product): void {
+    // Si es sub-admin, se le asigna su id como dueño
+    const ownerId = this.currentUserId();
+    const toSave = this.isSubAdmin() && ownerId ? { ...product, ownerId } : product;
 
-    if (this.editingIndex !== null) {
-      this.productService.updateProduct(product);
+    if (this.isEditing()) {
+      this.productService.updateProduct(toSave);
     } else {
-      this.productService.addProduct(product);
+      this.productService.addProduct(toSave);
     }
 
     this.closeModal();
   }
 
-  deleteProduct(index: number) {
-    const confirmacion = confirm('¿Eliminar producto?');
-    if (confirmacion) {
-      this.productService.deleteProduct(index);
-    }
-  }
-
-  deleteSelected() {
-    const ids = this.products.filter((p) => p.selected && p.id).map((p) => p.id as number);
+  protected deleteSelected(): void {
+    const ids = this.products().flatMap((p) => (p.id && this.isSelected(p) ? [p.id] : []));
 
     if (ids.length === 0) {
-      this.openConfirm(
-        'No has seleccionado ningún producto.',
-        () => {},
-        true, 
-      );
+      this.openConfirm('No has seleccionado ningún producto.', () => {}, true);
       return;
     }
 
     this.openConfirm('¿Eliminar los productos seleccionados?', () => {
       this.productService.deleteProductsByIds(ids);
-      this.clearSelection();
+      this.selectedIds.set(new Set());
     });
   }
 
-  // confirmar eliminar productos
-  openConfirm(message: string, action: () => void, onlyInfo: boolean = false) {
-    this.confirmMessage = message;
-    this.confirmAction = action;
-    this.isOnlyInfo = onlyInfo;
-    this.showConfirmModal = true;
+  protected openConfirm(message: string, action: () => void, onlyInfo = false): void {
+    this.confirmState.set({ message, action, onlyInfo });
   }
 
-  confirm() {
-    this.confirmAction();
-    this.showConfirmModal = false;
+  protected confirm(): void {
+    this.confirmState()?.action();
+    this.confirmState.set(null);
   }
 
-  cancelConfirm() {
-    this.showConfirmModal = false;
-  }
-
-  openView(index: number) {
-    this.currentProduct = { ...this.products[index] };
-    this.viewMode = true;
-    this.showModal = true;
-  }
-
-  // seleccionar productos
-  toggleAll(event: any) {
-    const checked = event.target.checked;
-    this.allSelected = checked;
-
-    this.products.forEach((p) => (p.selected = checked));
-  }
-
-  toggleOne() {
-    this.allSelected = this.products.every((p) => p.selected);
-  }
-
-  clearSelection() {
-    this.products.forEach((p) => (p.selected = false));
-    this.allSelected = false;
-  }
-
-  closeModal() {
-    this.showModal = false;
+  protected cancelConfirm(): void {
+    this.confirmState.set(null);
   }
 }

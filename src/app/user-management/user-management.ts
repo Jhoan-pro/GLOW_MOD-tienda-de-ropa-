@@ -1,108 +1,92 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { UserService } from '../services/user.service';
-import { User } from '../models/user.model';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { User } from '../models/user.model';
+import { UserService } from '../services/user.service';
+
+interface EditErrors {
+  email: string;
+  general: string;
+}
+
+const EMPTY_ERRORS: EditErrors = { email: '', general: '' };
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const ROLE_LABELS: Record<User['role'], string> = {
+  admin: 'Administrador',
+  cashier: 'Cajero',
+  client: 'Cliente',
+  'sub-admin': 'Sub Administrador',
+};
 
 @Component({
   selector: 'app-user-management',
-  standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   templateUrl: './user-management.html',
   styleUrl: './user-management.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class UserManagement implements OnInit {
-  users: User[] = [];
-  editingUser: User | null = null;
-  showEditModal: boolean = false;
+export class UserManagement {
+  private readonly userService = inject(UserService);
 
-  name: string = '';
-  email: string = '';
+  protected readonly users = this.userService.users;
+  protected readonly roleLabels = ROLE_LABELS;
 
-  roleLabels: any = {
-    admin: 'Administrador',
-    cashier: 'Cajero',
-    client: 'Cliente',
-    'sub-admin': 'Sub Administrador',
-  };
+  /** Usuario que se está editando; `null` = modal cerrado. */
+  protected readonly editingUser = signal<User | null>(null);
+  protected readonly errors = signal<EditErrors>(EMPTY_ERRORS);
 
-  errors: any = {
-    email: '',
-    password: '',
-    confirmPassword: '',
-    general: '',
-  };
-
-  constructor(private userService: UserService) { }
-
-  ngOnInit() {
-    this.loadUsers();
+  protected toggleStatus(user: User): void {
+    this.userService.setUsers(
+      this.users().map((u) => (u === user ? { ...u, active: !u.active } : u)),
+    );
   }
 
-  loadUsers() {
-    this.users = this.userService.getUsers();
+  protected openEdit(user: User): void {
+    this.errors.set(EMPTY_ERRORS);
+    this.editingUser.set({ ...user });
   }
 
-  toggleStatus(index: number) {
-    const allUsers = this.userService.getUsers();
-
-    allUsers[index].active = !allUsers[index].active;
-    this.saveAndRefresh(allUsers);
-  
+  protected closeEdit(): void {
+    this.editingUser.set(null);
   }
 
-  openEdit(user: User) {
-    this.errors = { email: '', password: '', confirmPassword: '', general: '' };
-    this.editingUser = { ...user };
-    this.showEditModal = true;
+  protected patchEditing<K extends keyof User>(key: K, value: User[K]): void {
+    this.editingUser.update((user) => (user ? { ...user, [key]: value } : user));
   }
 
-  saveEdit() {
-    if (this.editingUser) {
-      this.errors.email = '';
-      this.errors.general = '';
-      const allUsers = this.userService.getUsers();
+  protected saveEdit(): void {
+    const editing = this.editingUser();
+    if (!editing) return;
 
-      if (!this.editingUser.name?.trim() || !this.editingUser.email?.trim()) {
-        this.errors.general = 'El nombre y el correo no pueden estar vacíos.';
-        return;
-      }
+    this.errors.set(EMPTY_ERRORS);
 
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(this.editingUser.email)) {  
-        this.errors.email = 'Correo electrónico inválido. ej: ejemplo@gmail.com';
-        return;
-      }
-
-      const emailExiste = allUsers.some(
-        (u) =>
-          u.email.toLowerCase() === this.editingUser?.email.toLowerCase() &&
-          u.id !== this.editingUser?.id,
-      );
-
-      if (emailExiste) {
-        this.errors.email = 'Este correo ya está en uso por otro usuario.';
-        return;
-      }
-
-      const index = allUsers.findIndex((u) => u.id === this.editingUser?.id);
-      if (index !== -1) {
-        allUsers[index] = this.editingUser;
-        this.saveAndRefresh(allUsers);
-        this.showEditModal = false;
-      }
+    if (!editing.name?.trim() || !editing.email?.trim()) {
+      this.errors.set({ ...EMPTY_ERRORS, general: 'El nombre y el correo no pueden estar vacíos.' });
+      return;
     }
-  }
 
-  private saveAndRefresh(updatedUsers: User[]) {
-    localStorage.setItem('app_users', JSON.stringify(updatedUsers));
-    this.loadUsers();
-  }
+    if (!EMAIL_REGEX.test(editing.email)) {
+      this.errors.set({
+        ...EMPTY_ERRORS,
+        email: 'Correo electrónico inválido. ej: ejemplo@gmail.com',
+      });
+      return;
+    }
 
-  changeRole(index: number, newRole: string) {
-    const allUsers = this.userService.getUsers();
-    allUsers[index].role = newRole as 'admin' | 'sub-admin' | 'cashier' | 'client';
-    localStorage.setItem('app_users', JSON.stringify(allUsers));
-    this.loadUsers();
+    const allUsers = this.users();
+
+    const emailExiste = allUsers.some(
+      (u) => u.email.toLowerCase() === editing.email.toLowerCase() && u.id !== editing.id,
+    );
+
+    if (emailExiste) {
+      this.errors.set({ ...EMPTY_ERRORS, email: 'Este correo ya está en uso por otro usuario.' });
+      return;
+    }
+
+    if (!allUsers.some((u) => u.id === editing.id)) return;
+
+    this.userService.setUsers(allUsers.map((u) => (u.id === editing.id ? editing : u)));
+    this.closeEdit();
   }
 }

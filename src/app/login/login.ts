@@ -1,101 +1,86 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { CommonModule } from '@angular/common';
-import { UserService } from '../services/user.service';
+import { User } from '../models/user.model';
 import { CartService } from '../services/cart.service';
+import { UserService } from '../services/user.service';
+
+interface LoginErrors {
+  email: string;
+  password: string;
+  general: string;
+}
+
+const EMPTY_ERRORS: LoginErrors = { email: '', password: '', general: '' };
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 @Component({
   selector: 'app-login',
-  standalone: true,
-  imports: [FormsModule, RouterLink, CommonModule],
+  imports: [FormsModule, RouterLink],
   templateUrl: './login.html',
   styleUrl: './login.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Login {
-  email = '';
-  password = '';
+  private readonly router = inject(Router);
+  private readonly userService = inject(UserService);
+  private readonly cartService = inject(CartService);
 
-  errors: any = {
-    email: '',
-    password: '',
-    general: '',
-  };
+  protected readonly email = signal('');
+  protected readonly password = signal('');
+  protected readonly errors = signal<LoginErrors>(EMPTY_ERRORS);
 
-  constructor(
-    private router: Router,
-    private userService: UserService,
-    private cartService: CartService,
-  ) { }
+  protected login(): void {
+    this.errors.set(EMPTY_ERRORS);
 
-  login() {
-    this.errors = { email: '', password: '', general: '' };
-
-    const email = this.email.trim();
-    const emailLower = email.toLowerCase();
+    const email = this.email().trim();
+    const password = this.password();
 
     // Ambos vacíos
-    if (!email && !this.password) {
-      this.errors.general = 'Todos los campos son obligatorios';
+    if (!email && !password) {
+      this.fail('Todos los campos son obligatorios');
       return;
     }
 
-    // Campo correo vacío
-    if (!email) {
-      this.errors.email = 'El correo es obligatorio';
+    const errors: LoginErrors = { ...EMPTY_ERRORS };
+
+    if (!email) errors.email = 'El correo es obligatorio';
+    if (!password) errors.password = 'La contraseña es obligatoria';
+
+    // Formato del correo, solo si escribió algo
+    if (email && !EMAIL_REGEX.test(email)) {
+      errors.email = 'Correo inválido. Ej: ejemplo@gmail.com';
     }
 
-    // Campo contraseña vacío
-    if (!this.password) {
-      this.errors.password = 'La contraseña es obligatoria';
+    // Longitud de la contraseña, solo si escribió algo
+    if (password && password.length < 6) {
+      errors.password = 'La contraseña debe tener mínimo 6 caracteres';
     }
 
-    // Validar formato del correo SI escribió algo
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    if (email && !emailRegex.test(email)) {
-      this.errors.email = 'Correo inválido. Ej: ejemplo@gmail.com';
-    }
-
-    // Validar longitud contraseña SI escribió algo
-    if (this.password && this.password.length < 6) {
-      this.errors.password =
-        'La contraseña debe tener mínimo 6 caracteres';
-    }
-
-    // Si existe cualquier error 
-    if (
-      this.errors.email ||
-      this.errors.password ||
-      this.errors.general
-    ) {
+    if (errors.email || errors.password) {
+      this.errors.set(errors);
       return;
     }
 
-    const users = this.userService.getUsers();
-
-    const userFound = users.find(
-      (u) =>
-        u.email.toLowerCase() === emailLower &&
-        u.password === this.password
-    );
+    const emailLower = email.toLowerCase();
+    const userFound = this.userService
+      .getUsers()
+      .find((u) => u.email.toLowerCase() === emailLower && u.password === password);
 
     if (!userFound) {
-      this.errors.general = 'Correo o contraseña incorrectos';
+      this.fail('Correo o contraseña incorrectos');
       return;
     }
 
     if (!userFound.active) {
-      this.errors.general =
-        'Tu cuenta ha sido deshabilitada. Contacta al admin.';
+      this.fail('Tu cuenta ha sido deshabilitada. Contacta al admin.');
       return;
     }
 
-    const loginSuccess = this.userService.login(userFound);
-
-    if (!loginSuccess) {
-      this.errors.general =
-        'Sesión activa detectada. Ya tienes una sesión iniciada en este dispositivo. Cierra la sesión anterior para continuar.';
+    if (!this.userService.login(userFound)) {
+      this.fail(
+        'Sesión activa detectada. Ya tienes una sesión iniciada en este dispositivo. Cierra la sesión anterior para continuar.',
+      );
       return;
     }
 
@@ -103,14 +88,27 @@ export class Login {
     this.redirectByRole(userFound.role);
   }
 
-  private redirectByRole(role: string) {
-    if (role === 'admin') this.router.navigate(['/admin-dashboard/admin']);
-    else if (role === 'sub-admin') this.router.navigate(['/admin-dashboard/dashBoard']);
-    else if (role === 'cashier') this.router.navigate(['/dashboard/cashier']);
-    else this.router.navigate(['/']);
+  protected volver(): void {
+    this.router.navigate(['/register']);
   }
 
-  volver() {
-    this.router.navigate(['/register']);
+  private fail(general: string): void {
+    this.errors.set({ ...EMPTY_ERRORS, general });
+  }
+
+  private redirectByRole(role: User['role']): void {
+    switch (role) {
+      case 'admin':
+        this.router.navigate(['/admin-dashboard/admin']);
+        break;
+      case 'sub-admin':
+        this.router.navigate(['/admin-dashboard/dashBoard']);
+        break;
+      case 'cashier':
+        this.router.navigate(['/dashboard/cashier']);
+        break;
+      default:
+        this.router.navigate(['/']);
+    }
   }
 }

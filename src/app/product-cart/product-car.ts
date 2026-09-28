@@ -1,130 +1,147 @@
-import { Component, Input, OnChanges, OnInit, SimpleChanges, HostListener } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { DOCUMENT, isPlatformBrowser } from '@angular/common';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnInit,
+  PLATFORM_ID,
+  computed,
+  inject,
+  input,
+  signal,
+} from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { NavigationEnd, Router } from '@angular/router';
+import { filter, map } from 'rxjs';
 import { Product } from '../models/product.model';
 import { CartService } from '../services/cart.service';
 import { UserService } from '../services/user.service';
-import { Router } from '@angular/router';
+
+interface CategorySection {
+  category: string;
+  slug: string;
+  carouselId: string;
+  items: Product[];
+  /** Con pocos productos se centran; con muchos se muestran flechas de carrusel. */
+  carousel: boolean;
+}
+
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .trim()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
 
 @Component({
   selector: 'app-product-car',
-  standalone: true,
-  imports: [CommonModule],
   templateUrl: './product-car.html',
-  styleUrls: ['./product-car.css'],
+  styleUrl: './product-car.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    '(window:resize)': 'updateViewportMode()',
+    '(window:orientationchange)': 'updateViewportMode()',
+  },
 })
-export class ProductCar implements OnInit, OnChanges {
-  showLoginAlert = false;
-  isAdminView = false;
-  isMobileViewport = false;
+export class ProductCar implements OnInit {
+  private readonly cartService = inject(CartService);
+  private readonly userService = inject(UserService);
+  private readonly router = inject(Router);
+  private readonly document = inject(DOCUMENT);
+  private readonly platformId = inject(PLATFORM_ID);
 
-  @Input() products: Product[] = [];
+  readonly products = input<Product[]>([]);
 
-  constructor(
-    private cartService: CartService,
-    private userService: UserService,
-    private router: Router,
-  ) {}
+  protected readonly showLoginAlert = signal(false);
+  protected readonly isMobileViewport = signal(false);
 
-  ngOnInit() {
-    this.checkCurrentRoute();
-    this.updateViewportMode();
-  }
+  /** Claves de los productos que acaban de agregarse (efecto visual de 500 ms). */
+  protected readonly justAdded = signal<ReadonlySet<number | string>>(new Set());
 
-  ngOnChanges(_: SimpleChanges) {
-    this.checkCurrentRoute();
-    this.updateViewportMode();
-  }
+  private readonly currentUrl = toSignal(
+    this.router.events.pipe(
+      filter((event): event is NavigationEnd => event instanceof NavigationEnd),
+      map((event) => event.urlAfterRedirects),
+    ),
+    { initialValue: this.router.url },
+  );
 
-  @HostListener('window:resize')
-  onResize() {
-    this.updateViewportMode();
-  }
+  protected readonly isAdminView = computed(() =>
+    this.currentUrl().includes('admin-dashboard/dashBoard'),
+  );
 
-  @HostListener('window:orientationchange')
-  onOrientationChange() {
-    this.updateViewportMode();
-  }
+  protected readonly sections = computed<CategorySection[]>(() => {
+    const products = this.products();
+    const mobile = this.isMobileViewport();
 
-  private updateViewportMode() {
-    if (typeof window === 'undefined') return;
-    this.isMobileViewport = window.matchMedia('(max-width: 768px)').matches;
-  }
-
-  shouldEnableCarousel(category: string): boolean {
-    const total = this.getProductsByCategory(category).length;
-    return this.isMobileViewport ? total >= 2 : total >= 4;
-  }
-
-  shouldCenterProducts(category: string): boolean {
-    const total = this.getProductsByCategory(category).length;
-    return this.isMobileViewport ? total < 2 : total < 4;
-  }
-
-  slugify(text: string): string {
-    return text
-      .toLowerCase()
-      .trim()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '');
-  }
-
-  trackById(_: number, item: Product) {
-    return item.id ?? item.name;
-  }
-
-  private checkCurrentRoute() {
-    this.isAdminView = this.router.url.includes('admin-dashboard/dashBoard');
-  }
-
-  get categories(): string[] {
-    return [...new Set(this.products.map((p) => p.category).filter(Boolean))].sort((a, b) =>
+    const categories = [...new Set(products.map((p) => p.category).filter(Boolean))].sort((a, b) =>
       a.localeCompare(b),
     );
+
+    return categories.map((category) => {
+      const key = category.toLowerCase().trim();
+      const items = products.filter((p) => p.category?.toLowerCase().trim() === key);
+      const slug = slugify(category);
+
+      return {
+        category,
+        slug,
+        carouselId: `carousel-${slug}`,
+        items,
+        carousel: mobile ? items.length >= 2 : items.length >= 4,
+      };
+    });
+  });
+
+  ngOnInit(): void {
+    this.updateViewportMode();
   }
 
-  getProductsByCategory(category: string) {
-    return this.products.filter(
-      (p) => p.category?.toLowerCase().trim() === category.toLowerCase().trim(),
-    );
+  protected updateViewportMode(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+
+    const matches = this.document.defaultView?.matchMedia('(max-width: 768px)').matches ?? false;
+    this.isMobileViewport.set(matches);
   }
 
-  addToCart(product: Product) {
-    if (this.isAdminView) return;
+  protected addToCart(product: Product): void {
+    if (this.isAdminView()) return;
 
     if (!this.userService.isLoggedIn()) {
-      this.showLoginAlert = true;
+      this.showLoginAlert.set(true);
       return;
     }
 
-    product.added = true;
-    setTimeout(() => (product.added = false), 500);
-
+    this.flashAdded(product);
     this.cartService.addToCart(product);
   }
 
-  closeLoginAlert() {
-    this.showLoginAlert = false;
+  protected closeLoginAlert(): void {
+    this.showLoginAlert.set(false);
   }
 
-  goToLogin() {
-    this.showLoginAlert = false;
+  protected goToLogin(): void {
+    this.showLoginAlert.set(false);
     this.router.navigate(['/login']);
   }
 
-  carouselId(category: string): string {
-    return `carousel-${this.slugify(category)}`;
+  protected scrollCategory(carouselId: string, amount: number): void {
+    this.document.getElementById(carouselId)?.scrollBy({ left: amount, behavior: 'smooth' });
   }
 
-  scrollCategory(category: string, amount: number) {
-    const container = document.getElementById(this.carouselId(category));
+  private flashAdded(product: Product): void {
+    const key = product.id ?? product.name;
 
-    if (container) {
-      container.scrollBy({
-        left: amount,
-        behavior: 'smooth',
+    this.justAdded.update((keys) => new Set(keys).add(key));
+
+    setTimeout(() => {
+      this.justAdded.update((keys) => {
+        const next = new Set(keys);
+        next.delete(key);
+        return next;
       });
-    }
+    }, 500);
   }
 }

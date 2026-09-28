@@ -16,7 +16,7 @@
     <thead>
       <tr>
         <th>
-          <input type="checkbox" [checked]="allSelected" (change)="toggleAll($event)" />
+          <input type="checkbox" [checked]="allSelected()" (change)="toggleAll($event)" />
         </th>
         <th>Imagen</th>
         <th>Nombre</th>
@@ -28,61 +28,71 @@
     </thead>
 
     <tbody>
-      <tr *ngFor="let p of products; let i = index">
-        <td data-label="">
-          <input type="checkbox" [(ngModel)]="p.selected" (change)="toggleOne()" />
-        </td>
-        <td data-label="Imagen"><img [src]="p.image" width="60" height="60" *ngIf="p.image" /></td>
-        <td data-label="Nombre">{{ p.name }}</td>
-        <td data-label="Precio">{{ p.price }}</td>
-        <td data-label="Stock">{{ p.stock }}</td>
-        <td data-label="Categoría">{{ p.category }}</td>
-        <td data-label="Acciones">
-          <button class="update-btn" (click)="openEdit(i)">Editar</button>
-          <button class="view-btn" (click)="openView(i)">Ver</button>
-        </td>
-      </tr>
+      @for (p of products(); track p.id) {
+        <tr>
+          <td data-label="">
+            <input type="checkbox" [checked]="isSelected(p)" (change)="toggleOne(p, $event)" />
+          </td>
+          <td data-label="Imagen">
+            @if (p.image) {
+              <img [src]="p.image" [alt]="p.name" width="60" height="60" />
+            }
+          </td>
+          <td data-label="Nombre">{{ p.name }}</td>
+          <td data-label="Precio">{{ p.price }}</td>
+          <td data-label="Stock">{{ p.stock }}</td>
+          <td data-label="Categoría">{{ p.category }}</td>
+          <td data-label="Acciones">
+            <button class="update-btn" (click)="openEdit(p)">Editar</button>
+            <button class="view-btn" (click)="openView(p)">Ver</button>
+          </td>
+        </tr>
+      }
     </tbody>
   </table>
-  <div class="modal" *ngIf="showConfirmModal">
-    <div class="modal-content">
-      <p>{{ confirmMessage }}</p>
 
-      <div class="modal-actions">
-        <button class="delete-btn" (click)="confirm()">Confirmar</button>
-        <button class="cancel" (click)="cancelConfirm()">Cancelar</button>
+  @if (confirmState(); as state) {
+    <div class="modal">
+      <div class="modal-content">
+        <p>{{ state.message }}</p>
+
+        <div class="modal-actions">
+          <button class="delete-btn" (click)="confirm()">Confirmar</button>
+          <button class="cancel" (click)="cancelConfirm()">Cancelar</button>
+        </div>
       </div>
     </div>
-  </div>
 
-  <div class="logout-modal" *ngIf="showConfirmModal">
-    <div class="logout-box">
-      <h3>{{ isOnlyInfo ? 'Aviso' : 'Confirmación' }}</h3>
-      <p>{{ confirmMessage }}</p>
+    <div class="logout-modal">
+      <div class="logout-box">
+        <h3>{{ state.onlyInfo ? 'Aviso' : 'Confirmación' }}</h3>
+        <p>{{ state.message }}</p>
 
-      <div class="acciones">
-        <!-- SOLO INFORMACION -->
-        <button *ngIf="isOnlyInfo" class="confirmar" (click)="cancelConfirm()">Aceptar</button>
-
-        <!-- CONFIRMACION NORMAL -->
-        <ng-container *ngIf="!isOnlyInfo">
-          <button class="confirmar" (click)="confirm()">Confirmar</button>
-          <button class="cerrar-btn" (click)="cancelConfirm()">Cancelar</button>
-        </ng-container>
+        <div class="acciones">
+          @if (state.onlyInfo) {
+            <!-- SOLO INFORMACION -->
+            <button class="confirmar" (click)="cancelConfirm()">Aceptar</button>
+          } @else {
+            <!-- CONFIRMACION NORMAL -->
+            <button class="confirmar" (click)="confirm()">Confirmar</button>
+            <button class="cerrar-btn" (click)="cancelConfirm()">Cancelar</button>
+          }
+        </div>
       </div>
     </div>
-  </div>
+  }
 
-  <div class="modal" *ngIf="showModal">
-    <div class="modal-content">
-      <app-product-form
-        [viewMode]="viewMode"
-        [product]="currentProduct"
-        [isEditing]="editingIndex !== null"
-        (save)="saveProduct($event)"
-        (cancel)="closeModal()"
-      >
-      </app-product-form>
+  @if (showModal()) {
+    <div class="modal">
+      <div class="modal-content">
+        <app-product-form
+          [viewMode]="viewMode()"
+          [product]="currentProduct()"
+          [isEditing]="isEditing()"
+          (save)="saveProduct($event)"
+          (cancel)="closeModal()"
+        />
+      </div>
     </div>
-  </div>
+  }
 </section>

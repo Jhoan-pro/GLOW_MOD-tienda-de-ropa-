@@ -1,4 +1,4 @@
-import { Injectable, inject, PLATFORM_ID } from '@angular/core';
+import { Injectable, inject, PLATFORM_ID, signal } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { User } from '../models/user.model';
 
@@ -27,9 +27,21 @@ export class UserService {
   private readonly lockTimeoutMs = 12 * 60 * 60 * 1000; // 12 horas
   private tabChannel: BroadcastChannel | null = null;
 
+  // Estado reactivo (signals). Los métodos getUsers()/getCurrentUser() se mantienen
+  // para no romper los módulos que aún los usan.
+  private readonly _users = signal<User[]>([]);
+  private readonly _currentUser = signal<User | null>(null);
+
+  /** Lista de usuarios (solo lectura). */
+  readonly users = this._users.asReadonly();
+  /** Usuario con sesión iniciada en esta pestaña (solo lectura). */
+  readonly currentUser = this._currentUser.asReadonly();
+
   constructor() {
     if (isPlatformBrowser(this.platformId)) {
       this.ensureDefaultAdmin();
+      this._users.set(this.getUsers());
+      this._currentUser.set(this.getCurrentUser());
       this.initCrossTabProtection();
       this.cleanupExpiredLock();
 
@@ -163,6 +175,15 @@ export class UserService {
     users.push(user);
 
     localStorage.setItem(this.usersStorageKey, JSON.stringify(users));
+    this._users.set(users);
+  }
+
+  /** Reemplaza la lista completa de usuarios (persistencia + signal). */
+  setUsers(users: User[]): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+
+    localStorage.setItem(this.usersStorageKey, JSON.stringify(users));
+    this._users.set(users);
   }
 
   /**
@@ -181,6 +202,7 @@ export class UserService {
     }
 
     sessionStorage.setItem(this.currentUserKey, JSON.stringify(user));
+    this._currentUser.set(user);
 
     const newLock: SessionLock = {
       tabId: this.runtimeId,
@@ -200,6 +222,7 @@ export class UserService {
     if (!isPlatformBrowser(this.platformId)) return;
 
     sessionStorage.removeItem(this.currentUserKey);
+    this._currentUser.set(null);
     this.releaseSessionLockIfOwner();
   }
 
@@ -240,6 +263,7 @@ export class UserService {
     });
 
     localStorage.setItem(this.usersStorageKey, JSON.stringify(updatedUsers));
+    this._users.set(updatedUsers);
 
     const currentUser = this.getCurrentUser();
     if (
@@ -247,13 +271,9 @@ export class UserService {
       (currentUser.id === updatedUser.id ||
         currentUser.email.toLowerCase() === updatedUser.email.toLowerCase())
     ) {
-      sessionStorage.setItem(
-        this.currentUserKey,
-        JSON.stringify({
-          ...currentUser,
-          ...updatedUser,
-        })
-      );
+      const mergedUser: User = { ...currentUser, ...updatedUser };
+      sessionStorage.setItem(this.currentUserKey, JSON.stringify(mergedUser));
+      this._currentUser.set(mergedUser);
     }
   }
 
@@ -261,6 +281,7 @@ export class UserService {
     if (!isPlatformBrowser(this.platformId)) return;
 
     sessionStorage.removeItem(this.currentUserKey);
+    this._currentUser.set(null);
     this.releaseSessionLockIfOwner();
   }
 }

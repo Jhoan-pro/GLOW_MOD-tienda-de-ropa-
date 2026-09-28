@@ -1,71 +1,108 @@
 <div class="form-container">
-  <h3>{{ viewMode ? 'Información del producto' : isEditing ? 'Editar producto' : 'Agregar producto' }}</h3>
+  <h3>{{ viewMode() ? 'Información del producto' : isEditing() ? 'Editar producto' : 'Agregar producto' }}</h3>
 
-  <div class="imagen" *ngIf="product.image">
-    <img [src]="product.image">
-  </div>
+  @if (draft().image) {
+    <div class="imagen">
+      <img [src]="draft().image">
+    </div>
+  }
 
-
-  <div *ngIf="viewMode" class="view-info">
-    <div class="view-row">
-      <span class="view-label">Nombre:</span>
-      <span class="view-value">{{ product.name }}</span>
+  @if (viewMode()) {
+    <div class="view-info">
+      <div class="view-row">
+        <span class="view-label">Nombre:</span>
+        <span class="view-value">{{ draft().name }}</span>
+      </div>
+      <div class="view-row">
+        <span class="view-label">Precio:</span>
+        <span class="view-value">{{ draft().price | currency }}</span>
+      </div>
+      <div class="view-row">
+        <span class="view-label">Stock:</span>
+        <span class="view-value">{{ draft().stock }}</span>
+      </div>
+      <div class="view-row">
+        <span class="view-label">Categoría:</span>
+        <span class="view-value">{{ draft().category }}</span>
+      </div>
+      @if (draft().description) {
+        <div class="view-row">
+          <span class="view-label">Descripción:</span>
+          <span class="view-value">{{ draft().description }}</span>
+        </div>
+      }
     </div>
-    <div class="view-row">
-      <span class="view-label">Precio:</span>
-      <span class="view-value">{{ product.price | currency }}</span>
-    </div>
-    <div class="view-row">
-      <span class="view-label">Stock:</span>
-      <span class="view-value">{{ product.stock }}</span>
-    </div>
-    <div class="view-row">
-      <span class="view-label">Categoría:</span>
-      <span class="view-value">{{ product.category }}</span>
-    </div>
-    <div class="view-row" *ngIf="product.description">
-      <span class="view-label">Descripción:</span>
-      <span class="view-value">{{ product.description }}</span>
-    </div>
-  </div>
-
-
-  <div *ngIf="!viewMode">
+  } @else {
     <div>
-      <input type="file" (change)="onImageSelected($event)" accept="image/*">
-      <span class="error-text" *ngIf="errors.image">{{ errors.image }}</span>
-    </div>
+      <div>
+        <input type="file" (change)="onImageSelected($event)" accept="image/*">
+        @if (errors().image) {
+          <span class="error-text">{{ errors().image }}</span>
+        }
+      </div>
 
-    <div class="form-group">
-      <input type="text" placeholder="Nombre" [(ngModel)]="product.name">
-      <span class="error-text" *ngIf="errors.name">{{ errors.name }}</span>
-    </div>
+      <div class="form-group">
+        <input
+          type="text"
+          placeholder="Nombre"
+          [ngModel]="draft().name"
+          (ngModelChange)="patch('name', $event)"
+        >
+        @if (errors().name) {
+          <span class="error-text">{{ errors().name }}</span>
+        }
+      </div>
 
-    <div class="form-group">
-      <input type="number" placeholder="Precio" [ngModel]="product.price === 0 ? null : product.price"
-        (ngModelChange)="product.price = $event ?? 0" min="0">
-      <span class="error-text" *ngIf="errors.price">{{ errors.price }}</span>
-    </div>
+      <div class="form-group">
+        <input
+          type="number"
+          placeholder="Precio"
+          [ngModel]="draft().price === 0 ? null : draft().price"
+          (ngModelChange)="patch('price', $event ?? 0)"
+          min="0"
+        >
+        @if (errors().price) {
+          <span class="error-text">{{ errors().price }}</span>
+        }
+      </div>
 
-    <div class="form-group">
-      <input type="number" placeholder="Stock" [ngModel]="product.stock === 0 ? null : product.stock"
-        (ngModelChange)="product.stock = $event ?? 0" min="0">
-      <span class="error-text" *ngIf="errors.stock">{{ errors.stock }}</span>
-    </div>
+      <div class="form-group">
+        <input
+          type="number"
+          placeholder="Stock"
+          [ngModel]="draft().stock === 0 ? null : draft().stock"
+          (ngModelChange)="patch('stock', $event ?? 0)"
+          min="0"
+        >
+        @if (errors().stock) {
+          <span class="error-text">{{ errors().stock }}</span>
+        }
+      </div>
 
-    <div class="form-group">
-      <select [(ngModel)]="product.category">
-        <option value="">Selecciona una categoría</option>
-        <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
-      </select>
-      <span class="error-text" *ngIf="errors.category">{{ errors.category }}</span>
-    </div>
+      <div class="form-group">
+        <select [ngModel]="draft().category" (ngModelChange)="patch('category', $event)">
+          <option value="">Selecciona una categoría</option>
+          @for (cat of categories; track cat) {
+            <option [value]="cat">{{ cat }}</option>
+          }
+        </select>
+        @if (errors().category) {
+          <span class="error-text">{{ errors().category }}</span>
+        }
+      </div>
 
-    <textarea placeholder="Descripción (Opcional)" [(ngModel)]="product.description"></textarea>
-  </div>
+      <textarea
+        placeholder="Descripción (Opcional)"
+        [ngModel]="draft().description"
+        (ngModelChange)="patch('description', $event)"
+      ></textarea>
+    </div>
+  }
 
   <div class="actions">
-    <button *ngIf="!viewMode" (click)="onSubmit()">Guardar</button>
-    <button class="cancel" (click)="onCancel()">{{ viewMode ? 'Cerrar' : 'Cancelar' }}</button>
+    @if (!viewMode()) {
+      <button (click)="onSubmit()">Guardar</button>
+    }
+    <button class="cancel" (click)="onCancel()">{{ viewMode() ? 'Cerrar' : 'Cancelar' }}</button>
   </div>
 </div>

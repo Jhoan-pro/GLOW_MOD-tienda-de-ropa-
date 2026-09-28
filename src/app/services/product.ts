@@ -1,4 +1,4 @@
-import { Injectable, inject, PLATFORM_ID } from '@angular/core';
+import { Injectable, inject, PLATFORM_ID, signal } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { BehaviorSubject } from 'rxjs';
 import { Product } from '../models/product.model';
@@ -7,19 +7,26 @@ import { Product } from '../models/product.model';
   providedIn: 'root',
 })
 export class ProductService {
-  private storageKey = 'products';
-  private platformId = inject(PLATFORM_ID);
+  private readonly storageKey = 'products';
+  private readonly platformId = inject(PLATFORM_ID);
 
-  private productsSubject = new BehaviorSubject<Product[]>([]);
-  products$ = this.productsSubject.asObservable();
+  private readonly _products = signal<Product[]>([]);
+
+  /** Catálogo como signal de solo lectura (usar en los componentes nuevos). */
+  readonly products = this._products.asReadonly();
+
+  // Puente temporal: Home todavía se suscribe a products$.
+  // Se puede eliminar cuando Home lea el signal `products`.
+  private readonly productsSubject = new BehaviorSubject<Product[]>([]);
+  readonly products$ = this.productsSubject.asObservable();
 
   constructor() {
     if (isPlatformBrowser(this.platformId)) {
-      this.productsSubject.next(this.getProducts());
+      this.publish(this.getProducts());
 
       window.addEventListener('storage', (event: StorageEvent) => {
         if (event.key === this.storageKey) {
-          this.productsSubject.next(this.getProducts());
+          this.publish(this.getProducts());
         }
       });
     }
@@ -43,7 +50,12 @@ export class ProductService {
     if (!isPlatformBrowser(this.platformId)) return;
 
     localStorage.setItem(this.storageKey, JSON.stringify(products));
-    this.productsSubject.next([...products]);
+    this.publish([...products]);
+  }
+
+  private publish(products: Product[]): void {
+    this._products.set(products);
+    this.productsSubject.next(products);
   }
 
   setProducts(products: Product[]) {

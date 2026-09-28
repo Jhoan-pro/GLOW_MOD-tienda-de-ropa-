@@ -11,46 +11,68 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let user of users; let i = index" [style.opacity]="user.active ? '1' : '0.5'">
-        <td data-label="Nombre">{{ user.name }}</td>
-        <td data-label="Email">{{ user.email }}</td>
-        <td data-label="Rol">{{ roleLabels[user.role] }}</td>
-        <td data-label="Estado">
-          <span [class]="user.active ? 'status-active' : 'status-inactive'">
-            {{ user.active ? 'Activo' : 'Deshabilitado' }}
-          </span>
-        </td>
-        <td data-label="Acciones">
-          
-          <button *ngIf="user.active" class="update-btn" (click)="openEdit(user)">Editar</button>
+      @for (user of users(); track user.email) {
+        <tr [style.opacity]="user.active ? '1' : '0.5'">
+          <td data-label="Nombre">{{ user.name }}</td>
+          <td data-label="Email">{{ user.email }}</td>
+          <td data-label="Rol">{{ roleLabels[user.role] }}</td>
+          <td data-label="Estado">
+            <span [class.status-active]="user.active" [class.status-inactive]="!user.active">
+              {{ user.active ? 'Activo' : 'Deshabilitado' }}
+            </span>
+          </td>
+          <td data-label="Acciones">
+            @if (user.active) {
+              <button class="update-btn" (click)="openEdit(user)">Editar</button>
+            }
 
-          
-          <button [ngClass]="user.active ? 'delete-btn' : 'view-btn'" (click)="toggleStatus(i)">
-            {{ user.active ? 'Deshabilitar' : 'Habilitar' }}
-          </button>
-        </td>
-      </tr>
+            <button
+              [class.delete-btn]="user.active"
+              [class.view-btn]="!user.active"
+              (click)="toggleStatus(user)"
+            >
+              {{ user.active ? 'Deshabilitar' : 'Habilitar' }}
+            </button>
+          </td>
+        </tr>
+      }
     </tbody>
   </table>
 
-  <div class="modal" *ngIf="showEditModal">
-    <div class="modal-content">
-      <h3>Editar Usuario</h3>
-      <input type="text" [(ngModel)]="editingUser!.name" placeholder="Nombre" />
-      <input type="text" [(ngModel)]="editingUser!.email" placeholder="Correo" />
-      <span class="error-text" *ngIf="errors.email">{{ errors.email }}</span>
-      <span class="error-text" *ngIf="errors.general">{{ errors.general }}</span>
-      <select [(ngModel)]="editingUser!.role">
-        <option value="admin">Administrador</option>
-        <option value="cashier">Cajero</option>
-        <option value="client">Cliente</option>
-        <option value="sub-admin"> Sub Administrador</option>
-      </select>
+  @if (editingUser(); as editing) {
+    <div class="modal">
+      <div class="modal-content">
+        <h3>Editar Usuario</h3>
+        <input
+          type="text"
+          [ngModel]="editing.name"
+          (ngModelChange)="patchEditing('name', $event)"
+          placeholder="Nombre"
+        />
+        <input
+          type="text"
+          [ngModel]="editing.email"
+          (ngModelChange)="patchEditing('email', $event)"
+          placeholder="Correo"
+        />
+        @if (errors().email) {
+          <span class="error-text">{{ errors().email }}</span>
+        }
+        @if (errors().general) {
+          <span class="error-text">{{ errors().general }}</span>
+        }
+        <select [ngModel]="editing.role" (ngModelChange)="patchEditing('role', $event)">
+          <option value="admin">Administrador</option>
+          <option value="cashier">Cajero</option>
+          <option value="client">Cliente</option>
+          <option value="sub-admin"> Sub Administrador</option>
+        </select>
 
-      <div class="actions">
-        <button class="update-btn" (click)="saveEdit()">Actualizar</button>
-        <button class="cancel" (click)="showEditModal = false">Cancelar</button>
+        <div class="actions">
+          <button class="update-btn" (click)="saveEdit()">Actualizar</button>
+          <button class="cancel" (click)="closeEdit()">Cancelar</button>
+        </div>
       </div>
     </div>
-  </div>
+  }
 </div>

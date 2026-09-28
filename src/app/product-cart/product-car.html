@@ -1,86 +1,88 @@
 <section class="catalog-wrapper" id="catalogo">
-  <section
-    class="category-section"
-    *ngFor="let category of categories"
-    [attr.id]="slugify(category)"
-  >
-    <div class="category-header">
-      <div>
-        <h2 class="category-title">{{ category }}</h2>
-        <p class="category-subtitle">
-          {{ getProductsByCategory(category).length }} productos disponibles
-        </p>
+  @for (section of sections(); track section.category) {
+    <section class="category-section" [attr.id]="section.slug">
+      <div class="category-header">
+        <div>
+          <h2 class="category-title">{{ section.category }}</h2>
+          <p class="category-subtitle">
+            {{ section.items.length }} productos disponibles
+          </p>
+        </div>
       </div>
-    </div>
 
-    <div class="carousel-wrapper">
-      <button
-        *ngIf="shouldEnableCarousel(category)"
-        class="arrow left"
-        (click)="scrollCategory(category, -350)"
-      >
-        ❮
-      </button>
+      <div class="carousel-wrapper">
+        @if (section.carousel) {
+          <button class="arrow left" (click)="scrollCategory(section.carouselId, -350)">
+            ❮
+          </button>
+        }
 
-      <div
-        class="product-carousel"
-        [attr.id]="carouselId(category)"
-        [ngClass]="{ 'center-products': shouldCenterProducts(category) }"
-      >
-        <article
-          class="product-card"
-          *ngFor="let product of getProductsByCategory(category); trackBy: trackById"
+        <div
+          class="product-carousel"
+          [attr.id]="section.carouselId"
+          [class.center-products]="!section.carousel"
         >
-          <img
-            [src]="product.image || 'assets/no-image.png'"
-            [alt]="product.name"
-            class="product-image"
-          />
+          @for (product of section.items; track product.id ?? product.name) {
+            <article class="product-card">
+              <img
+                [src]="product.image || 'assets/no-image.png'"
+                [alt]="product.name"
+                class="product-image"
+              />
 
-          <div class="product-info">
-            <h3 class="product-name">{{ product.name }}</h3>
-            <p class="product-price">Precio: ${{ product.price }}</p>
+              <div class="product-info">
+                <h3 class="product-name">{{ product.name }}</h3>
+                <p class="product-price">Precio: ${{ product.price }}</p>
 
-            <p class="product-stock">
-              <span *ngIf="product.stock > 0">Stock: {{ product.stock }}</span>
-              <span *ngIf="product.stock === 0" class="sold-out">Agotado</span>
-            </p>
+                <p class="product-stock">
+                  @if (product.stock > 0) {
+                    <span>Stock: {{ product.stock }}</span>
+                  } @else if (product.stock === 0) {
+                    <span class="sold-out">Agotado</span>
+                  }
+                </p>
 
-            <button
-              *ngIf="!isAdminView"
-              class="add-btn"
-              [disabled]="product.stock === 0"
-              [ngClass]="{ added: product.added }"
-              (click)="addToCart(product)"
-            >
-              <span *ngIf="product.stock > 0">Agregar</span>
-              <span *ngIf="product.stock === 0">Sin stock</span>
-            </button>
+                @if (isAdminView()) {
+                  <p class="admin-note">Modo vista previa</p>
+                } @else {
+                  <button
+                    class="add-btn"
+                    [disabled]="product.stock === 0"
+                    [class.added]="justAdded().has(product.id ?? product.name)"
+                    (click)="addToCart(product)"
+                  >
+                    @if (product.stock > 0) {
+                      <span>Agregar</span>
+                    } @else if (product.stock === 0) {
+                      <span>Sin stock</span>
+                    }
+                  </button>
+                }
+              </div>
+            </article>
+          }
+        </div>
 
-            <p *ngIf="isAdminView" class="admin-note">Modo vista previa</p>
-          </div>
-        </article>
+        @if (section.carousel) {
+          <button class="arrow right" (click)="scrollCategory(section.carouselId, 350)">
+            ❯
+          </button>
+        }
       </div>
-
-      <button
-        *ngIf="shouldEnableCarousel(category)"
-        class="arrow right"
-        (click)="scrollCategory(category, 350)"
-      >
-        ❯
-      </button>
-    </div>
-  </section>
+    </section>
+  }
 </section>
 
-<div class="login-alert-overlay" *ngIf="showLoginAlert" (click)="closeLoginAlert()">
-  <div class="login-alert-card" (click)="$event.stopPropagation()">
-    <h3>Debes iniciar sesión</h3>
-    <p>Para agregar productos al carrito primero debes iniciar sesión.</p>
+@if (showLoginAlert()) {
+  <div class="login-alert-overlay" (click)="closeLoginAlert()">
+    <div class="login-alert-card" (click)="$event.stopPropagation()">
+      <h3>Debes iniciar sesión</h3>
+      <p>Para agregar productos al carrito primero debes iniciar sesión.</p>
 
-    <div class="login-alert-actions">
-      <button class="go-login-btn" (click)="goToLogin()">Ir a login</button>
-      <button class="cancel-btn" (click)="closeLoginAlert()">Cancelar</button>
+      <div class="login-alert-actions">
+        <button class="go-login-btn" (click)="goToLogin()">Ir a login</button>
+        <button class="cancel-btn" (click)="closeLoginAlert()">Cancelar</button>
+      </div>
     </div>
   </div>
-</div>
+}

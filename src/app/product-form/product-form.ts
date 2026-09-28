@@ -1,106 +1,85 @@
-import { Component, Input, Output, EventEmitter, OnInit, NgZone } from '@angular/core';
+import { CurrencyPipe } from '@angular/common';
+import { ChangeDetectionStrategy, Component, input, linkedSignal, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
 import { Product } from '../models/product.model';
+
+type ProductField = 'name' | 'price' | 'stock' | 'category' | 'image';
+type ProductErrors = Partial<Record<ProductField, string>>;
+
+const CATEGORIES = ['Camisetas', 'Pantalones', 'Zapatos', 'Chaquetas', 'Sudaderas', 'Camisas'] as const;
 
 @Component({
   selector: 'app-product-form',
-  standalone: true,
-  imports: [FormsModule, CommonModule],
+  imports: [FormsModule, CurrencyPipe],
   templateUrl: './product-form.html',
   styleUrl: './product-form.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ProductForm implements OnInit {
-  errors: any = {};
+export class ProductForm {
+  readonly product = input.required<Product>();
+  readonly viewMode = input(false);
+  readonly isEditing = input(false);
 
-  categories: string[] = [
-    'Camisetas',
-    'Pantalones',
-    'Zapatos',
-    'Chaquetas',
-    'Sudaderas',
-    'Camisas',
-  ];
+  readonly save = output<Product>();
+  readonly cancel = output<void>();
 
-  @Input() product!: Product;
-  @Input() viewMode: boolean = false;
-  @Input() isEditing: boolean = false;
+  protected readonly categories = CATEGORIES;
+  protected readonly errors = signal<ProductErrors>({});
 
-  @Output() save = new EventEmitter<Product>();
-  @Output() cancel = new EventEmitter<void>();
-  constructor(private zone: NgZone) {}
+  /** Copia editable del producto; se reinicia cuando el input `product` cambia. */
+  protected readonly draft = linkedSignal<Product>(() => ({
+    ...this.product(),
+    category: this.product().category ?? '',
+  }));
 
-  ngOnInit() {
-    if (!this.product.category) {
-      this.product.category = '';
-    }
-    this.resetErrors();
+  protected patch<K extends keyof Product>(key: K, value: Product[K]): void {
+    this.draft.update((product) => ({ ...product, [key]: value }));
   }
 
-  private resetErrors() {
-    this.errors = {
-      name: '',
-      price: '',
-      stock: '',
-      category: '',
-      image: '',
-    };
-  }
+  protected onSubmit(): void {
+    const product = this.draft();
+    const errors: ProductErrors = {};
 
-  onSubmit() {
-    this.resetErrors();
-    let isValid = true;
-
-    // Validación de Nombre
-    if (!this.product.name || this.product.name.trim() === '') {
-      this.errors.name = 'El nombre es obligatorio.';
-      isValid = false;
+    if (!product.name || product.name.trim() === '') {
+      errors.name = 'El nombre es obligatorio.';
     }
 
-    // Validación de Precio
-    if (!this.product.price || this.product.price <= 0) {
-      this.errors.price = 'El precio debe ser mayor a 0.';
-      isValid = false;
+    if (!product.price || product.price <= 0) {
+      errors.price = 'El precio debe ser mayor a 0.';
     }
 
-    // Validación de Stock
-    if (this.product.stock <= 0) {
-      this.errors.stock = 'El stock debe ser mayor a 0.';
-      isValid = false;
+    if (product.stock <= 0) {
+      errors.stock = 'El stock debe ser mayor a 0.';
     }
 
-    // Validación de Categoría
-    if (!this.product.category) {
-      this.errors.category = 'Debes seleccionar una categoría.';
-      isValid = false;
+    if (!product.category) {
+      errors.category = 'Debes seleccionar una categoría.';
     }
 
-    // Validación de Imagen
-    if (!this.product.image) {
-      this.errors.image = 'La imagen es obligatoria.';
-      isValid = false;
+    if (!product.image) {
+      errors.image = 'La imagen es obligatoria.';
     }
 
-    if (isValid) {
-      this.save.emit(this.product);
+    this.errors.set(errors);
+
+    if (Object.keys(errors).length === 0) {
+      this.save.emit(product);
     }
   }
 
-  onCancel() {
+  protected onCancel(): void {
     this.cancel.emit();
   }
 
-  onImageSelected(event: any) {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        this.zone.run(() => {
-          this.product.image = reader.result as string;
-          this.errors.image = ''; // Limpiamos error si lo había
-        });
-      };
-      reader.readAsDataURL(file);
-    }
+  protected onImageSelected(event: Event): void {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.patch('image', reader.result as string);
+      this.errors.update((errors) => ({ ...errors, image: '' }));
+    };
+    reader.readAsDataURL(file);
   }
 }

@@ -3,10 +3,14 @@
     <h2>Iniciar Sesión</h2>
 
     <input type="email" placeholder="Correo electrónico" [(ngModel)]="email">
-    <span class="error-text" *ngIf="errors.email">{{ errors.email }}</span>
+    @if (errors().email) {
+      <span class="error-text">{{ errors().email }}</span>
+    }
 
     <input type="password" placeholder="Contraseña" [(ngModel)]="password">
-    <span class="error-text" *ngIf="errors.password">{{ errors.password }}</span>
+    @if (errors().password) {
+      <span class="error-text">{{ errors().password }}</span>
+    }
 
     <a routerLink="/forgot-password" class="forgot-link">
       ¿Olvidaste tu contraseña?
@@ -20,8 +24,9 @@
       ¿No tienes cuenta? Regístrate
     </a>
 
- 
-      <span class="error-msg" *ngIf="errors.general">{{ errors.general }}</span>
+    @if (errors().general) {
+      <span class="error-msg">{{ errors().general }}</span>
+    }
 
     <div class="divider">Continuar con:</div>
 

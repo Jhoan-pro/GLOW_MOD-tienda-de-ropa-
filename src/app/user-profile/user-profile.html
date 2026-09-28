@@ -3,94 +3,89 @@
     <h2>Mi Perfil</h2>
 
     <div class="photo-section">
-      <img [src]="user.photo || 'img/user.png'" alt="foto" />
+      <img [src]="user().photo || 'img/user.png'" alt="foto" />
     </div>
 
     <label>Email</label>
-    <input type="text" [value]="user.email" disabled />
+    <input type="text" [value]="user().email" disabled />
 
     <label>Nombre</label>
-    <input type="text" [value]="user.name" disabled />
+    <input type="text" [value]="user().name" disabled />
 
     <label>Teléfono</label>
     <input
-      [(ngModel)]="user.phone"
-      name="phone"
-      (input)="user.phone = normalizeDigits(user.phone)"
+      [ngModel]="user().phone"
+      (ngModelChange)="patch('phone', normalizeDigits($event))"
       (keypress)="allowOnlyDigits($event)"
-      [disabled]="!editMode"
+      [disabled]="!editMode()"
     />
 
     <label>Ciudad</label>
     <input
-      [(ngModel)]="user.city"
-      name="city"
-      (input)="user.city = normalizeLetters(user.city)"
+      [ngModel]="user().city"
+      (ngModelChange)="patch('city', normalizeLetters($event))"
       (keypress)="allowOnlyLetters($event)"
-      [disabled]="!editMode"
+      [disabled]="!editMode()"
     />
 
     <label>Dirección</label>
     <input
-      [(ngModel)]="user.address"
-      name="address"
-      (input)="user.address = normalizeAddress(user.address)"
-      [disabled]="!editMode"
-      [ngClass]="{ 'input-error': submitted && errors.address }"
+      [ngModel]="user().address"
+      (ngModelChange)="patch('address', normalizeAddress($event))"
+      [disabled]="!editMode()"
+      [class.input-error]="submitted() && errors().address"
     />
-    <span class="error" *ngIf="submitted && errors.address">{{ errors.address }}</span>
+    @if (submitted() && errors().address) {
+      <span class="error">{{ errors().address }}</span>
+    }
 
     <label>Fecha de nacimiento</label>
-    <input type="date" [(ngModel)]="user.birthDate" [disabled]="!editMode" />
-    <span class="error" *ngIf="submitted && errors.birthDate">{{ errors.birthDate }}</span>
+    <input
+      type="date"
+      [ngModel]="user().birthDate"
+      (ngModelChange)="patch('birthDate', $event)"
+      [disabled]="!editMode()"
+    />
+    @if (submitted() && errors().birthDate) {
+      <span class="error">{{ errors().birthDate }}</span>
+    }
 
     <label>Identificación</label>
     <input
-      [(ngModel)]="user.idNumber"
-      name="idNumber"
-      (input)="user.idNumber = normalizeDigits(user.idNumber)"
+      [ngModel]="user().idNumber"
+      (ngModelChange)="patch('idNumber', normalizeDigits($event))"
       (keypress)="allowOnlyDigits($event)"
-      [disabled]="!editMode"
-      [ngClass]="{ 'input-error': submitted && errors.idNumber }"
+      [disabled]="!editMode()"
+      [class.input-error]="submitted() && errors().idNumber"
     />
-    <span class="error" *ngIf="submitted && errors.idNumber">{{ errors.idNumber }}</span>
+    @if (submitted() && errors().idNumber) {
+      <span class="error">{{ errors().idNumber }}</span>
+    }
 
     <label>País / Región</label>
     <select
-      [(ngModel)]="user.country"
-      name="country"
-      [disabled]="!editMode"
-      [ngClass]="{ 'input-error': submitted && errors.country }"
+      [ngModel]="user().country"
+      (ngModelChange)="patch('country', $event)"
+      [disabled]="!editMode()"
+      [class.input-error]="submitted() && errors().country"
     >
       <option value="">Selecciona un país</option>
-      <option value="Argentina">Argentina</option>
-      <option value="Bolivia">Bolivia</option>
-      <option value="Chile">Chile</option>
-      <option value="Colombia">Colombia</option>
-      <option value="Costa Rica">Costa Rica</option>
-      <option value="Cuba">Cuba</option>
-      <option value="Ecuador">Ecuador</option>
-      <option value="El Salvador">El Salvador</option>
-      <option value="España">España</option>
-      <option value="Estados Unidos">Estados Unidos</option>
-      <option value="Guatemala">Guatemala</option>
-      <option value="Honduras">Honduras</option>
-      <option value="México">México</option>
-      <option value="Nicaragua">Nicaragua</option>
-      <option value="Panamá">Panamá</option>
-      <option value="Paraguay">Paraguay</option>
-      <option value="Perú">Perú</option>
-      <option value="Puerto Rico">Puerto Rico</option>
-      <option value="República Dominicana">República Dominicana</option>
-      <option value="Uruguay">Uruguay</option>
-      <option value="Venezuela">Venezuela</option>
+      @for (country of countries; track country) {
+        <option [value]="country">{{ country }}</option>
+      }
     </select>
-    <span class="error" *ngIf="submitted && errors.country">{{ errors.country }}</span>
+    @if (submitted() && errors().country) {
+      <span class="error">{{ errors().country }}</span>
+    }
 
     <div class="actions">
-      <button *ngIf="!hasExtraInfo && !editMode" (click)="enableEdit()">Agregar info</button>
-      <button *ngIf="hasExtraInfo && !editMode" (click)="enableEdit()">Editar</button>
-      <button *ngIf="editMode" (click)="save()">Guardar</button>
+      @if (editMode()) {
+        <button (click)="save()">Guardar</button>
+      } @else if (hasExtraInfo()) {
+        <button (click)="enableEdit()">Editar</button>
+      } @else {
+        <button (click)="enableEdit()">Agregar info</button>
+      }
       <button class="back" (click)="volver()">Volver</button>
     </div>
   </div>

@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { timeout } from 'rxjs';
 import { API_BASE_URL } from './api-config';
 
-export type UserRole = 'admin' | 'sub-admin' | 'cashier' | 'client';
+export type UserRole = 'ADMIN' | 'SUB_ADMIN' | 'CASHIER' | 'CLIENT';
 
 export interface LoginRequest {
   email: string;

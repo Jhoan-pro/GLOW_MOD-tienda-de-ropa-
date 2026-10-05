@@ -97,13 +97,13 @@ export class Login {
 
   private redirectByRole(role: UserRole | undefined): void {
     switch (role) {
-      case 'admin':
+      case 'ADMIN':
         this.router.navigate(['/admin-dashboard/admin']);
         break;
-      case 'sub-admin':
+      case 'SUB_ADMIN':
         this.router.navigate(['/admin-dashboard/dashBoard']);
         break;
-      case 'cashier':
+      case 'CASHIER':
         this.router.navigate(['/dashboard/cashier']);
         break;
       default:

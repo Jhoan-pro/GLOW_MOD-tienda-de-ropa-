@@ -22,49 +22,64 @@ import { Products } from './products/products';
 import { UserManagement } from './user-management/user-management';
 import { cartGuard } from './cart/cart';
 import { AdminOrders } from './admin-orders/admin-orders';
-export const routes: Routes = [
 
-  // Inicio
+import { authGuard } from './core/auth/auth-guard';
+import { roleGuard } from './core/auth/role-guard';
+
+export const routes: Routes = [
+  // Inicio (público)
   { path: 'Home', component: Home },
   { path: 'Navbar', component: Navbar },
-  {path: 'cashier', component:Cashier},
-  // Autenticación
+  { path: 'categoria/:nombre', component: Home },
+
+  // Autenticación (público)
   { path: 'login', component: Login },
   { path: 'register', component: RegisterUser },
   { path: 'forgot-password', component: ForgotPassword },
-  { path: 'user', component: UserProfile },
-  { path: 'categoria/:nombre', component: Home },
 
+  // Requiere estar logueado (cualquier rol)
+  { path: 'user', component: UserProfile, canActivate: [authGuard] },
+  { path: 'invoice', component: Invoice, canActivate: [authGuard] },
 
-  
+  // Solo admin y sub-admin
+  {
+    path: 'product/new',
+    component: ProductForm,
+    canActivate: [roleGuard],
+    data: { roles: ['admin', 'sub-admin'] },
+  },
 
-  // Dashboard de administrador
+  // Dashboard de administrador (admin + sub-admin)
   {
     path: 'admin-dashboard',
     component: AdminDashboard,
+    canActivate: [roleGuard],
+    data: { roles: ['admin', 'sub-admin'] },
     children: [
       { path: 'admin', component: Admin },
       { path: 'products', component: Products },
-      { path: 'users', component: UserManagement },
+      {
+        // Gestión de usuarios: más restrictivo que el resto del dashboard
+        path: 'users',
+        component: UserManagement,
+        canActivate: [roleGuard],
+        data: { roles: ['admin'] },
+      },
       { path: 'admin-orders', component: AdminOrders },
 
       { path: 'dashBoard', component: Home },
       { path: 'client', component: Client },
       { path: 'Navbar', component: Navbar },
-
-    ]
+    ],
   },
 
-  // Otros módulos
-
-  { path: 'invoice', component: Invoice },
- 
-  { path: 'product/new', component: ProductForm },
+  // Caja: cashier y admin, y solo si hay items en el carrito
   {
     path: 'cashier',
     component: Cashier,
-    canActivate: [cartGuard]
+    canActivate: [cartGuard, roleGuard],
+    data: { roles: ['cashier', 'admin'] },
   },
 
-  { path: '**', redirectTo: 'Navbar' }
+  { path: '**', redirectTo: 'Navbar' },
 ];

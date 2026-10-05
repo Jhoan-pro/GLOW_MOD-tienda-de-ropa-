@@ -1,9 +1,10 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { User } from '../models/user.model';
 import { CartService } from '../services/cart.service';
-import { UserService } from '../services/user.service';
+import { AuthSession } from '../core/auth/auth-session';
+import { apiErrorMessage } from '../core/auth/api-error';
+import { UserRole } from '../core/auth/auth-api';
 
 interface LoginErrors {
   email: string;
@@ -23,14 +24,15 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 })
 export class Login {
   private readonly router = inject(Router);
-  private readonly userService = inject(UserService);
+  private readonly session = inject(AuthSession);
   private readonly cartService = inject(CartService);
 
   protected readonly email = signal('');
   protected readonly password = signal('');
   protected readonly errors = signal<LoginErrors>(EMPTY_ERRORS);
+  protected readonly loading = signal(false);
 
-  protected login(): void {
+  protected async login(): Promise<void> {
     this.errors.set(EMPTY_ERRORS);
 
     const email = this.email().trim();
@@ -62,30 +64,27 @@ export class Login {
       return;
     }
 
-    const emailLower = email.toLowerCase();
-    const userFound = this.userService
-      .getUsers()
-      .find((u) => u.email.toLowerCase() === emailLower && u.password === password);
+    this.loading.set(true);
 
-    if (!userFound) {
-      this.fail('Correo o contraseña incorrectos');
-      return;
+    try {
+      // AuthSession.login llama a POST /api/auth/login, guarda el token
+      // y después hidrata /api/auth/me para traer el usuario actual.
+      const success = await this.session.login({ email, password });
+
+      if (!success) {
+        this.fail('Correo o contraseña incorrectos');
+        return;
+      }
+
+      this.cartService.loadCart();
+      this.redirectByRole(this.session.user()?.role);
+    } catch (error) {
+      // Acá cae el 401 real del backend (credenciales inválidas),
+      // traducido a un mensaje legible por apiErrorMessage.
+      this.fail(apiErrorMessage(error, 'login'));
+    } finally {
+      this.loading.set(false);
     }
-
-    if (!userFound.active) {
-      this.fail('Tu cuenta ha sido deshabilitada. Contacta al admin.');
-      return;
-    }
-
-    if (!this.userService.login(userFound)) {
-      this.fail(
-        'Sesión activa detectada. Ya tienes una sesión iniciada en este dispositivo. Cierra la sesión anterior para continuar.',
-      );
-      return;
-    }
-
-    this.cartService.loadCart();
-    this.redirectByRole(userFound.role);
   }
 
   protected volver(): void {
@@ -96,7 +95,7 @@ export class Login {
     this.errors.set({ ...EMPTY_ERRORS, general });
   }
 
-  private redirectByRole(role: User['role']): void {
+  private redirectByRole(role: UserRole | undefined): void {
     switch (role) {
       case 'admin':
         this.router.navigate(['/admin-dashboard/admin']);

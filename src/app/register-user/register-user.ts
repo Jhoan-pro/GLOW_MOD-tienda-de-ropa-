@@ -1,136 +1,97 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { UserService } from '../services/user.service';
-import { User } from '../models/user.model';
-import { CommonModule } from '@angular/common';
+import { firstValueFrom } from 'rxjs';
+import { UsersApi } from '../services/users-api';
+import { apiErrorMessage } from '../core/auth/api-error';
+
+interface RegisterErrors {
+  email: string;
+  password: string;
+  confirmPassword: string;
+  general: string;
+}
+
+const EMPTY_ERRORS: RegisterErrors = {
+  email: '',
+  password: '',
+  confirmPassword: '',
+  general: '',
+};
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 @Component({
   selector: 'app-register-user',
-  standalone: true,
-  imports: [FormsModule, RouterLink, CommonModule],
+  imports: [FormsModule, RouterLink],
   templateUrl: './register-user.html',
   styleUrl: './register-user.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RegisterUser {
-  name: string = '';
-  email: string = '';
-  password: string = '';
-  confirmPassword: string = '';
-  successMsg: string = '';
+  private readonly router = inject(Router);
+  private readonly usersApi = inject(UsersApi);
 
-  errors: any = {
-    email: '',
-    password: '',
-    confirmPassword: '',
-    general: '',
-  };
+  protected readonly name = signal('');
+  protected readonly email = signal('');
+  protected readonly password = signal('');
+  protected readonly confirmPassword = signal('');
+  protected readonly errors = signal<RegisterErrors>(EMPTY_ERRORS);
+  protected readonly successMsg = signal('');
+  protected readonly loading = signal(false);
 
-  constructor(
-    private router: Router,
-    private userService: UserService,
-  ) { }
+  protected async register(): Promise<void> {
+    this.errors.set(EMPTY_ERRORS);
+    this.successMsg.set('');
 
-  register() {
-    this.errors = {
-      email: '',
-      password: '',
-      confirmPassword: '',
-      general: '',
-    };
+    const name = this.name().trim();
+    const email = this.email().trim();
+    const password = this.password();
+    const confirmPassword = this.confirmPassword();
 
-    this.successMsg = '';
-
-    const name = this.name.trim();
-    const email = this.email.trim();
-
-    //Todos vacíos
-    if (!name && !email && !this.password && !this.confirmPassword) {
-      this.errors.general = 'Todos los campos son obligatorios';
+    // Todos vacíos
+    if (!name && !email && !password && !confirmPassword) {
+      this.errors.set({ ...EMPTY_ERRORS, general: 'Todos los campos son obligatorios' });
       return;
     }
 
-    // Validaciones individuales
-    if (!name) {
-      this.errors.general = 'El nombre es obligatorio';
+    const errors: RegisterErrors = { ...EMPTY_ERRORS };
+
+    if (!name) errors.general = 'El nombre es obligatorio';
+    if (!email) errors.email = 'El correo es obligatorio';
+    if (!password) errors.password = 'La contraseña es obligatoria';
+    if (!confirmPassword) errors.confirmPassword = 'Debes confirmar la contraseña';
+
+    if (email && !EMAIL_REGEX.test(email)) {
+      errors.email = 'Correo inválido. Ej: ejemplo@gmail.com';
     }
 
-    if (!email) {
-      this.errors.email = 'El correo es obligatorio';
+    if (password && password.length < 6) {
+      errors.password = 'La contraseña debe tener mínimo 6 caracteres';
     }
 
-    if (!this.password) {
-      this.errors.password = 'La contraseña es obligatoria';
+    if (password && confirmPassword && password !== confirmPassword) {
+      errors.confirmPassword = 'Las contraseñas no coinciden';
     }
 
-    if (!this.confirmPassword) {
-      this.errors.confirmPassword =
-        'Debes confirmar la contraseña';
-    }
-
-    //  Validar formato correo
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    if (email && !emailRegex.test(email)) {
-      this.errors.email =
-        'Correo inválido. Ej: ejemplo@gmail.com';
-    }
-
-    //  Validar longitud contraseña
-    if (this.password && this.password.length < 6) {
-      this.errors.password =
-        'La contraseña debe tener mínimo 6 caracteres';
-    }
-
-    //  Validar coincidencia
-    if (
-      this.password &&
-      this.confirmPassword &&
-      this.password !== this.confirmPassword
-    ) {
-      this.errors.confirmPassword =
-        'Las contraseñas no coinciden';
-    }
-
-    //  Si existe cualquier error 
-    if (
-      this.errors.email ||
-      this.errors.password ||
-      this.errors.confirmPassword ||
-      this.errors.general
-    ) {
+    if (errors.email || errors.password || errors.confirmPassword || errors.general) {
+      this.errors.set(errors);
       return;
     }
 
-    //  Validar si correo ya existe
-    const usuarios = this.userService.getUsers();
+    this.loading.set(true);
 
-    const existe = usuarios.some(
-      (u) => u.email.toLowerCase() === email.toLowerCase()
-    );
+    try {
+      // POST /api/users — el backend valida el email duplicado (409)
+      // y hashea la contraseña; ya no hace falta chequear "existe" acá.
+      await firstValueFrom(this.usersApi.create({ name, email, password, role: 'client' }));
 
-    if (existe) {
-      this.errors.general =
-        'Este correo ya está registrado';
-      return;
+      this.successMsg.set('¡Registro exitoso!');
+      setTimeout(() => this.router.navigate(['/login']), 1500);
+    } catch (error) {
+      this.errors.set({ ...EMPTY_ERRORS, general: apiErrorMessage(error, 'users') });
+    } finally {
+      this.loading.set(false);
     }
-
-    //  Crear usuario
-    const newUser: User = {
-      name: name,
-      email: email,
-      password: this.password,
-      role: 'client',
-      active: true,
-    };
-
-    this.userService.addUser(newUser);
-
-    this.successMsg = '¡Registro exitoso!';
-
-    setTimeout(() => {
-      this.router.navigate(['/login']);
-    }, 1500);
   }
-
 }

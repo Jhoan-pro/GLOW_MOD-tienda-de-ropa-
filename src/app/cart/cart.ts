@@ -1,18 +1,22 @@
-import { inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { PLATFORM_ID, inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { CartService } from '../services/cart.service';
-import { UserService } from '../services/user.service';
+
 export const cartGuard: CanActivateFn = () => {
   const cartService = inject(CartService);
   const router = inject(Router);
+  const isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
   cartService.loadCart();
 
-  if (cartService.getItems().length > 0) {
+  if (cartService.items().length > 0) {
     return true;
-  } else {
-    alert('Tu carrito está vacío');
-    router.navigate(['/']);
-    return false;
   }
+
+  // alert() no existe en el servidor (SSR / prerender)
+  if (isBrowser) {
+    alert('Tu carrito está vacío');
+  }
+  return router.createUrlTree(['/']);
 };

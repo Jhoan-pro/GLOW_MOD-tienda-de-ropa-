@@ -1,14 +1,15 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { Injectable, signal } from '@angular/core';
 
 @Injectable({
   providedIn: 'root',
 })
 export class FilterService {
-  private categorySubject = new BehaviorSubject<string>('Todos');
-  category$ = this.categorySubject.asObservable();
+  private readonly _category = signal('Todos');
 
-  setCategory(category: string) {
-    this.categorySubject.next(category);
+  /** Categoría seleccionada (solo lectura). */
+  readonly category = this._category.asReadonly();
+
+  setCategory(category: string): void {
+    this._category.set(category);
   }
 }

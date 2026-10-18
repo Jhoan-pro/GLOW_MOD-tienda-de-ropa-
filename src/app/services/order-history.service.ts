@@ -1,5 +1,6 @@
-import { Injectable, inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { Injectable, PLATFORM_ID, inject } from '@angular/core';
+import { Order } from '../models/order.model';
 import { UserService } from './user.service';
 
 @Injectable({
@@ -7,8 +8,7 @@ import { UserService } from './user.service';
 })
 export class OrderHistoryService {
   private readonly platformId = inject(PLATFORM_ID);
-
-  constructor(private userService: UserService) {}
+  private readonly userService = inject(UserService);
 
   private readonly ADMIN_KEY = 'all_orders_global';
 
@@ -22,7 +22,7 @@ export class OrderHistoryService {
     return user ? `orderHistory_${user.email}` : 'orderHistory_guest';
   }
 
-  addOrder(order: any) {
+  addOrder(order: Order): void {
     if (!this.isBrowser()) return;
 
     const personalHistory = this.getHistory();
@@ -35,25 +35,25 @@ export class OrderHistoryService {
   }
 
   // Historial de cliente
-  getHistory(): any[] {
+  getHistory(): Order[] {
     if (!this.isBrowser()) return [];
 
     const data = localStorage.getItem(this.getPersonalKey());
-    return data ? JSON.parse(data) : [];
+    return data ? (JSON.parse(data) as Order[]) : [];
   }
 
   // Historial admin (todos los pedidos)
-  getAllOrdersForAdmin(): any[] {
+  getAllOrdersForAdmin(): Order[] {
     if (!this.isBrowser()) return [];
 
     const data = localStorage.getItem(this.ADMIN_KEY);
-    return data ? JSON.parse(data) : [];
+    return data ? (JSON.parse(data) as Order[]) : [];
   }
 
   // Filtra pedidos que contengan productos del sub-admin
-  getOrdersByOwner(ownerId: number): any[] {
+  getOrdersByOwner(ownerId: number): Order[] {
     return this.getAllOrdersForAdmin().filter((order) =>
-      order.items?.some((item: any) => item.ownerId === ownerId),
+      order.items?.some((item) => item.ownerId === ownerId),
     );
   }
 }

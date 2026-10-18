@@ -1,54 +1,59 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { CurrencyPipe, DatePipe, isPlatformBrowser } from '@angular/common';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  PLATFORM_ID,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
+import { Order, OrderItem } from '../models/order.model';
+
+const PAYMENT_LABELS: Record<string, string> = {
+  card: 'Tarjeta',
+  transfer: 'Transferencia',
+  paypal: 'PayPal',
+  wallet: 'Nequi / Daviplata',
+};
+
 @Component({
   selector: 'app-invoice',
-  standalone: true,
-  imports: [CommonModule],
+  imports: [CurrencyPipe, DatePipe, RouterLink],
   templateUrl: './invoice.html',
-  styleUrls: ['./invoice.css'],
+  styleUrl: './invoice.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Invoice {
-  invoice: any;
-  constructor(private router: Router) {}
+  private readonly router = inject(Router);
+  private readonly platformId = inject(PLATFORM_ID);
 
-  ngOnInit() {
-    const data = localStorage.getItem('lastInvoice');
-    if (data) {
-      this.invoice = JSON.parse(data);
-    }
-  }
+  protected readonly invoice = signal<Order | null>(this.loadInvoice());
 
-  getSubtotal(item: any): number {
+  protected readonly total = computed(
+    () => this.invoice()?.items?.reduce((acc, item) => acc + this.getSubtotal(item), 0) ?? 0,
+  );
+
+  protected readonly metodoPago = computed(
+    () => PAYMENT_LABELS[this.invoice()?.paymentMethod ?? ''] ?? '',
+  );
+
+  protected getSubtotal(item: OrderItem): number {
     return item.quantity * item.price;
   }
 
-  getTotal(): number {
-    return (
-      this.invoice?.items?.reduce((acc: number, item: any) => acc + this.getSubtotal(item), 0) || 0
-    );
-  }
-
-  getMetodoPago() {
-    switch (this.invoice?.paymentMethod) {
-      case 'card':
-        return 'Tarjeta';
-      case 'transfer':
-        return 'Transferencia';
-      case 'paypal':
-        return 'PayPal';
-      case 'wallet':
-        return 'Nequi / Daviplata';
-      default:
-        return '';
-    }
-  }
-
-  imprimirFactura() {
+  protected imprimirFactura(): void {
     window.print();
   }
 
-  irHome() {
+  protected irHome(): void {
     this.router.navigate(['/Navbar']);
+  }
+
+  private loadInvoice(): Order | null {
+    if (!isPlatformBrowser(this.platformId)) return null;
+
+    const data = localStorage.getItem('lastInvoice');
+    return data ? (JSON.parse(data) as Order) : null;
   }
 }

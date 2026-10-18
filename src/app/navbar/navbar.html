@@ -3,11 +3,10 @@
 
   <div class="actions">
     <div class="cart-icon" (click)="toggleCarrito()">
-      <img src="img/carrito.png" alt="Car" class="cart-img" /><span
-        class="badge"
-        *ngIf="getCantidadTotal() > 0"
-        >{{ getCantidadTotal() }}</span
-      >
+      <img src="img/carrito.png" alt="Car" class="cart-img" />
+      @if (cantidadTotal() > 0) {
+        <span class="badge">{{ cantidadTotal() }}</span>
+      }
     </div>
     <!-- LUPA / FILTROS -->
     <div class="search-box">
@@ -15,16 +14,18 @@
         <img src="img/search.png" alt="Buscar" class="search-icon" />
       </button>
 
-      <div class="filtros-panel" *ngIf="mostrarFiltros">
-        <h4>Categorías</h4>
+      @if (mostrarFiltros()) {
+        <div class="filtros-panel">
+          <h4>Categorías</h4>
 
-        <button class="filtro-item" (click)="selectCategory('Todos')">Todos</button>
-        <button class="filtro-item" (click)="selectCategory('Camisetas')">Camisetas</button>
-        <button class="filtro-item" (click)="selectCategory('Chaquetas')">Chaquetas</button>
-        <button class="filtro-item" (click)="selectCategory('Pantalones')">Pantalones</button>
-        <button class="filtro-item" (click)="selectCategory('Zapatos')">Zapatos</button>
-        <button class="filtro-item" (click)="selectCategory('Sudaderas')">Sudaderas</button>
-      </div>
+          <button class="filtro-item" (click)="selectCategory('Todos')">Todos</button>
+          <button class="filtro-item" (click)="selectCategory('Camisetas')">Camisetas</button>
+          <button class="filtro-item" (click)="selectCategory('Chaquetas')">Chaquetas</button>
+          <button class="filtro-item" (click)="selectCategory('Pantalones')">Pantalones</button>
+          <button class="filtro-item" (click)="selectCategory('Zapatos')">Zapatos</button>
+          <button class="filtro-item" (click)="selectCategory('Sudaderas')">Sudaderas</button>
+        </div>
+      }
     </div>
 
     <!-- Usuario -->
@@ -33,88 +34,95 @@
         <img src="img/user.png" alt="Perfilus" />
       </div>
 
-      <div class="dropdown-menu" *ngIf="menuUsuarioAbierto">
-        <!-- No logueado -->
-        <ng-container *ngIf="!isLoggedIn">
-          <a routerLink="/login">Iniciar sesión</a>
-        </ng-container>
-
-        <!-- Logueado -->
-        <ng-container *ngIf="isLoggedIn">
-          <a routerLink="/user">Administrar cuenta</a>
-          <button class="logout-btn" (click)="logout()">Cerrar sesión</button>
-        </ng-container>
-      </div>
+      @if (menuUsuarioAbierto()) {
+        <div class="dropdown-menu">
+          @if (isLoggedIn()) {
+            <!-- Logueado -->
+            <a routerLink="/user">Administrar cuenta</a>
+            <button class="logout-btn" (click)="logout()">Cerrar sesión</button>
+          } @else {
+            <!-- No logueado -->
+            <a routerLink="/login">Iniciar sesión</a>
+          }
+        </div>
+      }
     </div>
   </div>
 </header>
 
 <div class="page-content">
-  <app-home></app-home>
+  <app-home />
 </div>
 
-<div class="cart-panel" [class.open]="carritoAbierto">
+<div class="cart-panel" [class.open]="carritoAbierto()">
   <h3>
     Tu carrito
     <span class="vaciar-top" (click)="vaciar()">Vaciar</span>
   </h3>
 
   <div class="cart-content">
-    <div *ngIf="items.length === 0">
-      <p>El carrito está vacío</p>
-    </div>
-
-    <div class="cart-item" *ngFor="let item of items; let i = index">
-      <img [src]="item.product.image" />
-      <div class="info">
-        <p class="name">{{ item.product.name }}</p>
-        
-        <span class="price"> Precio unidad: ${{ item.product.price }} </span>
-
-        <p class="subtotal">Subtotal: ${{ item.product.price * item.cantidad }}</p>
-        <p class="stock">Cantidad Stock: {{item.product.stock}}</p>
-
-        <div class="cantidad">
-          <button (click)="disminuir(item)">-</button>
-          <span>{{ item.cantidad }}</span>
-          
-          <button (click)="aumentar(item)" [disabled]="item.product.stock === 0">+</button>
-
-        </div>
-        
-
-        <div class="eliminar" (click)="eliminar(i)">Eliminar</div>
+    @if (items().length === 0) {
+      <div>
+        <p>El carrito está vacío</p>
       </div>
-    </div>
+    }
+
+    @for (item of items(); track item.product.id ?? $index; let i = $index) {
+      <div class="cart-item">
+        <img [src]="item.product.image" />
+        <div class="info">
+          <p class="name">{{ item.product.name }}</p>
+
+          <span class="price"> Precio unidad: ${{ item.product.price }} </span>
+
+          <p class="subtotal">Subtotal: ${{ item.product.price * item.cantidad }}</p>
+          <p class="stock">Cantidad Stock: {{ item.product.stock }}</p>
+
+          <div class="cantidad">
+            <button (click)="disminuir(item)">-</button>
+            <span>{{ item.cantidad }}</span>
+
+            <button (click)="aumentar(item)" [disabled]="item.product.stock === 0">+</button>
+          </div>
+
+          <div class="eliminar" (click)="eliminar(i)">Eliminar</div>
+        </div>
+      </div>
+    }
   </div>
 
   <!-- Footer -->
   <div class="cart-footer">
     <p>
       <span>Total:</span>
-      <strong>${{ getTotal() }}</strong>
+      <strong>${{ total() }}</strong>
     </p>
 
     <div class="acciones">
       <button class="cerrar-btn" (click)="cerrarCarrito()">Cerrar</button>
 
-      <button class="comprar-btn" routerLink="/cashier" [disabled]="items.length === 0">
+      <button class="comprar-btn" routerLink="/cashier" [disabled]="items().length === 0">
         Comprar
       </button>
     </div>
   </div>
 </div>
-<div class="overlay" *ngIf="carritoAbierto" (click)="cerrarCarrito()"></div>
+@if (carritoAbierto()) {
+  <div class="overlay" (click)="cerrarCarrito()"></div>
+}
+
 <!--confirmacion de logout-->
-<div class="logout-modal" *ngIf="mostrarConfirmLogout">
-  <div class="logout-box">
-    <h3>¿Cerrar sesión?</h3>
-    <p>Tu sesión se cerrará.</p>
+@if (mostrarConfirmLogout()) {
+  <div class="logout-modal">
+    <div class="logout-box">
+      <h3>¿Cerrar sesión?</h3>
+      <p>Tu sesión se cerrará.</p>
 
-    <div class="acciones">
-      <button class="cerrar-btn" (click)="mostrarConfirmLogout = false">Cancelar</button>
+      <div class="acciones">
+        <button class="cerrar-btn" (click)="mostrarConfirmLogout.set(false)">Cancelar</button>
 
-      <button class="confirmar" (click)="confirmarLogout()">Sí, salir</button>
+        <button class="confirmar" (click)="confirmarLogout()">Sí, salir</button>
+      </div>
     </div>
   </div>
-</div>
+}

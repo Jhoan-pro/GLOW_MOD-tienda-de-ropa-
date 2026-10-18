@@ -1,63 +1,74 @@
 <div class="admin-body">
-
   <!-- Overlay móvil -->
-  <div class="sidebar-overlay" [class.active]="sidebarOpen" (click)="sidebarOpen = false"></div>
+  <div
+    class="sidebar-overlay"
+    [class.active]="sidebarOpen()"
+    (click)="sidebarOpen.set(false)"
+  ></div>
 
   <!-- SIDEBAR -->
-  <nav class="sidebar" [class.open]="sidebarOpen">
+  <nav class="sidebar" [class.open]="sidebarOpen()">
     <div class="sidebar-header">
       <h2 class="brand">Admin Ropa</h2>
     </div>
 
     <ul class="nav-links">
       <li routerLinkActive="active">
-        <a routerLink="/admin-dashboard/dashBoard" (click)="sidebarOpen = false">Vista general</a>
+        <a routerLink="/admin-dashboard/dashBoard" (click)="sidebarOpen.set(false)"
+          >Vista general</a
+        >
       </li>
-      <li routerLinkActive="active" *ngIf="!isSubAdmin">
-        <a routerLink="/admin-dashboard/admin" (click)="sidebarOpen = false">Resumen del negocio</a>
-      </li>
+      @if (!isSubAdmin()) {
+        <li routerLinkActive="active">
+          <a routerLink="/admin-dashboard/admin" (click)="sidebarOpen.set(false)"
+            >Resumen del negocio</a
+          >
+        </li>
+      }
       <li routerLinkActive="active">
-        <a routerLink="/admin-dashboard/products" (click)="sidebarOpen = false">Productos</a>
+        <a routerLink="/admin-dashboard/products" (click)="sidebarOpen.set(false)">Productos</a>
       </li>
-      <li routerLinkActive="active" *ngIf="!isSubAdmin">
-        <a routerLink="/admin-dashboard/users" (click)="sidebarOpen = false">Usuarios</a>
-      </li>
+      @if (!isSubAdmin()) {
+        <li routerLinkActive="active">
+          <a routerLink="/admin-dashboard/users" (click)="sidebarOpen.set(false)">Usuarios</a>
+        </li>
+      }
       <li routerLinkActive="active">
-        <a routerLink="/admin-dashboard/admin-orders" (click)="sidebarOpen = false">Pedidos</a>
+        <a routerLink="/admin-dashboard/admin-orders" (click)="sidebarOpen.set(false)">Pedidos</a>
       </li>
     </ul>
   </nav>
 
   <!-- CONTENIDO -->
   <main class="main-content">
-
     <header class="top-header">
-      <button class="menu-toggle" (click)="sidebarOpen = !sidebarOpen">
+      <button class="menu-toggle" (click)="sidebarOpen.update((open) => !open)">
         <span></span>
         <span></span>
         <span></span>
       </button>
       <h1>Panel de administrador</h1>
-      <span class="current-user">Usuario: {{ currentUserName }}</span>
+      <span class="current-user">Usuario: {{ currentUserName() }}</span>
       <button class="logout-btn" (click)="logout()">Cerrar sesión</button>
     </header>
-    <div class="logout-modal" *ngIf="mostrarConfirmLogout">
-      <div class="logout-box">
-        <h3>¿Cerrar sesión?</h3>
-        <p>Tu sesión se cerrará.</p>
 
-        <div class="acciones">
-          <button class="cerrar-btn" (click)="mostrarConfirmLogout = false">Cancelar</button>
+    @if (mostrarConfirmLogout()) {
+      <div class="logout-modal">
+        <div class="logout-box">
+          <h3>¿Cerrar sesión?</h3>
+          <p>Tu sesión se cerrará.</p>
 
-          <button class="confirmar" (click)="confirmarLogout()">Sí, salir</button>
+          <div class="acciones">
+            <button class="cerrar-btn" (click)="mostrarConfirmLogout.set(false)">Cancelar</button>
+
+            <button class="confirmar" (click)="confirmarLogout()">Sí, salir</button>
+          </div>
         </div>
       </div>
-    </div>
+    }
 
     <div class="scrollable-content">
-      <router-outlet></router-outlet>
+      <router-outlet />
     </div>
-
   </main>
-
 </div>

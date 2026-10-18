@@ -1,36 +1,36 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 @Component({
   selector: 'app-forgot-password',
-  standalone: true,
   imports: [FormsModule, RouterLink],
   templateUrl: './forgot-password.html',
   styleUrl: './forgot-password.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ForgotPassword {
+  protected readonly email = signal('');
+  protected readonly message = signal('');
 
-  email: string = '';
-  message: string = '';
-
-  sendRecovery() {
+  protected sendRecovery(): void {
+    const email = this.email();
 
     // Valida campo vacío
-    if (!this.email) {
-      this.message = 'El correo es obligatorio';
+    if (!email) {
+      this.message.set('El correo es obligatorio');
       return;
     }
 
     // Validar formato de email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    if (!emailRegex.test(this.email)) {
-      this.message = 'Correo inválido';
+    if (!EMAIL_REGEX.test(email)) {
+      this.message.set('Correo inválido');
       return;
     }
 
     // Simulación de envío
-    this.message = 'Se ha enviado un enlace de recuperación al correo';
+    this.message.set('Se ha enviado un enlace de recuperación al correo');
   }
 }

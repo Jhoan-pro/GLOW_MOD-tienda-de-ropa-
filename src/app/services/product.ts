@@ -1,6 +1,5 @@
 import { Injectable, inject, PLATFORM_ID, signal } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { BehaviorSubject } from 'rxjs';
 import { Product } from '../models/product.model';
 
 @Injectable({
@@ -12,13 +11,8 @@ export class ProductService {
 
   private readonly _products = signal<Product[]>([]);
 
-  /** Catálogo como signal de solo lectura (usar en los componentes nuevos). */
+  /** Catálogo como signal de solo lectura. */
   readonly products = this._products.asReadonly();
-
-  // Puente temporal: Home todavía se suscribe a products$.
-  // Se puede eliminar cuando Home lea el signal `products`.
-  private readonly productsSubject = new BehaviorSubject<Product[]>([]);
-  readonly products$ = this.productsSubject.asObservable();
 
   constructor() {
     if (isPlatformBrowser(this.platformId)) {
@@ -55,7 +49,6 @@ export class ProductService {
 
   private publish(products: Product[]): void {
     this._products.set(products);
-    this.productsSubject.next(products);
   }
 
   setProducts(products: Product[]) {
@@ -63,18 +56,17 @@ export class ProductService {
   }
 
   getProductsByOwner(ownerId: number): Product[] {
-    return this.getProducts().filter(p => p.ownerId === ownerId);
+    return this.getProducts().filter((p) => p.ownerId === ownerId);
   }
 
   getProductsForStore(): Product[] {
     // todos los productos van a la tienda principal
     return this.getProducts();
   }
-  
+
   addProduct(product: Product) {
     const products = this.getProducts();
-    const newId =
-      products.length > 0 ? Math.max(...products.map((p) => p.id || 0)) + 1 : 1;
+    const newId = products.length > 0 ? Math.max(...products.map((p) => p.id || 0)) + 1 : 1;
 
     products.push({
       ...product,

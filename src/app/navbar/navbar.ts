@@ -1,198 +1,140 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   ViewEncapsulation,
-  HostListener,
-  ElementRef,
-  OnInit,
-  OnDestroy,
+  computed,
   inject,
-  PLATFORM_ID,
+  signal,
 } from '@angular/core';
-import { RouterLink, RouterModule, Router } from '@angular/router';
-import { NgForOf, NgIf, isPlatformBrowser } from '@angular/common';
-import { CartService } from '../services/cart.service';
-import { UserService } from '../services/user.service';
-import { FilterService } from '../services/filter.service';
+import { DOCUMENT } from '@angular/common';
+import { Router, RouterLink } from '@angular/router';
 import { Home } from '../home/home';
+import { CartItem, CartService } from '../services/cart.service';
+import { UserService } from '../services/user.service';
+
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .trim()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
 
 @Component({
   selector: 'app-navbar',
-  standalone: true,
-  imports: [RouterLink, NgIf, RouterModule, NgForOf, Home],
+  imports: [RouterLink, Home],
   templateUrl: './navbar.html',
-  styleUrls: ['./navbar.css'],
+  styleUrl: './navbar.css',
   encapsulation: ViewEncapsulation.None,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    '(document:click)': 'clickFuera($event)',
+  },
 })
-export class Navbar implements OnInit, OnDestroy {
-  private readonly platformId = inject(PLATFORM_ID);
+export class Navbar {
+  private readonly router = inject(Router);
+  private readonly document = inject(DOCUMENT);
+  private readonly cartService = inject(CartService);
+  private readonly userService = inject(UserService);
 
-  items: any[] = [];
+  protected readonly items = this.cartService.items;
+  protected readonly cantidadTotal = this.cartService.count;
+  protected readonly total = this.cartService.total;
+  protected readonly isLoggedIn = computed(() => this.userService.currentUser() !== null);
 
-  mostrarConfirmLogout = false;
-  isLoggedIn = false;
-  mostrarFiltros = false;
-  menuUsuarioAbierto = false;
-  carritoAbierto = false;
+  protected readonly mostrarConfirmLogout = signal(false);
+  protected readonly mostrarFiltros = signal(false);
+  protected readonly menuUsuarioAbierto = signal(false);
+  protected readonly carritoAbierto = signal(false);
 
-  constructor(
-    private eRef: ElementRef,
-    private router: Router,
-    private cartService: CartService,
-    private userService: UserService,
-    private filterService: FilterService,
-  ) {}
-
-  private onStorageChange = (event: StorageEvent) => {
-    if (event.key === 'app_session_lock') {
-      this.checkLogin();
-    }
-  };
-
-  ngOnInit() {
+  constructor() {
     this.cartService.loadCart();
+  }
 
-    this.cartService.cart$.subscribe((data) => {
-      this.items = data;
-    });
+  protected toggleFiltros(): void {
+    this.mostrarFiltros.update((open) => !open);
 
-    this.checkLogin();
-
-    if (isPlatformBrowser(this.platformId)) {
-      window.addEventListener('storage', this.onStorageChange);
+    if (this.mostrarFiltros()) {
+      this.menuUsuarioAbierto.set(false);
+      this.carritoAbierto.set(false);
     }
   }
 
-  ngOnDestroy() {
-    if (isPlatformBrowser(this.platformId)) {
-      window.removeEventListener('storage', this.onStorageChange);
+  protected toggleMenuUsuario(): void {
+    this.menuUsuarioAbierto.update((open) => !open);
+
+    if (this.menuUsuarioAbierto()) {
+      this.mostrarFiltros.set(false);
+      this.carritoAbierto.set(false);
     }
   }
 
-  toggleFiltros() {
-    this.mostrarFiltros = !this.mostrarFiltros;
+  protected toggleCarrito(): void {
+    this.carritoAbierto.update((open) => !open);
 
-    if (this.mostrarFiltros) {
-      this.menuUsuarioAbierto = false;
-      this.carritoAbierto = false;
+    if (this.carritoAbierto()) {
+      this.mostrarFiltros.set(false);
+      this.menuUsuarioAbierto.set(false);
     }
   }
 
-  toggleMenuUsuario() {
-    this.menuUsuarioAbierto = !this.menuUsuarioAbierto;
-
-    if (this.menuUsuarioAbierto) {
-      this.mostrarFiltros = false;
-      this.carritoAbierto = false;
-    }
+  protected cerrarCarrito(): void {
+    this.carritoAbierto.set(false);
   }
 
-  slugify(text: string): string {
-    return text
-      .toLowerCase()
-      .trim()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '');
+  protected logout(): void {
+    this.mostrarConfirmLogout.set(true);
   }
 
-  logout() {
-    this.mostrarConfirmLogout = true;
-  }
-
-  confirmarLogout() {
+  protected confirmarLogout(): void {
     this.userService.logout();
     this.cartService.clearCart();
-    this.isLoggedIn = false;
-    this.mostrarConfirmLogout = false;
+    this.mostrarConfirmLogout.set(false);
     this.router.navigate(['/login']);
   }
 
-  
-
-  toggleCarrito() {
-    this.carritoAbierto = !this.carritoAbierto;
-
-    if (this.carritoAbierto) {
-      this.mostrarFiltros = false;
-      this.menuUsuarioAbierto = false;
-    }
-  }
-
-  cerrarCarrito() {
-    this.carritoAbierto = false;
-  }
-
-  @HostListener('document:click', ['$event'])
-  clickFuera(event: MouseEvent) {
+  protected clickFuera(event: MouseEvent): void {
     const target = event.target as HTMLElement;
 
-    const clickDentroFiltros = target.closest('.search-box');
-    const clickDentroUsuario = target.closest('.user-dropdown');
-    const clickDentroCarrito = target.closest('.cart-panel');
-    const clickIconCarrito = target.closest('.cart-icon');
+    const clickDentro =
+      target.closest('.search-box') ||
+      target.closest('.user-dropdown') ||
+      target.closest('.cart-panel') ||
+      target.closest('.cart-icon');
 
-    if (
-      !clickDentroFiltros &&
-      !clickDentroUsuario &&
-      !clickDentroCarrito &&
-      !clickIconCarrito
-    ) {
-      this.mostrarFiltros = false;
-      this.menuUsuarioAbierto = false;
-      this.carritoAbierto = false;
+    if (!clickDentro) {
+      this.mostrarFiltros.set(false);
+      this.menuUsuarioAbierto.set(false);
+      this.carritoAbierto.set(false);
     }
   }
 
-  checkLogin() {
-    this.isLoggedIn = this.userService.isLoggedIn();
-  }
-
-  eliminar(index: number) {
+  protected eliminar(index: number): void {
     this.cartService.removeItem(index);
   }
 
-  aumentar(item: any) {
+  protected aumentar(item: CartItem): void {
     this.cartService.increase(item);
   }
 
-  disminuir(item: any) {
+  protected disminuir(item: CartItem): void {
     this.cartService.decrease(item);
   }
 
-  getTotal() {
-    return this.cartService.getTotal();
-  }
-
-  vaciar() {
+  protected vaciar(): void {
     this.cartService.clearCart();
   }
 
-  getCantidadTotal() {
-    return this.items.reduce((acc, item) => acc + item.cantidad, 0);
-  }
+  protected selectCategory(category: string): void {
+    this.mostrarFiltros.set(false);
 
-  selectCategory(category: string) {
-    this.scrollToCategory(category);
-  }
-
-  scrollToCategory(category: string) {
-    this.mostrarFiltros = false;
-
-    const targetId =
-      category === 'Todos'
-        ? 'catalogo'
-        : category
-            .toLowerCase()
-            .trim()
-            .normalize('NFD')
-            .replace(/[\u0300-\u036f]/g, '')
-            .replace(/[^a-z0-9]+/g, '-')
-            .replace(/^-+|-+$/g, '');
+    const targetId = category === 'Todos' ? 'catalogo' : slugify(category);
 
     this.router.navigate(['/']).then(() => {
       setTimeout(() => {
-        document.getElementById(targetId)?.scrollIntoView({
+        this.document.getElementById(targetId)?.scrollIntoView({
           behavior: 'smooth',
           block: 'start',
         });

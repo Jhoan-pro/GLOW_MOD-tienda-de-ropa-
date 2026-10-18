@@ -1,42 +1,35 @@
-import { Component, OnInit } from '@angular/core';
-import { Router, RouterModule } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { UserService } from '../services/user.service';
 
 @Component({
   selector: 'app-admin-dashboard',
-  standalone: true,
-  imports: [RouterModule, CommonModule],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive],
   templateUrl: './admin-dashboard.html',
   styleUrl: './admin-dashboard.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AdminDashboard implements OnInit {
-  sidebarOpen = false;
-  mostrarConfirmLogout = false;
-  isLoggedIn = false;
-  isSubAdmin = false;
-  currentUserName = '';
+export class AdminDashboard {
+  private readonly router = inject(Router);
+  private readonly userService = inject(UserService);
 
-  constructor(
-    private router: Router,
-    private userService: UserService
-  ) { }
+  protected readonly sidebarOpen = signal(false);
+  protected readonly mostrarConfirmLogout = signal(false);
 
-  ngOnInit() {
-    const currentUser = this.userService.getCurrentUser();
-    this.isSubAdmin = currentUser?.role === 'sub-admin';
-    this.currentUserName = currentUser?.name || 'Administrador';
+  protected readonly isSubAdmin = computed(
+    () => this.userService.currentUser()?.role === 'sub-admin',
+  );
+  protected readonly currentUserName = computed(
+    () => this.userService.currentUser()?.name || 'Administrador',
+  );
+
+  protected logout(): void {
+    this.mostrarConfirmLogout.set(true);
   }
 
-  logout() {
-    this.mostrarConfirmLogout = true;
-  }
-
-  confirmarLogout() {
+  protected confirmarLogout(): void {
     this.userService.logout();
-    this.isLoggedIn = false;
-    this.mostrarConfirmLogout = false;
+    this.mostrarConfirmLogout.set(false);
     this.router.navigate(['/login']);
-    
   }
 }

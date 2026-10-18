@@ -1,12 +1,12 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { Home } from '../home/home';
 import { Navbar } from '../navbar/navbar';
+
 @Component({
   selector: 'app-client',
   imports: [Home, Navbar],
   templateUrl: './client.html',
   styleUrl: './client.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class Client {
-
-}
+export class Client {}

@@ -1,11 +1,10 @@
-import { Injectable, inject, PLATFORM_ID } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
+import { Injectable, PLATFORM_ID, computed, inject, signal } from '@angular/core';
 import { Product } from '../models/product.model';
 import { ProductService } from './product';
 import { UserService } from './user.service';
 
-interface CartItem {
+export interface CartItem {
   product: Product;
   cantidad: number;
 }
@@ -14,19 +13,25 @@ interface CartItem {
   providedIn: 'root',
 })
 export class CartService {
-  private platformId = inject(PLATFORM_ID);
+  private readonly platformId = inject(PLATFORM_ID);
+  private readonly productService = inject(ProductService);
+  private readonly userService = inject(UserService);
 
-  private items: CartItem[] = [];
-  private cartSubject = new BehaviorSubject<CartItem[]>([]);
-  cart$ = this.cartSubject.asObservable();
-
-  private readonly CART_TTL_MS = 30* 60 * 1000; // minutos el numero inicial
+  private readonly CART_TTL_MS = 30 * 60 * 1000; // 30 minutos
   private expiryTimer: ReturnType<typeof setTimeout> | null = null;
 
-  constructor(
-    private productService: ProductService,
-    private userService: UserService,
-  ) {
+  private readonly _items = signal<CartItem[]>([]);
+
+  /** Ítems del carrito (solo lectura). */
+  readonly items = this._items.asReadonly();
+  /** Unidades totales en el carrito (badge del navbar). */
+  readonly count = computed(() => this._items().reduce((acc, item) => acc + item.cantidad, 0));
+  /** Valor total del carrito. */
+  readonly total = computed(() =>
+    this._items().reduce((acc, item) => acc + item.product.price * item.cantidad, 0),
+  );
+
+  constructor() {
     if (isPlatformBrowser(this.platformId)) {
       window.addEventListener('storage', (event: StorageEvent) => {
         if (event.key === this.getCartKey() || event.key === this.getActivityKey()) {
@@ -50,42 +55,49 @@ export class CartService {
     return this.productService.getProducts().find((p) => p.id === productId);
   }
 
-  private syncItemSnapshots() {
+  /** Refresca la copia del producto de cada ítem con el catálogo actual (stock, precio…). */
+  private withFreshSnapshots(items: CartItem[]): CartItem[] {
     const products = this.productService.getProducts();
 
-    this.items = this.items.map((item) => {
+    return items.map((item) => {
       const current = products.find((p) => p.id === item.product.id);
       return current ? { ...item, product: { ...current } } : item;
     });
   }
 
-  private saveCart() {
-    if (!isPlatformBrowser(this.platformId)) return;
-
-    const key = this.getCartKey();
-    localStorage.setItem(key, JSON.stringify(this.items));
+  /** Publica el nuevo estado, lo persiste y reinicia el contador de inactividad. */
+  private commit(items: CartItem[]): void {
+    this._items.set(this.withFreshSnapshots(items));
+    this.saveCart();
+    this.touchCartActivity();
   }
 
-  private clearExpiryTimer() {
+  private saveCart(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+
+    localStorage.setItem(this.getCartKey(), JSON.stringify(this._items()));
+  }
+
+  private clearExpiryTimer(): void {
     if (this.expiryTimer) {
       clearTimeout(this.expiryTimer);
       this.expiryTimer = null;
     }
   }
 
-  private touchCartActivity() {
+  private touchCartActivity(): void {
     if (!isPlatformBrowser(this.platformId)) return;
 
     localStorage.setItem(this.getActivityKey(), Date.now().toString());
     this.scheduleExpiry();
   }
 
-  private scheduleExpiry() {
+  private scheduleExpiry(): void {
     if (!isPlatformBrowser(this.platformId)) return;
 
     this.clearExpiryTimer();
 
-    if (this.items.length === 0) {
+    if (this._items().length === 0) {
       localStorage.removeItem(this.getActivityKey());
       return;
     }
@@ -100,22 +112,19 @@ export class CartService {
       return;
     }
 
-    this.expiryTimer = setTimeout(() => {
-      this.expireCart();
-    }, remaining);
+    this.expiryTimer = setTimeout(() => this.expireCart(), remaining);
   }
 
-  private expireCart() {
+  private expireCart(): void {
     if (!isPlatformBrowser(this.platformId)) return;
-    if (this.items.length === 0) return;
+    if (this._items().length === 0) return;
 
-    this.items.forEach((item) => {
+    this._items().forEach((item) => {
       if (!item.product.id) return;
       this.productService.updateStock(item.product.id, item.product.stock + item.cantidad);
     });
 
-    this.items = [];
-    this.cartSubject.next([]);
+    this._items.set([]);
     this.saveCart();
     localStorage.removeItem(this.getActivityKey());
     this.clearExpiryTimer();
@@ -123,25 +132,19 @@ export class CartService {
     alert('Tu carrito expiró por inactividad y el stock fue liberado.');
   }
 
-  loadCart() {
+  loadCart(): void {
     if (!isPlatformBrowser(this.platformId)) return;
 
-    const key = this.getCartKey();
-    const data = localStorage.getItem(key);
+    const data = localStorage.getItem(this.getCartKey());
+    const stored: CartItem[] = data ? (JSON.parse(data) as CartItem[]) : [];
 
-    this.items = data ? JSON.parse(data) : [];
-    this.syncItemSnapshots();
-    this.cartSubject.next([...this.items]);
+    this._items.set(this.withFreshSnapshots(stored));
 
-    if (this.items.length > 0 && !localStorage.getItem(this.getActivityKey())) {
+    if (stored.length > 0 && !localStorage.getItem(this.getActivityKey())) {
       localStorage.setItem(this.getActivityKey(), Date.now().toString());
     }
 
     this.scheduleExpiry();
-  }
-
-  getItems() {
-    return this.items;
   }
 
   addToCart(product: Product): boolean {
@@ -153,28 +156,23 @@ export class CartService {
       return false;
     }
 
-    const existing = this.items.find((item) => item.product.id === product.id);
+    const items = this._items();
+    const exists = items.some((item) => item.product.id === product.id);
 
-    if (existing) {
-      existing.cantidad++;
-    } else {
-      this.items.push({
-        product: { ...current },
-        cantidad: 1,
-      });
-    }
+    const next = exists
+      ? items.map((item) =>
+          item.product.id === product.id ? { ...item, cantidad: item.cantidad + 1 } : item,
+        )
+      : [...items, { product: { ...current }, cantidad: 1 }];
 
     this.productService.updateStock(product.id, current.stock - 1);
-    this.syncItemSnapshots();
-    this.cartSubject.next([...this.items]);
-    this.saveCart();
-    this.touchCartActivity();
+    this.commit(next);
 
     return true;
   }
 
-  removeItem(index: number) {
-    const item = this.items[index];
+  removeItem(index: number): void {
+    const item = this._items()[index];
     if (!item?.product.id) return;
 
     const current = this.getCurrentProduct(item.product.id);
@@ -182,14 +180,10 @@ export class CartService {
       this.productService.updateStock(item.product.id, current.stock + item.cantidad);
     }
 
-    this.items.splice(index, 1);
-    this.syncItemSnapshots();
-    this.cartSubject.next([...this.items]);
-    this.saveCart();
-    this.touchCartActivity();
+    this.commit(this._items().filter((_, i) => i !== index));
   }
 
-  increase(item: CartItem) {
+  increase(item: CartItem): void {
     if (!item.product.id) return;
 
     const current = this.getCurrentProduct(item.product.id);
@@ -198,40 +192,37 @@ export class CartService {
       return;
     }
 
-    item.cantidad++;
     this.productService.updateStock(item.product.id, current.stock - 1);
-
-    this.syncItemSnapshots();
-    this.cartSubject.next([...this.items]);
-    this.saveCart();
-    this.touchCartActivity();
+    this.commit(
+      this._items().map((i) =>
+        i.product.id === item.product.id ? { ...i, cantidad: i.cantidad + 1 } : i,
+      ),
+    );
   }
 
-  decrease(item: CartItem) {
+  decrease(item: CartItem): void {
     if (!item.product.id) return;
 
-    const index = this.items.findIndex((i) => i.product.id === item.product.id);
+    const index = this._items().findIndex((i) => i.product.id === item.product.id);
     if (index === -1) return;
 
     const current = this.getCurrentProduct(item.product.id);
     if (!current) return;
 
-    if (item.cantidad > 1) {
-      item.cantidad--;
+    if (this._items()[index].cantidad > 1) {
       this.productService.updateStock(item.product.id, current.stock + 1);
-
-      this.syncItemSnapshots();
-      this.cartSubject.next([...this.items]);
-      this.saveCart();
-      this.touchCartActivity();
+      this.commit(
+        this._items().map((i, idx) => (idx === index ? { ...i, cantidad: i.cantidad - 1 } : i)),
+      );
       return;
     }
 
     this.removeItem(index);
   }
 
-  clearCart() {
-    this.items.forEach((item) => {
+  /** Vacía el carrito devolviendo el stock al catálogo. */
+  clearCart(): void {
+    this._items().forEach((item) => {
       if (!item.product.id) return;
 
       const current = this.getCurrentProduct(item.product.id);
@@ -240,8 +231,16 @@ export class CartService {
       }
     });
 
-    this.items = [];
-    this.cartSubject.next([]);
+    this.reset();
+  }
+
+  /** Vacía el carrito sin devolver stock (la compra se concretó). */
+  finalizePurchase(): void {
+    this.reset();
+  }
+
+  private reset(): void {
+    this._items.set([]);
     this.saveCart();
 
     if (isPlatformBrowser(this.platformId)) {
@@ -249,20 +248,5 @@ export class CartService {
     }
 
     this.clearExpiryTimer();
-  }
-  finalizePurchase() {
-    this.items = [];
-    this.cartSubject.next([]);
-    this.saveCart();
-
-    if (isPlatformBrowser(this.platformId)) {
-      localStorage.removeItem(this.getActivityKey());
-    }
-
-    this.clearExpiryTimer();
-  }
-
-  getTotal() {
-    return this.items.reduce((acc, item) => acc + item.product.price * item.cantidad, 0);
   }
 }

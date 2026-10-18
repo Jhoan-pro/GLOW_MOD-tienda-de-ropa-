@@ -1,50 +1,23 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CurrencyPipe, DatePipe } from '@angular/common';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { OrderHistoryService } from '../services/order-history.service';
 import { UserService } from '../services/user.service';
 
 @Component({
   selector: 'app-admin-orders',
-  standalone: true,
-  imports: [CommonModule],
+  imports: [CurrencyPipe, DatePipe],
   templateUrl: './admin-orders.html',
   styleUrl: './admin-orders.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AdminOrders implements OnInit {
-  orders: any[] = [];
-  totalVentas: number = 0;
+export class AdminOrders {
+  private readonly orderService = inject(OrderHistoryService);
+  private readonly currentUser = inject(UserService).currentUser();
 
-  constructor(
-    private orderService: OrderHistoryService,
-    private userService: UserService,
-  ) {}
+  protected readonly orders =
+    this.currentUser?.role === 'sub-admin' && this.currentUser.id
+      ? this.orderService.getOrdersByOwner(this.currentUser.id)
+      : this.orderService.getAllOrdersForAdmin();
 
-  ngOnInit() {
-    const currentUser = this.userService.getCurrentUser();
-    const isSubAdmin = currentUser?.role === 'sub-admin';
-
-    if (isSubAdmin && currentUser?.id) {
-      this.orders = this.orderService.getOrdersByOwner(currentUser.id);
-    } else {
-      this.orders = this.orderService.getAllOrdersForAdmin();
-    }
-
-    this.calculateTotal();
-  }
-
-  calculateTotal() {
-    this.totalVentas = this.orders.reduce((acc, order) => acc + (order.total || 0), 0);
-  }
-
-  viewOrderDetails(order: any) {
-    console.log('Detalles del pedido:', order);
-  }
-
-  getStatusClass(status: string) {
-    return {
-      'status-completed': status === 'Completado',
-      'status-pending': status === 'Pendiente',
-      'status-cancelled': status === 'Cancelado',
-    };
-  }
+  protected readonly totalVentas = this.orders.reduce((acc, order) => acc + (order.total || 0), 0);
 }

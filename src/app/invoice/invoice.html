@@ -1,81 +1,89 @@
-<div *ngIf="invoice; else noData" class="invoice-container">
-  <div class="invoice-header">
-    <div class="brand">
-      <h1><span class="glows">GLOW</span>_MOD</h1>
-      <p>Factura Electrónica</p>
+@if (invoice(); as inv) {
+  <div class="invoice-container">
+    <div class="invoice-header">
+      <div class="brand">
+        <h1><span class="glows">GLOW</span>_MOD</h1>
+        <p>Factura Electrónica</p>
+      </div>
+
+      <div class="meta">
+        <p>
+          <strong>#{{ inv.invoiceNumber }}</strong>
+        </p>
+        <p>{{ inv.date | date: 'medium' }}</p>
+      </div>
     </div>
 
-    <div class="meta">
-      <p>
-        <strong>#{{ invoice.invoiceNumber }}</strong>
-      </p>
-      <p>{{ invoice.date | date: 'medium' }}</p>
+    <div class="card">
+      <h3>Datos del cliente</h3>
+      <p><strong>Nombre:</strong> {{ inv.customer.name }}</p>
+      <p><strong>Email:</strong> {{ inv.customer.email }}</p>
+      <p><strong>Teléfono:</strong> {{ inv.customer.phone }}</p>
+      <p><strong>Ciudad:</strong> {{ inv.customer.city }}</p>
+      <p><strong>Dirección:</strong> {{ inv.customer.address }}</p>
+      <p><strong>Documento:</strong> {{ inv.customer.documentId || 'N/A' }}</p>
+    </div>
+
+    <div class="card">
+      <h3>Pago</h3>
+      <p><strong>Método:</strong> {{ metodoPago() }}</p>
+
+      @if (inv.paymentDetails; as payment) {
+        @if (payment.bank) {
+          <p><strong>Banco:</strong> {{ payment.bank }}</p>
+        }
+        @if (payment.reference) {
+          <p><strong>Referencia:</strong> {{ payment.reference }}</p>
+        }
+        @if (payment.walletNumber) {
+          <p><strong>Nequi / Daviplata:</strong> {{ payment.walletNumber }}</p>
+        }
+        @if (payment.cardName) {
+          <p><strong>Tarjeta:</strong> {{ payment.cardName }}</p>
+        }
+        @if (payment.cardNumberLast4) {
+          <p><strong>Tarjeta terminada en:</strong> **** {{ payment.cardNumberLast4 }}</p>
+        }
+      }
+    </div>
+
+    <div class="card">
+      <table>
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th>Cant.</th>
+            <th>Precio</th>
+            <th>Subtotal</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          @for (item of inv.items; track $index) {
+            <tr>
+              <td>{{ item.name }}</td>
+              <td>{{ item.quantity }}</td>
+              <td>{{ item.price | currency: 'COP' }}</td>
+              <td>{{ getSubtotal(item) | currency: 'COP' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="total-box">
+      <h2>Total</h2>
+      <span>{{ total() | currency: 'COP' }}</span>
+    </div>
+
+    <div class="acciones">
+      <button class="volver" (click)="irHome()">← Volver</button>
+      <button class="print" (click)="imprimirFactura()">Imprimir</button>
     </div>
   </div>
-
-  <div class="card">
-    <h3>Datos del cliente</h3>
-    <p><strong>Nombre:</strong> {{ invoice.customer.name }}</p>
-    <p><strong>Email:</strong> {{ invoice.customer.email }}</p>
-    <p><strong>Teléfono:</strong> {{ invoice.customer.phone }}</p>
-    <p><strong>Ciudad:</strong> {{ invoice.customer.city }}</p>
-    <p><strong>Dirección:</strong> {{ invoice.customer.address }}</p>
-    <p><strong>Documento:</strong> {{ invoice.customer.documentId || 'N/A' }}</p>
-  </div>
-
-  <div class="card">
-    <h3>Pago</h3>
-    <p><strong>Método:</strong> {{ getMetodoPago() }}</p>
-
-    <ng-container *ngIf="invoice.paymentDetails as payment">
-      <p *ngIf="payment.bank"><strong>Banco:</strong> {{ payment.bank }}</p>
-      <p *ngIf="payment.reference"><strong>Referencia:</strong> {{ payment.reference }}</p>
-      <p *ngIf="payment.walletNumber">
-        <strong>Nequi / Daviplata:</strong> {{ payment.walletNumber }}
-      </p>
-      <p *ngIf="payment.cardName"><strong>Tarjeta:</strong> {{ payment.cardName }}</p>
-      <p *ngIf="payment.cardNumberLast4">
-        <strong>Tarjeta terminada en:</strong> **** {{ payment.cardNumberLast4 }}
-      </p>
-    </ng-container>
-  </div>
-
-  <div class="card">
-    <table>
-      <thead>
-        <tr>
-          <th>Producto</th>
-          <th>Cant.</th>
-          <th>Precio</th>
-          <th>Subtotal</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        <tr *ngFor="let item of invoice.items">
-          <td>{{ item.name }}</td>
-          <td>{{ item.quantity }}</td>
-          <td>{{ item.price | currency: 'COP' }}</td>
-          <td>{{ getSubtotal(item) | currency: 'COP' }}</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div class="total-box">
-    <h2>Total</h2>
-    <span>{{ getTotal() | currency: 'COP' }}</span>
-  </div>
-
-  <div class="acciones">
-    <button class="volver" (click)="irHome()">← Volver</button>
-    <button class="print" (click)="imprimirFactura()">Imprimir</button>
-  </div>
-</div>
-
-<ng-template #noData>
+} @else {
   <div class="empty">
     <h2>No hay factura disponible</h2>
     <button routerLink="/home">Ir a tienda</button>
   </div>
-</ng-template>
+}

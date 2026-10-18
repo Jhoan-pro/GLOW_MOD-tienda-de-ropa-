@@ -16,30 +16,33 @@
         <th>Productos</th>
         <th>Total</th>
         <th>Estado</th>
-
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let order of orders">
-        <td data-label="Pedido">#{{ order.invoiceNumber || 'N/A' }}</td>
-        <td data-label="Fecha">{{ order.date | date:'short' }}</td>
-        <td data-label="Cliente">{{ order.customer.email }}</td>
-        <td data-label="Productos">
-          <div *ngFor="let prod of order.items">
-            {{ prod.name }} (x{{ prod.quantity }})
-          </div>
-        </td>
-        <td data-label="Total">{{ order.total | currency }}</td>
-        <td data-label="Estado">
-          <span class="status-badge">
-            {{ order.status || 'Completado' }}
-          </span>
-        </td>
-      </tr>
+      @for (order of orders; track $index) {
+        <tr>
+          <td data-label="Pedido">#{{ order.invoiceNumber || 'N/A' }}</td>
+          <td data-label="Fecha">{{ order.date | date: 'short' }}</td>
+          <td data-label="Cliente">{{ order.customer.email }}</td>
+          <td data-label="Productos">
+            @for (prod of order.items; track $index) {
+              <div>{{ prod.name }} (x{{ prod.quantity }})</div>
+            }
+          </td>
+          <td data-label="Total">{{ order.total | currency }}</td>
+          <td data-label="Estado">
+            <span class="status-badge">
+              {{ order.status || 'Completado' }}
+            </span>
+          </td>
+        </tr>
+      }
     </tbody>
   </table>
 
-  <div *ngIf="orders.length === 0" class="empty-msg">
-    <p>No hay registros de ventas todavía.</p>
-  </div>
+  @if (orders.length === 0) {
+    <div class="empty-msg">
+      <p>No hay registros de ventas todavía.</p>
+    </div>
+  }
 </div>

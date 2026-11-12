@@ -84,7 +84,7 @@ export class RegisterUser {
     try {
       // POST /api/users — el backend valida el email duplicado (409)
       // y hashea la contraseña; ya no hace falta chequear "existe" acá.
-      await firstValueFrom(this.usersApi.create({ name, email, password, role: 'CLIENT' }));
+      await firstValueFrom(this.usersApi.create({ name, email, password }));
 
       this.successMsg.set('¡Registro exitoso!');
       setTimeout(() => this.router.navigate(['/login']), 1500);

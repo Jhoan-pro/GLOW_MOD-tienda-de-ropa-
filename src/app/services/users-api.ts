@@ -4,11 +4,11 @@ import { timeout } from 'rxjs';
 import { API_BASE_URL } from '../core/auth/api-config';
 import { CurrentUser, UserRole } from '../core/auth/auth-api';
 
+// The backend always creates a `client` and rejects/strips any role sent here.
 export interface CreateUserRequest {
   name: string;
   email: string;
   password: string;
-  role: UserRole;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -24,5 +24,12 @@ export class UsersApi {
 
   list() {
     return this.http.get<CurrentUser[]>(`${this.base}/users`).pipe(timeout(10_000));
+  }
+
+  // PATCH /api/users/:id/admin — admin only. Role and active flag.
+  updateAdmin(id: number, changes: { role?: UserRole; active?: boolean }) {
+    return this.http
+      .patch<CurrentUser>(`${this.base}/users/${id}/admin`, changes)
+      .pipe(timeout(10_000));
   }
 }

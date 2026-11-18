@@ -60,9 +60,9 @@
   </table>
 
   <div class="pager">
-    <button class="cancel" [disabled]="!hasPrev()" (click)="prevPage()">Anterior</button>
+    <button [disabled]="!hasPrev()" (click)="prevPage()">Anterior</button>
     <span>Página {{ page() + 1 }}</span>
-    <button class="cancel" [disabled]="!hasNext()" (click)="nextPage()">Siguiente</button>
+    <button [disabled]="!hasNext()" (click)="nextPage()">Siguiente</button>
   </div>
 
   @if (confirmState(); as state) {

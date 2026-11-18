@@ -1,7 +1,8 @@
 import { inject, Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { timeout } from 'rxjs';
 import { API_BASE_URL } from '../core/auth/api-config';
+import { ListParams, toHttpParams } from './list-params';
 
 export interface ApiProduct {
   id: number;
@@ -29,10 +30,12 @@ export class ProductsApi {
   private readonly base = inject(API_BASE_URL);
 
   // GET /api/products[?ownerId=]
-  list(ownerId?: number) {
-    let params = new HttpParams();
-    if (ownerId !== undefined) params = params.set('ownerId', ownerId);
-    return this.http.get<ApiProduct[]>(`${this.base}/products`, { params }).pipe(timeout(10_000));
+  list(ownerId?: number, params?: ListParams) {
+    let httpParams = toHttpParams(params);
+    if (ownerId !== undefined) httpParams = httpParams.set('ownerId', ownerId);
+    return this.http
+      .get<ApiProduct[]>(`${this.base}/products`, { params: httpParams })
+      .pipe(timeout(10_000));
   }
 
   // POST /api/products — admin/sub-admin. `ownerId` lo deriva el servidor.

@@ -7,6 +7,16 @@
     </div>
   </div>
 
+  <div class="list-toolbar">
+    <input
+      class="list-search"
+      type="search"
+      placeholder="Buscar por pedido, fecha o cliente..."
+      [value]="search()"
+      (input)="setSearch($event)"
+    />
+  </div>
+
   <table class="products-table">
     <thead>
       <tr>
@@ -49,6 +59,12 @@
       }
     </tbody>
   </table>
+
+  <div class="pager">
+    <button [disabled]="!hasPrev()" (click)="prevPage()">Anterior</button>
+    <span>Página {{ page() + 1 }}</span>
+    <button [disabled]="!hasNext()" (click)="nextPage()">Siguiente</button>
+  </div>
 
   @if (orders().length === 0) {
     <div class="empty-msg">

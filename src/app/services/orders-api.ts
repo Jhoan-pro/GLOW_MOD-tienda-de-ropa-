@@ -2,6 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { timeout } from 'rxjs';
 import { API_BASE_URL } from '../core/auth/api-config';
+import { ListParams, toHttpParams } from './list-params';
 
 export type ApiPaymentMethod = 'card' | 'transfer' | 'wallet';
 export type ApiOrderStatus = 'PENDING' | 'PAID' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';
@@ -68,8 +69,10 @@ export class OrdersApi {
     return this.http.post<ApiOrder>(`${this.base}/orders`, order).pipe(timeout(15_000));
   }
 
-  list() {
-    return this.http.get<ApiOrder[]>(`${this.base}/orders`).pipe(timeout(10_000));
+  list(params?: ListParams) {
+    return this.http
+      .get<ApiOrder[]>(`${this.base}/orders`, { params: toHttpParams(params) })
+      .pipe(timeout(10_000));
   }
 
   findOne(id: number) {

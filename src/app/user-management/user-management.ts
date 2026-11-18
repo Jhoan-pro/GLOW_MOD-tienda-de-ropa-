@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, PLATFORM_ID, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, PLATFORM_ID, computed, inject, signal } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { firstValueFrom } from 'rxjs';
@@ -46,6 +46,11 @@ export class UserManagement {
 
   protected readonly users = signal<User[]>([]);
   protected readonly roleLabels = ROLE_LABELS;
+  protected readonly search = signal('');
+  protected readonly page = signal(0);
+  protected readonly pageSize = 10;
+  protected readonly hasPrev = computed(() => this.page() > 0);
+  protected readonly hasNext = computed(() => this.users().length === this.pageSize);
 
   /** Usuario que se está editando; `null` = modal cerrado. */
   protected readonly editingUser = signal<User | null>(null);
@@ -57,11 +62,35 @@ export class UserManagement {
 
   private async loadUsers(): Promise<void> {
     try {
-      const list = await firstValueFrom(this.usersApi.list());
+      const list = await firstValueFrom(
+        this.usersApi.list({
+          search: this.search(),
+          skip: this.page() * this.pageSize,
+          take: this.pageSize,
+        }),
+      );
       this.users.set(list.map(toUserModel));
     } catch (error) {
       console.error('No se pudieron cargar usuarios', error);
     }
+  }
+
+  protected setSearch(event: Event): void {
+    this.search.set((event.target as HTMLInputElement).value);
+    this.page.set(0);
+    void this.loadUsers();
+  }
+
+  protected prevPage(): void {
+    if (!this.hasPrev()) return;
+    this.page.update((page) => page - 1);
+    void this.loadUsers();
+  }
+
+  protected nextPage(): void {
+    if (!this.hasNext()) return;
+    this.page.update((page) => page + 1);
+    void this.loadUsers();
   }
 
   protected async toggleStatus(user: User): Promise<void> {

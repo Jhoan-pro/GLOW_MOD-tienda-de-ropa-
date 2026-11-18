@@ -16,6 +16,15 @@
 
       @if (mostrarFiltros()) {
         <div class="filtros-panel">
+          <h4>Buscar productos</h4>
+          <input
+            class="catalog-search-input"
+            type="search"
+            placeholder="Nombre o categoría..."
+            [value]="catalogSearch.query()"
+            (input)="setSearch($event)"
+          />
+
           <h4>Categorías</h4>
 
           <button class="filtro-item" (click)="selectCategory('Todos')">Todos</button>

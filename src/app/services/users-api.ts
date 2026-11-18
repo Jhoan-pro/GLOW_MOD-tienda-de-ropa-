@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { timeout } from 'rxjs';
 import { API_BASE_URL } from '../core/auth/api-config';
 import { CurrentUser, UserRole } from '../core/auth/auth-api';
+import { ListParams, toHttpParams } from './list-params';
 
 // The backend always creates a `client` and rejects/strips any role sent here.
 export interface CreateUserRequest {
@@ -43,8 +44,10 @@ export class UsersApi {
     return this.http.post<CurrentUser>(`${this.base}/users`, user).pipe(timeout(10_000));
   }
 
-  list() {
-    return this.http.get<CurrentUser[]>(`${this.base}/users`).pipe(timeout(10_000));
+  list(params?: ListParams) {
+    return this.http
+      .get<CurrentUser[]>(`${this.base}/users`, { params: toHttpParams(params) })
+      .pipe(timeout(10_000));
   }
 
   // GET /api/users/:id — el propio usuario o un admin.

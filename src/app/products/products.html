@@ -3,6 +3,14 @@
     <h2>Productos</h2>
 
     <div>
+      <input
+        class="list-search"
+        type="search"
+        placeholder="Buscar producto..."
+        [value]="search()"
+        (input)="setSearch($event)"
+      />
+
       <div class="actions">
         <button class="add-btn" (click)="openCreate()">Agregar producto</button>
         <button class="deleteSelected-btn" (click)="deleteSelected()">
@@ -50,6 +58,12 @@
       }
     </tbody>
   </table>
+
+  <div class="pager">
+    <button class="cancel" [disabled]="!hasPrev()" (click)="prevPage()">Anterior</button>
+    <span>Página {{ page() + 1 }}</span>
+    <button class="cancel" [disabled]="!hasNext()" (click)="nextPage()">Siguiente</button>
+  </div>
 
   @if (confirmState(); as state) {
     <div class="modal">

@@ -143,6 +143,18 @@
   font-weight: 800;
 }
 
+.catalog-search-input {
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 12px;
+  padding: 9px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(15, 23, 42, 0.85);
+  color: #e2e8f0;
+  font-size: 14px;
+}
+
 /* BOTONES DE FILTRO */
 .filtro-item {
   width: 100%;

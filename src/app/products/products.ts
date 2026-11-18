@@ -62,6 +62,11 @@ export class Products {
 
   /** Sub-admin ve solo sus productos; el admin principal ve todos. */
   protected readonly products = signal<Product[]>([]);
+  protected readonly search = signal('');
+  protected readonly page = signal(0);
+  protected readonly pageSize = 10;
+  protected readonly hasPrev = computed(() => this.page() > 0);
+  protected readonly hasNext = computed(() => this.products().length === this.pageSize);
 
   // Selección
   private readonly selectedIds = signal<ReadonlySet<number>>(new Set());
@@ -84,11 +89,35 @@ export class Products {
   private async loadProducts(): Promise<void> {
     try {
       const ownerId = this.isSubAdmin() ? this.session.user()?.id : undefined;
-      const list = await firstValueFrom(this.productsApi.list(ownerId));
+      const list = await firstValueFrom(
+        this.productsApi.list(ownerId, {
+          search: this.search(),
+          skip: this.page() * this.pageSize,
+          take: this.pageSize,
+        }),
+      );
       this.products.set(list.map(toProduct));
     } catch (error) {
       console.error('No se pudieron cargar los productos', error);
     }
+  }
+
+  protected setSearch(event: Event): void {
+    this.search.set((event.target as HTMLInputElement).value);
+    this.page.set(0);
+    void this.loadProducts();
+  }
+
+  protected prevPage(): void {
+    if (!this.hasPrev()) return;
+    this.page.update((page) => page - 1);
+    void this.loadProducts();
+  }
+
+  protected nextPage(): void {
+    if (!this.hasNext()) return;
+    this.page.update((page) => page + 1);
+    void this.loadProducts();
   }
 
   protected isSelected(product: Product): boolean {

@@ -38,6 +38,11 @@ export class AdminOrders implements OnInit {
     () => (this.session.user()?.role ?? '').toLowerCase() === 'admin',
   );
   protected readonly orders = signal<ApiOrder[]>([]);
+  protected readonly search = signal('');
+  protected readonly page = signal(0);
+  protected readonly pageSize = 10;
+  protected readonly hasPrev = computed(() => this.page() > 0);
+  protected readonly hasNext = computed(() => this.orders().length === this.pageSize);
   protected readonly totalVentas = computed(() =>
     this.orders()
       .filter((order) => order.status !== 'CANCELLED')
@@ -66,9 +71,35 @@ export class AdminOrders implements OnInit {
     }
   }
 
+  protected setSearch(event: Event): void {
+    this.search.set((event.target as HTMLInputElement).value);
+    this.page.set(0);
+    void this.loadOrders();
+  }
+
+  protected prevPage(): void {
+    if (!this.hasPrev()) return;
+    this.page.update((page) => page - 1);
+    void this.loadOrders();
+  }
+
+  protected nextPage(): void {
+    if (!this.hasNext()) return;
+    this.page.update((page) => page + 1);
+    void this.loadOrders();
+  }
+
   private async loadOrders(): Promise<void> {
     try {
-      this.orders.set(await firstValueFrom(this.ordersApi.list()));
+      this.orders.set(
+        await firstValueFrom(
+          this.ordersApi.list({
+            search: this.search(),
+            skip: this.page() * this.pageSize,
+            take: this.pageSize,
+          }),
+        ),
+      );
     } catch (error) {
       console.error('No se pudieron cargar los pedidos', error);
     }

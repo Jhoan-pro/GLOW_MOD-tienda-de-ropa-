@@ -11,6 +11,7 @@ import { Router, RouterLink } from '@angular/router';
 import { Home } from '../home/home';
 import { CartItem, CartService } from '../services/cart.service';
 import { AuthSession } from '../core/auth/auth-session';
+import { CatalogSearch } from '../services/catalog-search';
 
 function slugify(text: string): string {
   return text
@@ -38,6 +39,7 @@ export class Navbar {
   private readonly document = inject(DOCUMENT);
   private readonly cartService = inject(CartService);
   private readonly authSession = inject(AuthSession);
+  protected readonly catalogSearch = inject(CatalogSearch);
 
   protected readonly items = this.cartService.items;
   protected readonly cantidadTotal = this.cartService.count;
@@ -126,6 +128,11 @@ export class Navbar {
 
   protected vaciar(): void {
     this.cartService.clearCart();
+  }
+
+  protected setSearch(event: Event): void {
+    this.catalogSearch.query.set((event.target as HTMLInputElement).value);
+    this.mostrarFiltros.set(false);
   }
 
   protected selectCategory(category: string): void {

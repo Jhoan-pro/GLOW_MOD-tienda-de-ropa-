@@ -11,6 +11,27 @@ export interface CreateUserRequest {
   password: string;
 }
 
+export interface ApiUserProfile extends CurrentUser {
+  fullName?: string | null;
+  phone?: string | null;
+  city?: string | null;
+  address?: string | null;
+  birthDate?: string | null;
+  idNumber?: string | null;
+  country?: string | null;
+}
+
+export interface UpdateProfileRequest {
+  name?: string;
+  fullName?: string;
+  phone?: string;
+  city?: string;
+  address?: string;
+  birthDate?: string;
+  idNumber?: string;
+  country?: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class UsersApi {
   private readonly http = inject(HttpClient);
@@ -24,6 +45,18 @@ export class UsersApi {
 
   list() {
     return this.http.get<CurrentUser[]>(`${this.base}/users`).pipe(timeout(10_000));
+  }
+
+  // GET /api/users/:id — el propio usuario o un admin.
+  findOne(id: number) {
+    return this.http.get<ApiUserProfile>(`${this.base}/users/${id}`).pipe(timeout(10_000));
+  }
+
+  // PATCH /api/users/:id — el propio usuario o un admin.
+  updateProfile(id: number, changes: UpdateProfileRequest) {
+    return this.http
+      .patch<ApiUserProfile>(`${this.base}/users/${id}`, changes)
+      .pipe(timeout(10_000));
   }
 
   // PATCH /api/users/:id/admin — admin only. Role and active flag.

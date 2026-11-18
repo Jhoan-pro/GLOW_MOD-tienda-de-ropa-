@@ -78,9 +78,15 @@
       <span class="error">{{ errors().country }}</span>
     }
 
+    @if (saveError()) {
+      <span class="error">{{ saveError() }}</span>
+    }
+
     <div class="actions">
       @if (editMode()) {
-        <button (click)="save()">Guardar</button>
+        <button [disabled]="saving()" (click)="save()">
+          {{ saving() ? 'Guardando...' : 'Guardar' }}
+        </button>
       } @else if (hasExtraInfo()) {
         <button (click)="enableEdit()">Editar</button>
       } @else {

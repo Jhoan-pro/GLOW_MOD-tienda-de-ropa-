@@ -1,9 +1,11 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
 import { User } from '../models/user.model';
-import { UserService } from '../services/user.service';
+import { ApiUserProfile, UpdateProfileRequest, UsersApi } from '../services/users-api';
 import { AuthSession } from '../core/auth/auth-session';
+import { apiErrorMessage } from '../core/auth/api-error';
 
 type ErrorKeys = 'address' | 'birthDate' | 'idNumber' | 'country';
 type ProfileErrors = Partial<Record<ErrorKeys, string>>;
@@ -47,6 +49,23 @@ const EMPTY_USER: User = {
   city: '',
 };
 
+function toUser(profile: ApiUserProfile): User {
+  return {
+    id: profile.id,
+    name: profile.name,
+    email: profile.email,
+    role: profile.role.toLowerCase() as User['role'],
+    active: profile.active,
+    fullName: profile.fullName ?? '',
+    phone: profile.phone ?? '',
+    city: profile.city ?? '',
+    address: profile.address ?? '',
+    birthDate: profile.birthDate ? profile.birthDate.slice(0, 10) : '',
+    idNumber: profile.idNumber ?? '',
+    country: profile.country ?? '',
+  };
+}
+
 @Component({
   selector: 'app-user-profile',
   imports: [FormsModule],
@@ -55,8 +74,8 @@ const EMPTY_USER: User = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UserProfile implements OnInit {
-  private readonly userService = inject(UserService);
   private readonly session = inject(AuthSession);
+  private readonly usersApi = inject(UsersApi);
   private readonly router = inject(Router);
 
   protected readonly countries = COUNTRIES;
@@ -65,6 +84,8 @@ export class UserProfile implements OnInit {
   protected readonly editMode = signal(false);
   protected readonly submitted = signal(false);
   protected readonly errors = signal<ProfileErrors>({});
+  protected readonly saveError = signal('');
+  protected readonly saving = signal(false);
 
   protected readonly hasExtraInfo = computed(() => {
     const { address, birthDate, idNumber, country } = this.user();
@@ -89,22 +110,12 @@ export class UserProfile implements OnInit {
       active: current.active,
     };
 
-    const savedUser = this.userService
-      .users()
-      .find((u) => u.email.toLowerCase() === current.email.toLowerCase() || u.id === current.id);
-
-    this.user.set(
-      savedUser
-        ? {
-            ...savedUser,
-            id: current.id,
-            name: current.name,
-            email: current.email,
-            role: base.role,
-            active: current.active,
-          }
-        : base,
-    );
+    try {
+      const profile = await firstValueFrom(this.usersApi.findOne(current.id));
+      this.user.set(toUser(profile));
+    } catch {
+      this.user.set(base);
+    }
   }
 
   protected patch<K extends keyof User>(key: K, value: User[K]): void {
@@ -185,30 +196,37 @@ export class UserProfile implements OnInit {
     return Object.keys(errors).length === 0;
   }
 
-  protected save(): void {
+  protected async save(): Promise<void> {
     this.submitted.set(true);
     if (!this.validarFormulario()) return;
 
-    const user: User = {
-      ...this.user(),
-      address: this.user().address?.trim(),
-      country: this.user().country?.trim(),
-      phone: this.user().phone?.trim(),
-      city: this.user().city?.trim(),
+    const current = this.user();
+    const id = this.session.user()?.id ?? current.id;
+    if (!id) return;
+
+    const changes: UpdateProfileRequest = {
+      name: current.name,
+      fullName: current.fullName?.trim() || undefined,
+      phone: current.phone?.trim() || undefined,
+      city: current.city?.trim() || undefined,
+      address: current.address?.trim(),
+      birthDate: current.birthDate,
+      idNumber: current.idNumber?.trim(),
+      country: current.country?.trim(),
     };
 
-    const currentId = this.session.user()?.id;
-    if (currentId) user.id = currentId;
+    this.saving.set(true);
+    this.saveError.set('');
 
-    this.user.set(user);
-    const users = this.userService.users();
-    const exists = users.some((u) => u.email.toLowerCase() === user.email.toLowerCase());
-    if (exists) {
-      this.userService.updateUserProfile(user);
-    } else {
-      this.userService.setUsers([...users, user]);
+    try {
+      const profile = await firstValueFrom(this.usersApi.updateProfile(id, changes));
+      this.user.set(toUser(profile));
+      this.editMode.set(false);
+    } catch (error) {
+      this.saveError.set(apiErrorMessage(error, 'users'));
+    } finally {
+      this.saving.set(false);
     }
-    this.editMode.set(false);
   }
 
   protected volver(): void {

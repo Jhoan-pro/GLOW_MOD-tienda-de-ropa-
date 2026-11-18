@@ -50,7 +50,7 @@ export class UserManagement {
   protected readonly page = signal(0);
   protected readonly pageSize = 10;
   protected readonly hasPrev = computed(() => this.page() > 0);
-  protected readonly hasNext = computed(() => this.users().length === this.pageSize);
+  protected readonly hasNext = signal(false);
 
   /** Usuario que se está editando; `null` = modal cerrado. */
   protected readonly editingUser = signal<User | null>(null);
@@ -66,10 +66,11 @@ export class UserManagement {
         this.usersApi.list({
           search: this.search(),
           skip: this.page() * this.pageSize,
-          take: this.pageSize,
+          take: this.pageSize + 1,
         }),
       );
-      this.users.set(list.map(toUserModel));
+      this.hasNext.set(list.length > this.pageSize);
+      this.users.set(list.slice(0, this.pageSize).map(toUserModel));
     } catch (error) {
       console.error('No se pudieron cargar usuarios', error);
     }

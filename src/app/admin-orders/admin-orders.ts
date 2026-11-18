@@ -42,7 +42,7 @@ export class AdminOrders implements OnInit {
   protected readonly page = signal(0);
   protected readonly pageSize = 10;
   protected readonly hasPrev = computed(() => this.page() > 0);
-  protected readonly hasNext = computed(() => this.orders().length === this.pageSize);
+  protected readonly hasNext = signal(false);
   protected readonly totalVentas = computed(() =>
     this.orders()
       .filter((order) => order.status !== 'CANCELLED')
@@ -91,15 +91,15 @@ export class AdminOrders implements OnInit {
 
   private async loadOrders(): Promise<void> {
     try {
-      this.orders.set(
-        await firstValueFrom(
-          this.ordersApi.list({
-            search: this.search(),
-            skip: this.page() * this.pageSize,
-            take: this.pageSize,
-          }),
-        ),
+      const result = await firstValueFrom(
+        this.ordersApi.list({
+          search: this.search(),
+          skip: this.page() * this.pageSize,
+          take: this.pageSize + 1,
+        }),
       );
+      this.hasNext.set(result.length > this.pageSize);
+      this.orders.set(result.slice(0, this.pageSize));
     } catch (error) {
       console.error('No se pudieron cargar los pedidos', error);
     }

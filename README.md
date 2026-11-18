@@ -57,3 +57,17 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+
+## Despliegue con Docker
+
+La imagen compila Angular y sirve el resultado con Nginx:
+
+```bash
+docker build -t glow-frontend .
+docker run --rm -p 8080:8080 -e PORT=8080 glow-frontend
+# http://localhost:8080 y recargar una ruta interna no debe dar 404
+```
+
+Antes de compilar para producción, reemplazá la URL de ejemplo en
+`src/environments/environment.prod.ts` por la URL pública del backend en Railway.
+La configuración `production` de `angular.json` usa ese archivo automáticamente.

@@ -20,11 +20,11 @@ describe('InvoiceComponent', () => {
   });
 
   it('debería calcular el total correctamente', () => {
-    expect(component.getTotal()).toBe(180000);
+    expect((component as any).total()).toBe(180000);
   });
 
   it('debería calcular subtotal correctamente', () => {
-    const item = { name: 'Test', quantity: 2, price: 10000 };
-    expect(component.getSubtotal(item)).toBe(20000);
+    const item = { name: 'Test', quantity: 2, price: 10000, ownerId: null };
+    expect((component as any).getSubtotal(item)).toBe(20000);
   });
 });

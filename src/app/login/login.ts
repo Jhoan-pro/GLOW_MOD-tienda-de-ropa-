@@ -76,7 +76,7 @@ export class Login {
         return;
       }
 
-      this.cartService.loadCart();
+      void this.cartService.loadCart();
       this.redirectByRole(this.session.user()?.role);
     } catch (error) {
       // Acá cae el 401 real del backend (credenciales inválidas),

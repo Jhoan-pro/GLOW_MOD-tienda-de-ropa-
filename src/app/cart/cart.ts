@@ -1,14 +1,17 @@
 import { isPlatformBrowser } from '@angular/common';
 import { PLATFORM_ID, inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
+import { AuthSession } from '../core/auth/auth-session';
 import { CartService } from '../services/cart.service';
 
-export const cartGuard: CanActivateFn = () => {
+export const cartGuard: CanActivateFn = async () => {
   const cartService = inject(CartService);
+  const session = inject(AuthSession);
   const router = inject(Router);
   const isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
-  cartService.loadCart();
+  await session.hydrate();
+  await cartService.loadCart();
 
   if (cartService.items().length > 0) {
     return true;

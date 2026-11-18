@@ -1,11 +1,31 @@
 import { isPlatformBrowser } from '@angular/common';
 import { Injectable, PLATFORM_ID, computed, inject, signal } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
 import { Product } from '../models/product.model';
 import { AuthSession } from '../core/auth/auth-session';
+import { CartApi, ApiCartItem } from './cart-api';
+import { ApiProduct } from './products-api';
 
 export interface CartItem {
   product: Product;
   cantidad: number;
+}
+
+function toProduct(p: ApiProduct): Product {
+  return {
+    id: p.id,
+    ownerId: p.ownerId ?? undefined,
+    name: p.name,
+    price: p.price,
+    stock: p.stock,
+    category: p.category,
+    description: p.description,
+    image: p.image ?? undefined,
+  };
+}
+
+function toCartItem(item: ApiCartItem): CartItem {
+  return { product: toProduct(item.product), cantidad: item.cantidad };
 }
 
 @Injectable({
@@ -14,9 +34,7 @@ export interface CartItem {
 export class CartService {
   private readonly platformId = inject(PLATFORM_ID);
   private readonly session = inject(AuthSession);
-
-  private readonly CART_TTL_MS = 30 * 60 * 1000; // 30 minutos
-  private expiryTimer: ReturnType<typeof setTimeout> | null = null;
+  private readonly cartApi = inject(CartApi);
 
   private readonly _items = signal<CartItem[]>([]);
 
@@ -29,102 +47,25 @@ export class CartService {
     this._items().reduce((acc, item) => acc + item.product.price * item.cantidad, 0),
   );
 
-  constructor() {
-    if (isPlatformBrowser(this.platformId)) {
-      window.addEventListener('storage', (event: StorageEvent) => {
-        if (event.key === this.getCartKey() || event.key === this.getActivityKey()) {
-          this.loadCart();
-        }
-      });
-    }
+  private get canSync(): boolean {
+    return isPlatformBrowser(this.platformId) && this.session.authenticated();
   }
 
-  private getCartKey(): string {
-    const user = this.session.user();
-    const userKey = user?.id ?? user?.email ?? 'guest';
-    return `cart_${userKey}`;
-  }
-
-  private getActivityKey(): string {
-    return `${this.getCartKey()}_last_activity`;
-  }
-
-  /** Publica el nuevo estado, lo persiste y reinicia el contador de inactividad. */
-  private commit(items: CartItem[]): void {
-    this._items.set(items);
-    this.saveCart();
-    this.touchCartActivity();
-  }
-
-  private saveCart(): void {
+  /** Carga el carrito del usuario desde el backend. */
+  async loadCart(): Promise<void> {
     if (!isPlatformBrowser(this.platformId)) return;
 
-    localStorage.setItem(this.getCartKey(), JSON.stringify(this._items()));
-  }
-
-  private clearExpiryTimer(): void {
-    if (this.expiryTimer) {
-      clearTimeout(this.expiryTimer);
-      this.expiryTimer = null;
-    }
-  }
-
-  private touchCartActivity(): void {
-    if (!isPlatformBrowser(this.platformId)) return;
-
-    localStorage.setItem(this.getActivityKey(), Date.now().toString());
-    this.scheduleExpiry();
-  }
-
-  private scheduleExpiry(): void {
-    if (!isPlatformBrowser(this.platformId)) return;
-
-    this.clearExpiryTimer();
-
-    if (this._items().length === 0) {
-      localStorage.removeItem(this.getActivityKey());
+    if (!this.session.authenticated()) {
+      this._items.set([]);
       return;
     }
 
-    const lastActivityRaw = localStorage.getItem(this.getActivityKey());
-    const lastActivity = lastActivityRaw ? Number(lastActivityRaw) : Date.now();
-    const elapsed = Date.now() - lastActivity;
-    const remaining = this.CART_TTL_MS - elapsed;
-
-    if (remaining <= 0) {
-      this.expireCart();
-      return;
+    try {
+      const cart = await firstValueFrom(this.cartApi.get());
+      this._items.set(cart.items.map(toCartItem));
+    } catch {
+      /* Sin conexión: se conserva el estado actual. */
     }
-
-    this.expiryTimer = setTimeout(() => this.expireCart(), remaining);
-  }
-
-  // El stock lo gestiona el backend al crear la orden; aquí solo se vacía el carrito.
-  private expireCart(): void {
-    if (!isPlatformBrowser(this.platformId)) return;
-    if (this._items().length === 0) return;
-
-    this._items.set([]);
-    this.saveCart();
-    localStorage.removeItem(this.getActivityKey());
-    this.clearExpiryTimer();
-
-    alert('Tu carrito expiró por inactividad.');
-  }
-
-  loadCart(): void {
-    if (!isPlatformBrowser(this.platformId)) return;
-
-    const data = localStorage.getItem(this.getCartKey());
-    const stored: CartItem[] = data ? (JSON.parse(data) as CartItem[]) : [];
-
-    this._items.set(stored);
-
-    if (stored.length > 0 && !localStorage.getItem(this.getActivityKey())) {
-      localStorage.setItem(this.getActivityKey(), Date.now().toString());
-    }
-
-    this.scheduleExpiry();
   }
 
   addToCart(product: Product): boolean {
@@ -143,18 +84,25 @@ export class CartService {
       return false;
     }
 
+    const cantidad = existing ? existing.cantidad + 1 : 1;
     const next = existing
       ? items.map((item) =>
-          item.product.id === product.id ? { ...item, cantidad: item.cantidad + 1 } : item,
+          item.product.id === product.id ? { ...item, cantidad } : item,
         )
-      : [...items, { product: { ...product }, cantidad: 1 }];
+      : [...items, { product: { ...product }, cantidad }];
 
-    this.commit(next);
+    this._items.set(next);
+    void this.pushItem(product.id, cantidad);
     return true;
   }
 
   removeItem(index: number): void {
-    this.commit(this._items().filter((_, i) => i !== index));
+    const item = this._items()[index];
+    if (!item) return;
+
+    this._items.set(this._items().filter((_, i) => i !== index));
+
+    if (item.product.id) void this.removeOnServer(item.product.id);
   }
 
   increase(item: CartItem): void {
@@ -165,11 +113,14 @@ export class CartService {
       return;
     }
 
-    this.commit(
+    const cantidad = item.cantidad + 1;
+    this._items.set(
       this._items().map((i) =>
-        i.product.id === item.product.id ? { ...i, cantidad: i.cantidad + 1 } : i,
+        i.product.id === item.product.id ? { ...i, cantidad } : i,
       ),
     );
+
+    void this.pushItem(item.product.id, cantidad);
   }
 
   decrease(item: CartItem): void {
@@ -179,33 +130,52 @@ export class CartService {
     if (index === -1) return;
 
     if (this._items()[index].cantidad > 1) {
-      this.commit(
-        this._items().map((i, idx) => (idx === index ? { ...i, cantidad: i.cantidad - 1 } : i)),
+      const cantidad = this._items()[index].cantidad - 1;
+      this._items.set(
+        this._items().map((i, idx) => (idx === index ? { ...i, cantidad } : i)),
       );
+      void this.pushItem(item.product.id, cantidad);
       return;
     }
 
     this.removeItem(index);
   }
 
-  /** Vacía el carrito. El stock ya lo controla el backend. */
+  /** Vacía el carrito del usuario (también en el backend). */
   clearCart(): void {
-    this.reset();
-  }
-
-  /** Vacía el carrito sin devolver stock (la compra se concretó). */
-  finalizePurchase(): void {
-    this.reset();
-  }
-
-  private reset(): void {
     this._items.set([]);
-    this.saveCart();
+    if (!this.canSync) return;
 
-    if (isPlatformBrowser(this.platformId)) {
-      localStorage.removeItem(this.getActivityKey());
+    void firstValueFrom(this.cartApi.clear()).catch(() => undefined);
+  }
+
+  /** Vacía solo el carrito en memoria (logout o compra ya registrada). */
+  finalizePurchase(): void {
+    this._items.set([]);
+  }
+
+  /** Limpia el estado local sin tocar el carrito guardado en el backend. */
+  resetLocal(): void {
+    this._items.set([]);
+  }
+
+  private async pushItem(productId: number, cantidad: number): Promise<void> {
+    if (!this.canSync) return;
+
+    try {
+      await firstValueFrom(this.cartApi.upsert(productId, cantidad));
+    } catch {
+      await this.loadCart();
     }
+  }
 
-    this.clearExpiryTimer();
+  private async removeOnServer(productId: number): Promise<void> {
+    if (!this.canSync) return;
+
+    try {
+      await firstValueFrom(this.cartApi.remove(productId));
+    } catch {
+      await this.loadCart();
+    }
   }
 }

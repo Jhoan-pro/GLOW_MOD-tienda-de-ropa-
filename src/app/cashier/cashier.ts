@@ -91,7 +91,7 @@ export class Cashier {
   protected readonly alertType = signal<'success' | 'error'>('success');
 
   constructor() {
-    this.cartService.loadCart();
+    void this.cartService.loadCart();
     this.prefillFromUser();
     this.restoreDraft();
   }

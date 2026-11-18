@@ -51,7 +51,7 @@ export class Navbar {
   protected readonly carritoAbierto = signal(false);
 
   constructor() {
-    this.cartService.loadCart();
+    void this.cartService.loadCart();
   }
 
   protected toggleFiltros(): void {
@@ -91,7 +91,7 @@ export class Navbar {
 
   protected confirmarLogout(): void {
     this.authSession.clear();
-    this.cartService.clearCart();
+    this.cartService.resetLocal();
     this.mostrarConfirmLogout.set(false);
     this.router.navigate(['/login']);
   }

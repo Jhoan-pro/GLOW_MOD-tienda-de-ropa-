@@ -13,6 +13,13 @@ describe('ProductForm', () => {
     .compileComponents();
 
     fixture = TestBed.createComponent(ProductForm);
+    fixture.componentRef.setInput('product', {
+      name: '',
+      price: 0,
+      stock: 0,
+      category: '',
+      description: '',
+    });
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

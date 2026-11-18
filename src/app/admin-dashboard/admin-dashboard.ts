@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { UserService } from '../services/user.service';
+import { AuthSession } from '../core/auth/auth-session';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -11,16 +11,16 @@ import { UserService } from '../services/user.service';
 })
 export class AdminDashboard {
   private readonly router = inject(Router);
-  private readonly userService = inject(UserService);
+  private readonly session = inject(AuthSession);
 
   protected readonly sidebarOpen = signal(false);
   protected readonly mostrarConfirmLogout = signal(false);
 
   protected readonly isSubAdmin = computed(
-    () => this.userService.currentUser()?.role === 'sub-admin',
+    () => (this.session.user()?.role ?? '').toLowerCase() === 'sub-admin',
   );
   protected readonly currentUserName = computed(
-    () => this.userService.currentUser()?.name || 'Administrador',
+    () => this.session.user()?.name || 'Administrador',
   );
 
   protected logout(): void {
@@ -28,7 +28,7 @@ export class AdminDashboard {
   }
 
   protected confirmarLogout(): void {
-    this.userService.logout();
+    this.session.clear();
     this.mostrarConfirmLogout.set(false);
     this.router.navigate(['/login']);
   }

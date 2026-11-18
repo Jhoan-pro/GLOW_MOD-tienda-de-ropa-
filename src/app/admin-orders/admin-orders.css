@@ -68,6 +68,16 @@
   text-transform: uppercase;
 }
 
+.status-select {
+  background-color: #1e293b;
+  color: #e2e8f0;
+  border: 1px solid #475569;
+  border-radius: 8px;
+  padding: 6px 8px;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
 .empty-msg {
   text-align: center;
   padding: 3rem;

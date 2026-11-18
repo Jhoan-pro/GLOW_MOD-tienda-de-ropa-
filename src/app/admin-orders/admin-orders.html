@@ -31,7 +31,19 @@
           </td>
           <td data-label="Total">{{ order.total | currency }}</td>
           <td data-label="Estado">
-            <span class="status-badge">Completado</span>
+            @if (isAdmin()) {
+              <select
+                class="status-select"
+                [value]="order.status"
+                (change)="cambiarEstado(order, $event)"
+              >
+                @for (estado of estados; track estado.value) {
+                  <option [value]="estado.value">{{ estado.label }}</option>
+                }
+              </select>
+            } @else {
+              <span class="status-badge">{{ estadoLabel(order.status) }}</span>
+            }
           </td>
         </tr>
       }

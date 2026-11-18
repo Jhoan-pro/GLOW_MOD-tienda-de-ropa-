@@ -104,7 +104,11 @@ export class Admin implements OnInit {
   private async loadOrders(): Promise<void> {
     try {
       const orders = await firstValueFrom(this.ordersApi.list());
-      this.totalRecaudo.set(orders.reduce((acc, order) => acc + (order.total || 0), 0));
+      this.totalRecaudo.set(
+        orders
+          .filter((order) => order.status !== 'CANCELLED')
+          .reduce((acc, order) => acc + (order.total || 0), 0),
+      );
       this.ventasSemana.set(buildSalesByDay(orders));
     } catch (error) {
       console.error('No se pudo calcular el recaudo', error);

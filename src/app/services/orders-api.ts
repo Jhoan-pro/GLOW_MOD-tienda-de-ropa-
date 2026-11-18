@@ -4,6 +4,7 @@ import { timeout } from 'rxjs';
 import { API_BASE_URL } from '../core/auth/api-config';
 
 export type ApiPaymentMethod = 'card' | 'transfer' | 'wallet';
+export type ApiOrderStatus = 'PENDING' | 'PAID' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';
 
 /**
  * Mirrors CreateOrderDto on the backend.
@@ -50,6 +51,7 @@ export interface ApiOrder {
   customerCity: string;
   customerDocumentId: string;
   notes: string | null;
+  status: ApiOrderStatus;
   cashierId: number;
   paymentMethod: string;
   total: number;
@@ -74,9 +76,9 @@ export class OrdersApi {
     return this.http.get<ApiOrder>(`${this.base}/orders/${id}`).pipe(timeout(10_000));
   }
 
-  // Only an admin may patch (notes only) or delete.
-  updateNotes(id: number, notes: string) {
-    return this.http.patch<ApiOrder>(`${this.base}/orders/${id}`, { notes }).pipe(timeout(10_000));
+  // Only an admin may patch (notes/status) or delete.
+  update(id: number, changes: { notes?: string; status?: ApiOrderStatus }) {
+    return this.http.patch<ApiOrder>(`${this.base}/orders/${id}`, changes).pipe(timeout(10_000));
   }
 
   remove(id: number) {

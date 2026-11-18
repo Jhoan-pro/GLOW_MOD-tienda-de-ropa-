@@ -36,11 +36,87 @@
 }
 
 .charts-area {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
     margin-top: 2rem;
+}
+
+.chart-card {
+    background-color: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.chart-title {
+    color: #ffffff;
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+}
+
+.bar-chart {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 0.75rem;
+    height: 220px;
+}
+
+.bar-column {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    height: 100%;
+    min-width: 0;
+}
+
+.bar-value {
+    color: #94a3b8;
+    font-size: 0.7rem;
+    margin-bottom: 0.35rem;
+}
+
+.bar-track {
+    display: flex;
+    align-items: flex-end;
+    width: 100%;
+    max-width: 48px;
+    flex: 1;
+    background-color: rgba(148, 163, 184, 0.12);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.bar-fill {
+    width: 100%;
+    min-height: 3px;
+    border-radius: 8px 8px 0 0;
+    background: linear-gradient(180deg, #06b6d4, #7c3aed);
+    transition: height 0.4s ease;
+}
+
+.bar-fill.stock {
+    background: linear-gradient(180deg, #34d399, #06b6d4);
+}
+
+.bar-label {
+    color: #94a3b8;
+    font-size: 0.75rem;
+    margin-top: 0.5rem;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.chart-empty {
     color: #64748b;
     font-size: 0.9rem;
-    border: 2px dashed #334155;
-    padding: 3rem;
-    border-radius: 12px;
     text-align: center;
+    padding: 2rem 0;
 }

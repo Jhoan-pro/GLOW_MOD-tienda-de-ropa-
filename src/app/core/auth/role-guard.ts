@@ -10,7 +10,7 @@ export const roleGuard: CanActivateFn = async (route) => {
   if (!(await session.hydrate())) return router.createUrlTree(['/login']);
 
   const roles: unknown = route.data['roles'];
-  return (
-    (Array.isArray(roles) && roles.includes(session.user()?.role)) || router.createUrlTree(['/'])
-  );
+  const userRole = (session.user()?.role ?? '').toLowerCase();
+  const allowed = Array.isArray(roles) && roles.some((r: string) => r.toLowerCase() === userRole);
+  return allowed || router.createUrlTree(['/']);
 };

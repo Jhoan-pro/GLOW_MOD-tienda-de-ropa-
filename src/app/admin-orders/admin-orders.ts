@@ -1,7 +1,15 @@
-import { CurrencyPipe, DatePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { OrderHistoryService } from '../services/order-history.service';
-import { UserService } from '../services/user.service';
+import { CurrencyPipe, DatePipe, isPlatformBrowser } from '@angular/common';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnInit,
+  PLATFORM_ID,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
+import { firstValueFrom } from 'rxjs';
+import { ApiOrder, OrdersApi } from '../services/orders-api';
 
 @Component({
   selector: 'app-admin-orders',
@@ -10,14 +18,24 @@ import { UserService } from '../services/user.service';
   styleUrl: './admin-orders.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AdminOrders {
-  private readonly orderService = inject(OrderHistoryService);
-  private readonly currentUser = inject(UserService).currentUser();
+export class AdminOrders implements OnInit {
+  private readonly ordersApi = inject(OrdersApi);
+  private readonly platformId = inject(PLATFORM_ID);
 
-  protected readonly orders =
-    this.currentUser?.role === 'sub-admin' && this.currentUser.id
-      ? this.orderService.getOrdersByOwner(this.currentUser.id)
-      : this.orderService.getAllOrdersForAdmin();
+  protected readonly orders = signal<ApiOrder[]>([]);
+  protected readonly totalVentas = computed(() =>
+    this.orders().reduce((acc, order) => acc + (order.total || 0), 0),
+  );
 
-  protected readonly totalVentas = this.orders.reduce((acc, order) => acc + (order.total || 0), 0);
+  ngOnInit(): void {
+    if (isPlatformBrowser(this.platformId)) void this.loadOrders();
+  }
+
+  private async loadOrders(): Promise<void> {
+    try {
+      this.orders.set(await firstValueFrom(this.ordersApi.list()));
+    } catch (error) {
+      console.error('No se pudieron cargar los pedidos', error);
+    }
+  }
 }

@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { User } from '../models/user.model';
 import { UserService } from '../services/user.service';
+import { AuthSession } from '../core/auth/auth-session';
 
 type ErrorKeys = 'address' | 'birthDate' | 'idNumber' | 'country';
 type ProfileErrors = Partial<Record<ErrorKeys, string>>;
@@ -55,6 +56,7 @@ const EMPTY_USER: User = {
 })
 export class UserProfile implements OnInit {
   private readonly userService = inject(UserService);
+  private readonly session = inject(AuthSession);
   private readonly router = inject(Router);
 
   protected readonly countries = COUNTRIES;
@@ -69,19 +71,40 @@ export class UserProfile implements OnInit {
     return !!(address && birthDate && idNumber && country);
   });
 
-  ngOnInit(): void {
-    const currentUser = this.userService.currentUser();
+  async ngOnInit(): Promise<void> {
+    const authenticated = await this.session.hydrate();
+    const current = this.session.user();
 
-    if (!currentUser) {
+    if (!authenticated || !current) {
       this.router.navigate(['/login']);
       return;
     }
 
+    const base: User = {
+      ...EMPTY_USER,
+      id: current.id,
+      name: current.name,
+      email: current.email,
+      role: current.role.toLowerCase() as User['role'],
+      active: current.active,
+    };
+
     const savedUser = this.userService
       .users()
-      .find((u) => u.email === currentUser.email || u.id === currentUser.id);
+      .find((u) => u.email.toLowerCase() === current.email.toLowerCase() || u.id === current.id);
 
-    this.user.set(savedUser ? { ...savedUser } : { ...currentUser });
+    this.user.set(
+      savedUser
+        ? {
+            ...savedUser,
+            id: current.id,
+            name: current.name,
+            email: current.email,
+            role: base.role,
+            active: current.active,
+          }
+        : base,
+    );
   }
 
   protected patch<K extends keyof User>(key: K, value: User[K]): void {
@@ -174,17 +197,21 @@ export class UserProfile implements OnInit {
       city: this.user().city?.trim(),
     };
 
-    if (!user.id) {
-      const currentId = this.userService.currentUser()?.id;
-      if (currentId) user.id = currentId;
-    }
+    const currentId = this.session.user()?.id;
+    if (currentId) user.id = currentId;
 
     this.user.set(user);
-    this.userService.updateUserProfile(user);
+    const users = this.userService.users();
+    const exists = users.some((u) => u.email.toLowerCase() === user.email.toLowerCase());
+    if (exists) {
+      this.userService.updateUserProfile(user);
+    } else {
+      this.userService.setUsers([...users, user]);
+    }
     this.editMode.set(false);
   }
 
   protected volver(): void {
-    this.router.navigate(['/home']);
+    this.router.navigate(['/Home']);
   }
 }

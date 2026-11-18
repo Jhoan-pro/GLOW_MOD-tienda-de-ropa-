@@ -1,8 +1,10 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, PLATFORM_ID, computed, inject, signal } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { firstValueFrom } from 'rxjs';
 import { Product } from '../models/product.model';
 import { ProductForm } from '../product-form/product-form';
-import { ProductService } from '../services/product';
-import { UserService } from '../services/user.service';
+import { ProductsApi, ApiProduct, ProductInput } from '../services/products-api';
+import { AuthSession } from '../core/auth/auth-session';
 
 interface ConfirmState {
   message: string;
@@ -18,6 +20,30 @@ const EMPTY_PRODUCT: Product = {
   description: '',
 };
 
+function toProduct(p: ApiProduct): Product {
+  return {
+    id: p.id,
+    ownerId: p.ownerId ?? undefined,
+    name: p.name,
+    price: p.price,
+    stock: p.stock,
+    category: p.category,
+    description: p.description,
+    image: p.image ?? undefined,
+  };
+}
+
+function toInput(p: Product): ProductInput {
+  return {
+    name: p.name,
+    price: p.price,
+    stock: p.stock,
+    category: p.category,
+    description: p.description,
+    image: p.image,
+  };
+}
+
 @Component({
   selector: 'app-products',
   imports: [ProductForm],
@@ -26,19 +52,16 @@ const EMPTY_PRODUCT: Product = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Products {
-  private readonly productService = inject(ProductService);
-  private readonly userService = inject(UserService);
+  private readonly productsApi = inject(ProductsApi);
+  private readonly session = inject(AuthSession);
+  private readonly platformId = inject(PLATFORM_ID);
 
-  private readonly currentUser = this.userService.currentUser;
-  private readonly currentUserId = computed(() => this.currentUser()?.id);
-  protected readonly isSubAdmin = computed(() => this.currentUser()?.role === 'sub-admin');
+  protected readonly isSubAdmin = computed(
+    () => (this.session.user()?.role ?? '').toLowerCase() === 'sub-admin',
+  );
 
   /** Sub-admin ve solo sus productos; el admin principal ve todos. */
-  protected readonly products = computed(() => {
-    const all = this.productService.products();
-    const ownerId = this.currentUserId();
-    return this.isSubAdmin() && ownerId ? all.filter((p) => p.ownerId === ownerId) : all;
-  });
+  protected readonly products = signal<Product[]>([]);
 
   // Selección
   private readonly selectedIds = signal<ReadonlySet<number>>(new Set());
@@ -53,6 +76,20 @@ export class Products {
   protected readonly viewMode = signal(false);
   protected readonly isEditing = signal(false);
   protected readonly currentProduct = signal<Product>({ ...EMPTY_PRODUCT });
+
+  constructor() {
+    if (isPlatformBrowser(this.platformId)) void this.loadProducts();
+  }
+
+  private async loadProducts(): Promise<void> {
+    try {
+      const ownerId = this.isSubAdmin() ? this.session.user()?.id : undefined;
+      const list = await firstValueFrom(this.productsApi.list(ownerId));
+      this.products.set(list.map(toProduct));
+    } catch (error) {
+      console.error('No se pudieron cargar los productos', error);
+    }
+  }
 
   protected isSelected(product: Product): boolean {
     return product.id !== undefined && this.selectedIds().has(product.id);
@@ -103,22 +140,23 @@ export class Products {
     this.showModal.set(false);
   }
 
-  protected saveProduct(product: Product): void {
-    // Si es sub-admin, se le asigna su id como dueño
-    const ownerId = this.currentUserId();
-    const toSave = this.isSubAdmin() && ownerId ? { ...product, ownerId } : product;
-
-    if (this.isEditing()) {
-      this.productService.updateProduct(toSave);
-    } else {
-      this.productService.addProduct(toSave);
+  protected async saveProduct(product: Product): Promise<void> {
+    try {
+      if (this.isEditing() && product.id !== undefined) {
+        await firstValueFrom(this.productsApi.update(product.id, toInput(product)));
+      } else {
+        await firstValueFrom(this.productsApi.create(toInput(product)));
+      }
+      this.closeModal();
+      await this.loadProducts();
+    } catch (error) {
+      console.error('No se pudo guardar el producto', error);
+      this.openConfirm('No se pudo guardar el producto.', () => {}, true);
     }
-
-    this.closeModal();
   }
 
   protected deleteSelected(): void {
-    const ids = this.products().flatMap((p) => (p.id && this.isSelected(p) ? [p.id] : []));
+    const ids = this.products().flatMap((p) => (p.id !== undefined && this.isSelected(p) ? [p.id] : []));
 
     if (ids.length === 0) {
       this.openConfirm('No has seleccionado ningún producto.', () => {}, true);
@@ -126,9 +164,21 @@ export class Products {
     }
 
     this.openConfirm('¿Eliminar los productos seleccionados?', () => {
-      this.productService.deleteProductsByIds(ids);
-      this.selectedIds.set(new Set());
+      void this.removeProducts(ids);
     });
+  }
+
+  private async removeProducts(ids: number[]): Promise<void> {
+    try {
+      for (const id of ids) {
+        await firstValueFrom(this.productsApi.remove(id));
+      }
+      this.selectedIds.set(new Set());
+      await this.loadProducts();
+    } catch (error) {
+      console.error('No se pudieron eliminar los productos', error);
+      this.openConfirm('No se pudieron eliminar los productos.', () => {}, true);
+    }
   }
 
   protected openConfirm(message: string, action: () => void, onlyInfo = false): void {

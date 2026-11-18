@@ -4,21 +4,55 @@
   <div class="stats-grid">
     <article class="stat-card">
       <span class="stat-label">Recaudo Total:</span>
-      <span class="stat-value">{{ totalRecaudo | currency}}</span>
+      <span class="stat-value">{{ totalRecaudo() | currency}}</span>
     </article>
 
     <article class="stat-card">
       <span class="stat-label">Total Productos:</span>
-      <span class="stat-value">{{ totalProductos }}</span>
+      <span class="stat-value">{{ totalProductos() }}</span>
     </article>
 
     <article class="stat-card">
       <span class="stat-label">Total Clientes:</span>
-      <span class="stat-value">{{ totalClientes }}</span>
+      <span class="stat-value">{{ totalClientes() }}</span>
     </article>
   </div>
 
   <div class="charts-area">
-    <p>[Gráficos de ventas e inventario]</p>
+    <article class="chart-card">
+      <h3 class="chart-title">Ventas últimos 7 días</h3>
+
+      <div class="bar-chart">
+        @for (bar of ventasSemana(); track $index) {
+          <div class="bar-column">
+            <span class="bar-value">{{ bar.value | number: '1.0-0' }}</span>
+            <div class="bar-track">
+              <div class="bar-fill" [style.height.%]="(bar.value / maxVenta()) * 100"></div>
+            </div>
+            <span class="bar-label">{{ bar.label }}</span>
+          </div>
+        }
+      </div>
+    </article>
+
+    <article class="chart-card">
+      <h3 class="chart-title">Inventario por categoría</h3>
+
+      @if (stockCategorias().length > 0) {
+        <div class="bar-chart">
+          @for (bar of stockCategorias(); track bar.label) {
+            <div class="bar-column">
+              <span class="bar-value">{{ bar.value | number: '1.0-0' }}</span>
+              <div class="bar-track">
+                <div class="bar-fill stock" [style.height.%]="(bar.value / maxStock()) * 100"></div>
+              </div>
+              <span class="bar-label">{{ bar.label }}</span>
+            </div>
+          }
+        </div>
+      } @else {
+        <p class="chart-empty">Sin productos registrados.</p>
+      }
+    </article>
   </div>
 </section>

@@ -27,10 +27,11 @@ import { authGuard } from './core/auth/auth-guard';
 import { roleGuard } from './core/auth/role-guard';
 
 export const routes: Routes = [
-  // Inicio (público)
-  { path: 'Home', component: Home },
+  // Inicio (público): el layout de tienda (navbar + catálogo)
+  { path: 'Home', component: Navbar },
+  { path: 'home', redirectTo: 'Home' },
   { path: 'Navbar', component: Navbar },
-  { path: 'categoria/:nombre', component: Home },
+  { path: 'categoria/:nombre', component: Navbar },
 
   // Autenticación (público)
   { path: 'login', component: Login },
@@ -73,13 +74,13 @@ export const routes: Routes = [
     ],
   },
 
-  // Caja: cashier y admin, y solo si hay items en el carrito
+  // Caja: cualquier usuario autenticado con items en el carrito
   {
     path: 'cashier',
     component: Cashier,
     canActivate: [cartGuard, roleGuard],
-    data: { roles: ['cashier', 'admin'] },
+    data: { roles: ['cashier', 'admin', 'client'] },
   },
 
-  { path: '**', redirectTo: 'Navbar' },
+  { path: '**', redirectTo: 'Home' },
 ];

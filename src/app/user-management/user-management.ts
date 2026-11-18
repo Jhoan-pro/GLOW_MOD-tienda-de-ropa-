@@ -1,7 +1,10 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, PLATFORM_ID, inject, signal } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { firstValueFrom } from 'rxjs';
+
 import { User } from '../models/user.model';
-import { UserService } from '../services/user.service';
+import { UsersApi } from '../services/users-api';
 
 interface EditErrors {
   email: string;
@@ -9,14 +12,26 @@ interface EditErrors {
 }
 
 const EMPTY_ERRORS: EditErrors = { email: '', general: '' };
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+$/;
 
-const ROLE_LABELS: Record<User['role'], string> = {
+const ROLE_LABELS: Record<string, string> = {
   admin: 'Administrador',
   cashier: 'Cajero',
   client: 'Cliente',
   'sub-admin': 'Sub Administrador',
 };
+
+type UserResponse = { id?: number; role?: string; active?: boolean; name?: string; email?: string };
+function toUserModel(u: UserResponse): User {
+  return {
+    id: u.id ?? 0,
+    name: u.name ?? '',
+    email: u.email ?? '',
+    password: '',
+    role: (u.role ?? 'client').toLowerCase() as User['role'],
+    active: u.active ?? true,
+  };
+}
 
 @Component({
   selector: 'app-user-management',
@@ -26,19 +41,37 @@ const ROLE_LABELS: Record<User['role'], string> = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UserManagement {
-  private readonly userService = inject(UserService);
+  private readonly usersApi = inject(UsersApi);
+  private readonly platformId = inject(PLATFORM_ID);
 
-  protected readonly users = this.userService.users;
+  protected readonly users = signal<User[]>([]);
   protected readonly roleLabels = ROLE_LABELS;
 
   /** Usuario que se está editando; `null` = modal cerrado. */
   protected readonly editingUser = signal<User | null>(null);
   protected readonly errors = signal<EditErrors>(EMPTY_ERRORS);
 
-  protected toggleStatus(user: User): void {
-    this.userService.setUsers(
-      this.users().map((u) => (u === user ? { ...u, active: !u.active } : u)),
-    );
+  constructor() {
+    if (isPlatformBrowser(this.platformId)) void this.loadUsers();
+  }
+
+  private async loadUsers(): Promise<void> {
+    try {
+      const list = await firstValueFrom(this.usersApi.list());
+      this.users.set(list.map(toUserModel));
+    } catch (error) {
+      console.error('No se pudieron cargar usuarios', error);
+    }
+  }
+
+  protected async toggleStatus(user: User): Promise<void> {
+    if (!user.id) return;
+    try {
+      await firstValueFrom(this.usersApi.updateAdmin(user.id, { active: !user.active }));
+      await this.loadUsers();
+    } catch (error) {
+      console.error('No se pudo actualizar estado', error);
+    }
   }
 
   protected openEdit(user: User): void {
@@ -54,7 +87,7 @@ export class UserManagement {
     this.editingUser.update((user) => (user ? { ...user, [key]: value } : user));
   }
 
-  protected saveEdit(): void {
+  protected async saveEdit(): Promise<void> {
     const editing = this.editingUser();
     if (!editing) return;
 
@@ -73,20 +106,13 @@ export class UserManagement {
       return;
     }
 
-    const allUsers = this.users();
-
-    const emailExiste = allUsers.some(
-      (u) => u.email.toLowerCase() === editing.email.toLowerCase() && u.id !== editing.id,
-    );
-
-    if (emailExiste) {
-      this.errors.set({ ...EMPTY_ERRORS, email: 'Este correo ya está en uso por otro usuario.' });
-      return;
+    try {
+      await firstValueFrom(this.usersApi.updateAdmin(editing.id!, { role: editing.role }));
+      this.closeEdit();
+      await this.loadUsers();
+    } catch (error) {
+      console.error('No se pudo actualizar usuario', error);
+      this.errors.set({ ...EMPTY_ERRORS, general: 'Error al actualizar usuario.' });
     }
-
-    if (!allUsers.some((u) => u.id === editing.id)) return;
-
-    this.userService.setUsers(allUsers.map((u) => (u.id === editing.id ? editing : u)));
-    this.closeEdit();
   }
 }

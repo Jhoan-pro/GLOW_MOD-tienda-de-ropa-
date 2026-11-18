@@ -14,7 +14,7 @@ import { NavigationEnd, Router } from '@angular/router';
 import { filter, map } from 'rxjs';
 import { Product } from '../models/product.model';
 import { CartService } from '../services/cart.service';
-import { UserService } from '../services/user.service';
+import { AuthSession } from '../core/auth/auth-session';
 
 interface CategorySection {
   category: string;
@@ -47,7 +47,7 @@ function slugify(text: string): string {
 })
 export class ProductCar implements OnInit {
   private readonly cartService = inject(CartService);
-  private readonly userService = inject(UserService);
+  private readonly session = inject(AuthSession);
   private readonly router = inject(Router);
   private readonly document = inject(DOCUMENT);
   private readonly platformId = inject(PLATFORM_ID);
@@ -109,7 +109,7 @@ export class ProductCar implements OnInit {
   protected addToCart(product: Product): void {
     if (this.isAdminView()) return;
 
-    if (!this.userService.isLoggedIn()) {
+    if (!this.session.authenticated()) {
       this.showLoginAlert.set(true);
       return;
     }

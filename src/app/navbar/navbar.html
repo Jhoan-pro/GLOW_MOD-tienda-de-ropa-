@@ -20,6 +20,7 @@
 
           <button class="filtro-item" (click)="selectCategory('Todos')">Todos</button>
           <button class="filtro-item" (click)="selectCategory('Camisetas')">Camisetas</button>
+          <button class="filtro-item" (click)="selectCategory('Camisas')">Camisas</button>
           <button class="filtro-item" (click)="selectCategory('Chaquetas')">Chaquetas</button>
           <button class="filtro-item" (click)="selectCategory('Pantalones')">Pantalones</button>
           <button class="filtro-item" (click)="selectCategory('Zapatos')">Zapatos</button>
@@ -109,6 +110,20 @@
 </div>
 @if (carritoAbierto()) {
   <div class="overlay" (click)="cerrarCarrito()"></div>
+}
+
+<!--aviso sin resultados-->
+@if (modalMensaje()) {
+  <div class="logout-modal" (click)="modalMensaje.set(null)">
+    <div class="logout-box" (click)="$event.stopPropagation()">
+      <h3>Sin resultados</h3>
+      <p>{{ modalMensaje() }}</p>
+
+      <div class="acciones">
+        <button class="confirmar" (click)="modalMensaje.set(null)">Entendido</button>
+      </div>
+    </div>
+  </div>
 }
 
 <!--confirmacion de logout-->

@@ -10,7 +10,7 @@ import { DOCUMENT } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { Home } from '../home/home';
 import { CartItem, CartService } from '../services/cart.service';
-import { UserService } from '../services/user.service';
+import { AuthSession } from '../core/auth/auth-session';
 
 function slugify(text: string): string {
   return text
@@ -37,14 +37,15 @@ export class Navbar {
   private readonly router = inject(Router);
   private readonly document = inject(DOCUMENT);
   private readonly cartService = inject(CartService);
-  private readonly userService = inject(UserService);
+  private readonly authSession = inject(AuthSession);
 
   protected readonly items = this.cartService.items;
   protected readonly cantidadTotal = this.cartService.count;
   protected readonly total = this.cartService.total;
-  protected readonly isLoggedIn = computed(() => this.userService.currentUser() !== null);
+  protected readonly isLoggedIn = this.authSession.authenticated;
 
   protected readonly mostrarConfirmLogout = signal(false);
+  protected readonly modalMensaje = signal<string | null>(null);
   protected readonly mostrarFiltros = signal(false);
   protected readonly menuUsuarioAbierto = signal(false);
   protected readonly carritoAbierto = signal(false);
@@ -89,7 +90,7 @@ export class Navbar {
   }
 
   protected confirmarLogout(): void {
-    this.userService.logout();
+    this.authSession.clear();
     this.cartService.clearCart();
     this.mostrarConfirmLogout.set(false);
     this.router.navigate(['/login']);
@@ -130,15 +131,36 @@ export class Navbar {
   protected selectCategory(category: string): void {
     this.mostrarFiltros.set(false);
 
-    const targetId = category === 'Todos' ? 'catalogo' : slugify(category);
-
     this.router.navigate(['/']).then(() => {
-      setTimeout(() => {
-        this.document.getElementById(targetId)?.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start',
-        });
-      }, 80);
+      this.scrollToCategory(category);
     });
+  }
+
+  private scrollToCategory(category: string, attempt = 0): void {
+    const isAll = category === 'Todos';
+    const container = this.document.getElementById('catalogo');
+    const catalogLoaded = !!container?.querySelector('.category-section');
+    const target = isAll ? null : this.document.getElementById(slugify(category));
+
+    if (isAll && catalogLoaded) {
+      container?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return;
+    }
+
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return;
+    }
+
+    if (catalogLoaded || attempt >= 25) {
+      this.modalMensaje.set(
+        isAll || !catalogLoaded
+          ? 'No hay productos disponibles por el momento.'
+          : `No hay productos en la categoría "${category}".`,
+      );
+      return;
+    }
+
+    setTimeout(() => this.scrollToCategory(category, attempt + 1), 100);
   }
 }

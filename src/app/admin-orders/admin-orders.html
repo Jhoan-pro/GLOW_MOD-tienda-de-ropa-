@@ -3,7 +3,7 @@
     <h2>Historial de Ventas / Pedidos</h2>
     <div class="stat-card">
       <span class="label">Total Recaudado:</span>
-      <span class="value">{{ totalVentas | currency }}</span>
+      <span class="value">{{ totalVentas() | currency }}</span>
     </div>
   </div>
 
@@ -19,11 +19,11 @@
       </tr>
     </thead>
     <tbody>
-      @for (order of orders; track $index) {
+      @for (order of orders(); track order.id) {
         <tr>
           <td data-label="Pedido">#{{ order.invoiceNumber || 'N/A' }}</td>
           <td data-label="Fecha">{{ order.date | date: 'short' }}</td>
-          <td data-label="Cliente">{{ order.customer.email }}</td>
+          <td data-label="Cliente">{{ order.customerEmail }}</td>
           <td data-label="Productos">
             @for (prod of order.items; track $index) {
               <div>{{ prod.name }} (x{{ prod.quantity }})</div>
@@ -31,16 +31,14 @@
           </td>
           <td data-label="Total">{{ order.total | currency }}</td>
           <td data-label="Estado">
-            <span class="status-badge">
-              {{ order.status || 'Completado' }}
-            </span>
+            <span class="status-badge">Completado</span>
           </td>
         </tr>
       }
     </tbody>
   </table>
 
-  @if (orders.length === 0) {
+  @if (orders().length === 0) {
     <div class="empty-msg">
       <p>No hay registros de ventas todavía.</p>
     </div>

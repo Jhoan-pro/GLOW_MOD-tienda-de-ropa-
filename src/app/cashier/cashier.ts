@@ -2,10 +2,11 @@ import { DOCUMENT, isPlatformBrowser } from '@angular/common';
 import { ChangeDetectionStrategy, Component, PLATFORM_ID, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Order, PaymentMethod } from '../models/order.model';
+import { firstValueFrom } from 'rxjs';
+import { Order } from '../models/order.model';
 import { CartService } from '../services/cart.service';
-import { OrderHistoryService } from '../services/order-history.service';
-import { UserService } from '../services/user.service';
+import { OrdersApi, ApiOrder, CreateOrderRequest } from '../services/orders-api';
+import { AuthSession } from '../core/auth/auth-session';
 
 type ErrorKeys =
   | 'customerName'
@@ -43,8 +44,8 @@ export class Cashier {
   private readonly document = inject(DOCUMENT);
   private readonly cartService = inject(CartService);
   private readonly router = inject(Router);
-  private readonly userService = inject(UserService);
-  private readonly orderHistory = inject(OrderHistoryService);
+  private readonly session = inject(AuthSession);
+  private readonly ordersApi = inject(OrdersApi);
 
   protected readonly items = this.cartService.items;
   protected readonly total = this.cartService.total;
@@ -283,7 +284,7 @@ export class Cashier {
 
   // ───────── Pago ─────────
 
-  protected pagar(): void {
+  protected async pagar(): Promise<void> {
     if (this.loading()) return;
 
     this.submitted.set(true);
@@ -301,25 +302,80 @@ export class Cashier {
       return;
     }
 
+    const paymentMethod = this.paymentMethod();
+    if (paymentMethod !== 'card' && paymentMethod !== 'transfer' && paymentMethod !== 'wallet') {
+      this.mostrarAlerta('Método de pago no disponible', 'error');
+      this.loading.set(false);
+      return;
+    }
+
     this.loading.set(true);
 
-    const user = this.userService.getCurrentUser();
+    const request: CreateOrderRequest = {
+      customerName: this.customerName().trim(),
+      customerEmail: this.customerEmail().trim(),
+      customerPhone: this.phone().trim(),
+      customerAddress: this.address().trim(),
+      customerCity: this.city().trim(),
+      customerDocumentId: this.documentId().trim(),
+      notes: this.notes().trim() || undefined,
+      paymentMethod,
+      cardName: paymentMethod === 'card' ? this.cardName().trim() : undefined,
+      cardNumberLast4: paymentMethod === 'card' ? this.cardNumber().slice(-4) : undefined,
+      bank: paymentMethod === 'transfer' ? this.bank() : undefined,
+      reference: paymentMethod === 'transfer' ? this.reference().trim() : undefined,
+      walletNumber: paymentMethod === 'wallet' ? this.phoneWallet().trim() : undefined,
+      items: this.items().flatMap((item) =>
+        item.product.id !== undefined
+          ? [{ productId: item.product.id, quantity: item.cantidad }]
+          : [],
+      ),
+    };
+
+    try {
+      const order = await firstValueFrom(this.ordersApi.create(request));
+      const invoice = this.toInvoice(order);
+
+      if (this.isBrowser()) {
+        localStorage.setItem('lastInvoice', JSON.stringify(invoice));
+      }
+
+      this.clearDraft();
+      this.cartService.finalizePurchase();
+
+      this.mostrarAlerta('Pago realizado con éxito', 'success');
+
+      setTimeout(() => {
+        this.loading.set(false);
+        this.router.navigate(['/invoice']);
+      }, 1200);
+    } catch (error) {
+      console.error('No se pudo crear el pedido', error);
+      this.loading.set(false);
+      this.mostrarAlerta(
+        'No se pudo completar el pedido. Verifica el stock e intenta de nuevo.',
+        'error',
+      );
+    }
+  }
+
+  private toInvoice(order: ApiOrder): Order {
     const paymentMethod = this.paymentMethod();
 
-    const invoice: Order = {
-      invoiceNumber: 'INV-' + Date.now(),
-      date: new Date(),
+    return {
+      invoiceNumber: order.invoiceNumber,
+      date: order.date,
       customer: {
-        name: this.customerName().trim(),
-        email: this.customerEmail().trim(),
-        phone: this.phone().trim(),
-        address: this.address().trim(),
-        city: this.city().trim(),
-        documentId: this.documentId().trim(),
+        name: order.customerName,
+        email: order.customerEmail,
+        phone: order.customerPhone,
+        address: order.customerAddress,
+        city: order.customerCity,
+        documentId: order.customerDocumentId,
       },
-      notes: this.notes().trim(),
-      userId: user?.email,
-      paymentMethod: paymentMethod as PaymentMethod,
+      notes: order.notes ?? '',
+      userId: this.session.user()?.email,
+      paymentMethod: order.paymentMethod as Order['paymentMethod'],
       paymentDetails: {
         walletNumber: paymentMethod === 'wallet' ? this.phoneWallet().trim() : null,
         bank: paymentMethod === 'transfer' ? this.bank() : null,
@@ -327,34 +383,18 @@ export class Cashier {
         cardName: paymentMethod === 'card' ? this.cardName().trim() : null,
         cardNumberLast4: paymentMethod === 'card' ? this.cardNumber().slice(-4) : null,
       },
-      items: this.items().map((item) => ({
-        name: item.product.name,
-        quantity: item.cantidad,
-        price: item.product.price,
-        ownerId: item.product.ownerId ?? null,
+      items: order.items.map((item) => ({
+        name: item.name,
+        quantity: item.quantity,
+        price: item.price,
+        ownerId: item.ownerId,
       })),
-      total: this.total(),
+      total: order.total,
     };
-
-    if (this.isBrowser()) {
-      localStorage.setItem('lastInvoice', JSON.stringify(invoice));
-    }
-
-    this.orderHistory.addOrder(invoice);
-
-    this.clearDraft();
-    this.cartService.finalizePurchase();
-
-    this.mostrarAlerta('Pago realizado con éxito', 'success');
-
-    setTimeout(() => {
-      this.loading.set(false);
-      this.router.navigate(['/invoice']);
-    }, 1200);
   }
 
   protected cerrar(): void {
-    this.router.navigate(['/home']);
+    this.router.navigate(['/Home']);
   }
 
   private enfocarPrimerError(): void {
@@ -404,15 +444,11 @@ export class Cashier {
   }
 
   private prefillFromUser(): void {
-    const user = this.userService.getCurrentUser();
+    const user = this.session.user();
     if (!user) return;
 
     this.customerName.set(user.name || '');
     this.customerEmail.set(user.email || '');
-    this.phone.set(user.phone || '');
-    this.address.set(user.address || '');
-    this.city.set(user.city || '');
-    this.documentId.set(user.idNumber || '');
   }
 
   private restoreDraft(): void {
@@ -445,7 +481,7 @@ export class Cashier {
   }
 
   private getDraftKey(): string {
-    const user = this.userService.getCurrentUser();
+    const user = this.session.user();
     const userKey = user?.id ?? user?.email ?? 'guest';
     return `${DRAFT_KEY_PREFIX}_${userKey}`;
   }

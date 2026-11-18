@@ -5,7 +5,6 @@ export interface User {
   password?: string;
   role: 'admin' | 'sub-admin' | 'cashier' | 'client';
   active: boolean;
-
   fullName?: string;
   phone?: string;
   city?: string;

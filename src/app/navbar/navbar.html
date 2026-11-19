@@ -63,11 +63,9 @@
   </div>
 </header>
 
-@if (showCatalog()) {
-  <div class="page-content">
-    <app-home />
-  </div>
-}
+<div class="page-content">
+  <app-home />
+</div>
 
 <div class="cart-panel" [class.open]="carritoAbierto()">
   <h3>

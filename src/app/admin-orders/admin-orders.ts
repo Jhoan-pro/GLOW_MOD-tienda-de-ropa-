@@ -15,7 +15,6 @@ import { firstValueFrom, map } from 'rxjs';
 import { ApiOrder, ApiOrderStatus, OrdersApi } from '../services/orders-api';
 import { AuthSession } from '../core/auth/auth-session';
 import { normalizeRole } from '../core/auth/auth-api';
-import { Navbar } from '../navbar/navbar';
 
 const ESTADOS: { value: ApiOrderStatus; label: string }[] = [
   { value: 'PENDING', label: 'Pendiente' },
@@ -27,7 +26,7 @@ const ESTADOS: { value: ApiOrderStatus; label: string }[] = [
 
 @Component({
   selector: 'app-admin-orders',
-  imports: [CurrencyPipe, DatePipe, FormsModule, RouterLink, Navbar],
+  imports: [CurrencyPipe, DatePipe, FormsModule, RouterLink],
   templateUrl: './admin-orders.html',
   styleUrl: './admin-orders.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

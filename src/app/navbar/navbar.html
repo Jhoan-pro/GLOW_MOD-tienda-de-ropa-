@@ -2,12 +2,14 @@
   <div class="logo"><span class="logo-glow">GLOW</span><span class="logo-mod">_MOD</span></div>
 
   <div class="actions">
-    <div class="cart-icon" (click)="toggleCarrito()">
-      <img src="img/carrito.png" alt="Car" class="cart-img" />
-      @if (cantidadTotal() > 0) {
-        <span class="badge">{{ cantidadTotal() }}</span>
-      }
-    </div>
+    @if (!esCajero()) {
+      <div class="cart-icon" (click)="toggleCarrito()">
+        <img src="img/carrito.png" alt="Car" class="cart-img" />
+        @if (cantidadTotal() > 0) {
+          <span class="badge">{{ cantidadTotal() }}</span>
+        }
+      </div>
+    }
     <!-- LUPA / FILTROS -->
     <div class="search-box">
       <button id="btn-lupa" (click)="toggleFiltros()">
@@ -68,11 +70,12 @@
   <app-home />
 </div>
 
-<div class="cart-panel" [class.open]="carritoAbierto()">
-  <h3>
-    Tu carrito
-    <span class="vaciar-top" (click)="vaciar()">Vaciar</span>
-  </h3>
+@if (!esCajero()) {
+  <div class="cart-panel" [class.open]="carritoAbierto()">
+    <h3>
+      Tu carrito
+      <span class="vaciar-top" (click)="vaciar()">Vaciar</span>
+    </h3>
 
   <div class="cart-content">
     @if (items().length === 0) {
@@ -120,9 +123,10 @@
       </button>
     </div>
   </div>
-</div>
-@if (carritoAbierto()) {
-  <div class="overlay" (click)="cerrarCarrito()"></div>
+  </div>
+  @if (carritoAbierto()) {
+    <div class="overlay" (click)="cerrarCarrito()"></div>
+  }
 }
 
 <!--aviso sin resultados-->

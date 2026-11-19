@@ -83,12 +83,13 @@ export const routes: Routes = [
   },
 
   // Historial de ventas: el backend filtra por rol (admin/sub-admin ven todo,
-  // el cajero solo sus propias ventas registradas).
+  // el cajero solo sus propias ventas registradas). Fuera del dashboard se
+  // muestra con su propia barra de navegación (standalone).
   {
     path: 'my-sales',
     component: AdminOrders,
     canActivate: [roleGuard],
-    data: { roles: ['admin', 'sub-admin', 'cashier'] },
+    data: { roles: ['admin', 'sub-admin', 'cashier'], standalone: true },
   },
 
   { path: '**', redirectTo: 'Home' },

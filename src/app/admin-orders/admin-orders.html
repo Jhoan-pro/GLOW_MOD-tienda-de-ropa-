@@ -1,4 +1,12 @@
 <div class="admin-orders-container">
+  @if (standalone()) {
+    <div class="sales-topbar">
+      <a class="back-btn" routerLink="/Home">Volver</a>
+      <h2>Mis ventas</h2>
+      <a class="cash-btn" routerLink="/cashier">Ir a Caja</a>
+    </div>
+  }
+
   <div class="header-stats">
     <h2>Historial de Ventas / Pedidos</h2>
     <div class="stat-card">

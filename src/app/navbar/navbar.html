@@ -48,6 +48,10 @@
         <div class="dropdown-menu">
           @if (isLoggedIn()) {
             <!-- Logueado -->
+            @if (esCajero()) {
+              <a routerLink="/cashier" (click)="cerrarMenuUsuario()">Caja</a>
+              <a routerLink="/my-sales" (click)="cerrarMenuUsuario()">Mis ventas</a>
+            }
             <a routerLink="/user">Administrar cuenta</a>
             <button class="logout-btn" (click)="logout()">Cerrar sesión</button>
           } @else {

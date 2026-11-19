@@ -12,6 +12,7 @@ import { Home } from '../home/home';
 import { CartItem, CartService } from '../services/cart.service';
 import { AuthSession } from '../core/auth/auth-session';
 import { CatalogSearch } from '../services/catalog-search';
+import { normalizeRole } from '../core/auth/auth-api';
 
 function slugify(text: string): string {
   return text
@@ -45,6 +46,9 @@ export class Navbar {
   protected readonly cantidadTotal = this.cartService.count;
   protected readonly total = this.cartService.total;
   protected readonly isLoggedIn = this.authSession.authenticated;
+  protected readonly esCajero = computed(
+    () => normalizeRole(this.authSession.user()?.role) === 'cashier',
+  );
 
   protected readonly mostrarConfirmLogout = signal(false);
   protected readonly modalMensaje = signal<string | null>(null);
@@ -85,6 +89,10 @@ export class Navbar {
 
   protected cerrarCarrito(): void {
     this.carritoAbierto.set(false);
+  }
+
+  protected cerrarMenuUsuario(): void {
+    this.menuUsuarioAbierto.set(false);
   }
 
   protected logout(): void {

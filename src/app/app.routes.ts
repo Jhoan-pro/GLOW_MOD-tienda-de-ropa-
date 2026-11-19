@@ -82,5 +82,14 @@ export const routes: Routes = [
     data: { roles: ['cashier', 'admin', 'client'] },
   },
 
+  // Historial de ventas: el backend filtra por rol (admin/sub-admin ven todo,
+  // el cajero solo sus propias ventas registradas).
+  {
+    path: 'my-sales',
+    component: AdminOrders,
+    canActivate: [roleGuard],
+    data: { roles: ['admin', 'sub-admin', 'cashier'] },
+  },
+
   { path: '**', redirectTo: 'Home' },
 ];

@@ -2,14 +2,12 @@
   <div class="logo"><span class="logo-glow">GLOW</span><span class="logo-mod">_MOD</span></div>
 
   <div class="actions">
-    @if (!esCajero()) {
-      <div class="cart-icon" (click)="toggleCarrito()">
-        <img src="img/carrito.png" alt="Car" class="cart-img" />
-        @if (cantidadTotal() > 0) {
-          <span class="badge">{{ cantidadTotal() }}</span>
-        }
-      </div>
-    }
+    <div class="cart-icon" (click)="toggleCarrito()">
+      <img src="img/carrito.png" alt="Car" class="cart-img" />
+      @if (cantidadTotal() > 0) {
+        <span class="badge">{{ cantidadTotal() }}</span>
+      }
+    </div>
     <!-- LUPA / FILTROS -->
     <div class="search-box">
       <button id="btn-lupa" (click)="toggleFiltros()">
@@ -51,7 +49,6 @@
           @if (isLoggedIn()) {
             <!-- Logueado -->
             @if (esCajero()) {
-              <a routerLink="/cashier" (click)="cerrarMenuUsuario()">Caja</a>
               <a routerLink="/my-sales" (click)="cerrarMenuUsuario()">Mis ventas</a>
             }
             <a routerLink="/user">Administrar cuenta</a>
@@ -70,12 +67,11 @@
   <app-home />
 </div>
 
-@if (!esCajero()) {
-  <div class="cart-panel" [class.open]="carritoAbierto()">
-    <h3>
-      Tu carrito
-      <span class="vaciar-top" (click)="vaciar()">Vaciar</span>
-    </h3>
+<div class="cart-panel" [class.open]="carritoAbierto()">
+  <h3>
+    Tu carrito
+    <span class="vaciar-top" (click)="vaciar()">Vaciar</span>
+  </h3>
 
   <div class="cart-content">
     @if (items().length === 0) {
@@ -123,10 +119,9 @@
       </button>
     </div>
   </div>
-  </div>
-  @if (carritoAbierto()) {
-    <div class="overlay" (click)="cerrarCarrito()"></div>
-  }
+</div>
+@if (carritoAbierto()) {
+  <div class="overlay" (click)="cerrarCarrito()"></div>
 }
 
 <!--aviso sin resultados-->

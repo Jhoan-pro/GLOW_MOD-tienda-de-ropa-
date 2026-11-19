@@ -17,8 +17,7 @@
   color: #e2e8f0;
 }
 
-.sales-topbar .back-btn,
-.sales-topbar .cash-btn {
+.sales-topbar .back-btn {
   padding: 10px 22px;
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.12);
@@ -29,8 +28,7 @@
   transition: all 0.25s ease;
 }
 
-.sales-topbar .back-btn:hover,
-.sales-topbar .cash-btn:hover {
+.sales-topbar .back-btn:hover {
   background: linear-gradient(45deg, #7c3aed, #06b6d4);
   color: white;
 }

@@ -13,46 +13,29 @@
     </div>
 
     <ul class="nav-links">
-      @if (esCajero()) {
+      <li routerLinkActive="active">
+        <a routerLink="/admin-dashboard/dashBoard" (click)="sidebarOpen.set(false)"
+          >Vista general</a
+        >
+      </li>
+      @if (!isSubAdmin()) {
         <li routerLinkActive="active">
-          <a routerLink="/admin-dashboard/my-sales" (click)="sidebarOpen.set(false)"
-            >Mis ventas</a
-          >
-        </li>
-        <li routerLinkActive="active">
-          <a routerLink="/Home" (click)="sidebarOpen.set(false)">Ir a la tienda</a>
-        </li>
-      } @else {
-        <li routerLinkActive="active">
-          <a routerLink="/admin-dashboard/dashBoard" (click)="sidebarOpen.set(false)"
-            >Vista general</a
-          >
-        </li>
-        @if (!isSubAdmin()) {
-          <li routerLinkActive="active">
-            <a routerLink="/admin-dashboard/admin" (click)="sidebarOpen.set(false)"
-              >Resumen del negocio</a
-            >
-          </li>
-        }
-        <li routerLinkActive="active">
-          <a routerLink="/admin-dashboard/products" (click)="sidebarOpen.set(false)"
-            >Productos</a
-          >
-        </li>
-        @if (!isSubAdmin()) {
-          <li routerLinkActive="active">
-            <a routerLink="/admin-dashboard/users" (click)="sidebarOpen.set(false)"
-              >Usuarios</a
-            >
-          </li>
-        }
-        <li routerLinkActive="active">
-          <a routerLink="/admin-dashboard/admin-orders" (click)="sidebarOpen.set(false)"
-            >Pedidos</a
+          <a routerLink="/admin-dashboard/admin" (click)="sidebarOpen.set(false)"
+            >Resumen del negocio</a
           >
         </li>
       }
+      <li routerLinkActive="active">
+        <a routerLink="/admin-dashboard/products" (click)="sidebarOpen.set(false)">Productos</a>
+      </li>
+      @if (!isSubAdmin()) {
+        <li routerLinkActive="active">
+          <a routerLink="/admin-dashboard/users" (click)="sidebarOpen.set(false)">Usuarios</a>
+        </li>
+      }
+      <li routerLinkActive="active">
+        <a routerLink="/admin-dashboard/admin-orders" (click)="sidebarOpen.set(false)">Pedidos</a>
+      </li>
     </ul>
   </nav>
 
@@ -64,7 +47,7 @@
         <span></span>
         <span></span>
       </button>
-      <h1>{{ panelTitle() }}</h1>
+      <h1>Panel de administrador</h1>
       <span class="current-user">Usuario: {{ currentUserName() }}</span>
       <button class="logout-btn" (click)="logout()">Cerrar sesión</button>
     </header>

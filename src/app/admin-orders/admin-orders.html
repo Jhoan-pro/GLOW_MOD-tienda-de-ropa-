@@ -1,6 +1,19 @@
-<div class="admin-orders-container">
+@if (standalone()) {
+  <app-navbar [showCatalog]="false" />
+}
+
+<div class="admin-orders-container" [class.sales-page]="standalone()">
+  @if (standalone()) {
+    <div class="sales-topbar">
+      <h2>{{ esCajero() ? 'Mis ventas' : 'Historial de Ventas / Pedidos' }}</h2>
+      <a class="back-btn" routerLink="/Home">Volver</a>
+    </div>
+  }
+
   <div class="header-stats">
-    <h2>{{ esCajero() ? 'Mis ventas' : 'Historial de Ventas / Pedidos' }}</h2>
+    @if (!standalone()) {
+      <h2>{{ esCajero() ? 'Mis ventas' : 'Historial de Ventas / Pedidos' }}</h2>
+    }
     <div class="stat-card">
       <span class="label">Total Recaudado:</span>
       <span class="value">{{ totalVentas() | currency }}</span>

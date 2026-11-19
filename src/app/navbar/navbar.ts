@@ -4,6 +4,7 @@ import {
   ViewEncapsulation,
   computed,
   inject,
+  input,
   signal,
 } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
@@ -36,6 +37,10 @@ function slugify(text: string): string {
   },
 })
 export class Navbar {
+  // En vistas standalone (p. ej. /my-sales) el navbar se monta sin el
+  // catálogo; en las rutas de tienda se muestra tal cual.
+  readonly showCatalog = input(true);
+
   private readonly router = inject(Router);
   private readonly document = inject(DOCUMENT);
   private readonly cartService = inject(CartService);

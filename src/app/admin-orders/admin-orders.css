@@ -2,6 +2,41 @@
   padding: 20px;
 }
 
+/* Página standalone (/my-sales): mismo aire que las vistas del panel */
+.sales-page {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.sales-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.sales-topbar h2 {
+  margin: 0;
+  color: #e2e8f0;
+}
+
+.sales-topbar .back-btn {
+  background: linear-gradient(135deg, #0e9bb5, #06b6d4);
+  color: white;
+  border: none;
+  border-radius: 25px;
+  padding: 0.5rem 1.4rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.sales-topbar .back-btn:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 20px rgba(6, 182, 212, 0.4);
+}
+
 .header-stats {
   display: flex;
   justify-content: space-between;

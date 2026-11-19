@@ -9,10 +9,13 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { firstValueFrom } from 'rxjs';
+import { ActivatedRoute, RouterLink } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { firstValueFrom, map } from 'rxjs';
 import { ApiOrder, ApiOrderStatus, OrdersApi } from '../services/orders-api';
 import { AuthSession } from '../core/auth/auth-session';
 import { normalizeRole } from '../core/auth/auth-api';
+import { Navbar } from '../navbar/navbar';
 
 const ESTADOS: { value: ApiOrderStatus; label: string }[] = [
   { value: 'PENDING', label: 'Pendiente' },
@@ -24,7 +27,7 @@ const ESTADOS: { value: ApiOrderStatus; label: string }[] = [
 
 @Component({
   selector: 'app-admin-orders',
-  imports: [CurrencyPipe, DatePipe, FormsModule],
+  imports: [CurrencyPipe, DatePipe, FormsModule, RouterLink, Navbar],
   templateUrl: './admin-orders.html',
   styleUrl: './admin-orders.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -33,6 +36,14 @@ export class AdminOrders implements OnInit {
   private readonly ordersApi = inject(OrdersApi);
   private readonly session = inject(AuthSession);
   private readonly platformId = inject(PLATFORM_ID);
+  private readonly route = inject(ActivatedRoute);
+
+  // Fuera del dashboard (/my-sales) la página monta el navbar del sitio
+  // (carrito incluido) y su botón para volver a la tienda.
+  protected readonly standalone = toSignal(
+    this.route.data.pipe(map((data) => data['standalone'] === true)),
+    { initialValue: false },
+  );
 
   protected readonly estados = ESTADOS;
   protected readonly isAdmin = computed(

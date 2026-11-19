@@ -5,6 +5,7 @@ import { OrdersApi, ApiOrder } from '../services/orders-api';
 import { ProductsApi, ApiProduct } from '../services/products-api';
 import { UsersApi } from '../services/users-api';
 import { AuthSession } from '../core/auth/auth-session';
+import { normalizeRole } from '../core/auth/auth-api';
 
 interface ChartPoint {
   label: string;
@@ -86,7 +87,7 @@ export class Admin implements OnInit {
   );
 
   private get isAdmin(): boolean {
-    return (this.session.user()?.role ?? '').toLowerCase() === 'admin';
+    return normalizeRole(this.session.user()?.role) === 'admin';
   }
 
   ngOnInit(): void {

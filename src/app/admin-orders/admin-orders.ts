@@ -12,6 +12,7 @@ import {
 import { firstValueFrom } from 'rxjs';
 import { ApiOrder, ApiOrderStatus, OrdersApi } from '../services/orders-api';
 import { AuthSession } from '../core/auth/auth-session';
+import { normalizeRole } from '../core/auth/auth-api';
 
 const ESTADOS: { value: ApiOrderStatus; label: string }[] = [
   { value: 'PENDING', label: 'Pendiente' },
@@ -35,7 +36,7 @@ export class AdminOrders implements OnInit {
 
   protected readonly estados = ESTADOS;
   protected readonly isAdmin = computed(
-    () => (this.session.user()?.role ?? '').toLowerCase() === 'admin',
+    () => normalizeRole(this.session.user()?.role) === 'admin',
   );
   protected readonly orders = signal<ApiOrder[]>([]);
   protected readonly search = signal('');

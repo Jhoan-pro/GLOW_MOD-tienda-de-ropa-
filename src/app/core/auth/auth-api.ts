@@ -13,6 +13,17 @@ export type UserRole =
   | 'CASHIER'
   | 'CLIENT';
 
+export type NormalizedRole = 'admin' | 'sub-admin' | 'cashier' | 'client';
+
+// Backend responses carry the Prisma enum member (`SUB_ADMIN`); the UI uses
+// the lowercase hyphenated form (`sub-admin`). Normalize in one place.
+export function normalizeRole(role: string | undefined | null): NormalizedRole {
+  const value = (role ?? '').toLowerCase().replace(/_/g, '-');
+  return value === 'admin' || value === 'sub-admin' || value === 'cashier'
+    ? value
+    : 'client';
+}
+
 export interface LoginRequest {
   email: string;
   password: string;

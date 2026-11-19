@@ -4,7 +4,7 @@ import { Router, RouterLink } from '@angular/router';
 import { CartService } from '../services/cart.service';
 import { AuthSession } from '../core/auth/auth-session';
 import { apiErrorMessage } from '../core/auth/api-error';
-import { UserRole } from '../core/auth/auth-api';
+import { UserRole, normalizeRole } from '../core/auth/auth-api';
 
 interface LoginErrors {
   email: string;
@@ -96,7 +96,7 @@ export class Login {
   }
 
   private redirectByRole(role: UserRole | undefined): void {
-    const r = role?.toLowerCase();
+    const r = normalizeRole(role);
     switch (r) {
       case 'admin':
         this.router.navigate(['/admin-dashboard/admin']);

@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthSession } from '../core/auth/auth-session';
+import { normalizeRole } from '../core/auth/auth-api';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -17,7 +18,7 @@ export class AdminDashboard {
   protected readonly mostrarConfirmLogout = signal(false);
 
   protected readonly isSubAdmin = computed(
-    () => (this.session.user()?.role ?? '').toLowerCase() === 'sub-admin',
+    () => normalizeRole(this.session.user()?.role) === 'sub-admin',
   );
   protected readonly currentUserName = computed(
     () => this.session.user()?.name || 'Administrador',

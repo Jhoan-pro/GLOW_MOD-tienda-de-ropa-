@@ -6,6 +6,7 @@ import { User } from '../models/user.model';
 import { ApiUserProfile, UpdateProfileRequest, UsersApi } from '../services/users-api';
 import { AuthSession } from '../core/auth/auth-session';
 import { apiErrorMessage } from '../core/auth/api-error';
+import { normalizeRole } from '../core/auth/auth-api';
 
 type ErrorKeys = 'address' | 'birthDate' | 'idNumber' | 'country';
 type ProfileErrors = Partial<Record<ErrorKeys, string>>;
@@ -54,7 +55,7 @@ function toUser(profile: ApiUserProfile): User {
     id: profile.id,
     name: profile.name,
     email: profile.email,
-    role: profile.role.toLowerCase() as User['role'],
+    role: normalizeRole(profile.role),
     active: profile.active,
     fullName: profile.fullName ?? '',
     phone: profile.phone ?? '',
@@ -106,7 +107,7 @@ export class UserProfile implements OnInit {
       id: current.id,
       name: current.name,
       email: current.email,
-      role: current.role.toLowerCase() as User['role'],
+      role: normalizeRole(current.role),
       active: current.active,
     };
 

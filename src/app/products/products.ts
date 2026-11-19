@@ -5,6 +5,7 @@ import { Product } from '../models/product.model';
 import { ProductForm } from '../product-form/product-form';
 import { ProductsApi, ApiProduct, ProductInput } from '../services/products-api';
 import { AuthSession } from '../core/auth/auth-session';
+import { normalizeRole } from '../core/auth/auth-api';
 
 interface ConfirmState {
   message: string;
@@ -57,7 +58,7 @@ export class Products {
   private readonly platformId = inject(PLATFORM_ID);
 
   protected readonly isSubAdmin = computed(
-    () => (this.session.user()?.role ?? '').toLowerCase() === 'sub-admin',
+    () => normalizeRole(this.session.user()?.role) === 'sub-admin',
   );
 
   /** Sub-admin ve solo sus productos; el admin principal ve todos. */

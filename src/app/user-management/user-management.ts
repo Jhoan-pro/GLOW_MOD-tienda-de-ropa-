@@ -5,6 +5,7 @@ import { firstValueFrom } from 'rxjs';
 
 import { User } from '../models/user.model';
 import { UsersApi } from '../services/users-api';
+import { normalizeRole } from '../core/auth/auth-api';
 
 interface EditErrors {
   email: string;
@@ -28,7 +29,7 @@ function toUserModel(u: UserResponse): User {
     name: u.name ?? '',
     email: u.email ?? '',
     password: '',
-    role: (u.role ?? 'client').toLowerCase() as User['role'],
+    role: normalizeRole(u.role),
     active: u.active ?? true,
   };
 }

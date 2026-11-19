@@ -2,37 +2,6 @@
   padding: 20px;
 }
 
-/* Barra superior cuando la vista corre fuera del dashboard (/my-sales) */
-.sales-topbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-}
-
-.sales-topbar h2 {
-  margin: 0;
-  font-size: 1.6rem;
-  color: #e2e8f0;
-}
-
-.sales-topbar .back-btn {
-  padding: 10px 22px;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: #1e293b;
-  color: #e2e8f0;
-  font-weight: 600;
-  text-decoration: none;
-  transition: all 0.25s ease;
-}
-
-.sales-topbar .back-btn:hover {
-  background: linear-gradient(45deg, #7c3aed, #06b6d4);
-  color: white;
-}
-
 .header-stats {
   display: flex;
   justify-content: space-between;

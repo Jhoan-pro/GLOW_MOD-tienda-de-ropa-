@@ -1,13 +1,6 @@
 <div class="admin-orders-container">
-  @if (standalone()) {
-    <div class="sales-topbar">
-      <a class="back-btn" routerLink="/Home">Volver</a>
-      <h2>Mis ventas</h2>
-    </div>
-  }
-
   <div class="header-stats">
-    <h2>Historial de Ventas / Pedidos</h2>
+    <h2>{{ esCajero() ? 'Mis ventas' : 'Historial de Ventas / Pedidos' }}</h2>
     <div class="stat-card">
       <span class="label">Total Recaudado:</span>
       <span class="value">{{ totalVentas() | currency }}</span>

@@ -9,9 +9,6 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { map } from 'rxjs';
 import { firstValueFrom } from 'rxjs';
 import { ApiOrder, ApiOrderStatus, OrdersApi } from '../services/orders-api';
 import { AuthSession } from '../core/auth/auth-session';
@@ -27,7 +24,7 @@ const ESTADOS: { value: ApiOrderStatus; label: string }[] = [
 
 @Component({
   selector: 'app-admin-orders',
-  imports: [CurrencyPipe, DatePipe, FormsModule, RouterLink],
+  imports: [CurrencyPipe, DatePipe, FormsModule],
   templateUrl: './admin-orders.html',
   styleUrl: './admin-orders.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -36,17 +33,13 @@ export class AdminOrders implements OnInit {
   private readonly ordersApi = inject(OrdersApi);
   private readonly session = inject(AuthSession);
   private readonly platformId = inject(PLATFORM_ID);
-  private readonly route = inject(ActivatedRoute);
-
-  // Fuera del dashboard (/my-sales) la vista trae su propia barra superior.
-  protected readonly standalone = toSignal(
-    this.route.data.pipe(map((data) => data['standalone'] === true)),
-    { initialValue: false },
-  );
 
   protected readonly estados = ESTADOS;
   protected readonly isAdmin = computed(
     () => normalizeRole(this.session.user()?.role) === 'admin',
+  );
+  protected readonly esCajero = computed(
+    () => normalizeRole(this.session.user()?.role) === 'cashier',
   );
   protected readonly orders = signal<ApiOrder[]>([]);
   protected readonly search = signal('');

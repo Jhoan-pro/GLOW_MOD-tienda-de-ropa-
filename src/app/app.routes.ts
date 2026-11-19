@@ -50,15 +50,26 @@ export const routes: Routes = [
     data: { roles: ['admin', 'sub-admin'] },
   },
 
-  // Dashboard de administrador (admin + sub-admin)
+  // Dashboard de administrador. El cajero también entra al shell, pero solo
+  // alcanza su propia vista (my-sales): cada hijo tiene su guard.
   {
     path: 'admin-dashboard',
     component: AdminDashboard,
     canActivate: [roleGuard],
-    data: { roles: ['admin', 'sub-admin'] },
+    data: { roles: ['admin', 'sub-admin', 'cashier'] },
     children: [
-      { path: 'admin', component: Admin },
-      { path: 'products', component: Products },
+      {
+        path: 'admin',
+        component: Admin,
+        canActivate: [roleGuard],
+        data: { roles: ['admin', 'sub-admin'] },
+      },
+      {
+        path: 'products',
+        component: Products,
+        canActivate: [roleGuard],
+        data: { roles: ['admin', 'sub-admin'] },
+      },
       {
         // Gestión de usuarios: más restrictivo que el resto del dashboard
         path: 'users',
@@ -66,11 +77,37 @@ export const routes: Routes = [
         canActivate: [roleGuard],
         data: { roles: ['admin'] },
       },
-      { path: 'admin-orders', component: AdminOrders },
-
-      { path: 'dashBoard', component: Home },
-      { path: 'client', component: Client },
-      { path: 'Navbar', component: Navbar },
+      {
+        path: 'admin-orders',
+        component: AdminOrders,
+        canActivate: [roleGuard],
+        data: { roles: ['admin', 'sub-admin'] },
+      },
+      {
+        // Historial del cajero: el backend solo le devuelve sus propias ventas.
+        path: 'my-sales',
+        component: AdminOrders,
+        canActivate: [roleGuard],
+        data: { roles: ['cashier'] },
+      },
+      {
+        path: 'dashBoard',
+        component: Home,
+        canActivate: [roleGuard],
+        data: { roles: ['admin', 'sub-admin'] },
+      },
+      {
+        path: 'client',
+        component: Client,
+        canActivate: [roleGuard],
+        data: { roles: ['admin', 'sub-admin'] },
+      },
+      {
+        path: 'Navbar',
+        component: Navbar,
+        canActivate: [roleGuard],
+        data: { roles: ['admin', 'sub-admin'] },
+      },
     ],
   },
 
@@ -80,16 +117,6 @@ export const routes: Routes = [
     component: Cashier,
     canActivate: [cartGuard, roleGuard],
     data: { roles: ['cashier', 'admin', 'client'] },
-  },
-
-  // Historial de ventas: el backend filtra por rol (admin/sub-admin ven todo,
-  // el cajero solo sus propias ventas registradas). Fuera del dashboard se
-  // muestra con su propia barra de navegación (standalone).
-  {
-    path: 'my-sales',
-    component: AdminOrders,
-    canActivate: [roleGuard],
-    data: { roles: ['admin', 'sub-admin', 'cashier'], standalone: true },
   },
 
   { path: '**', redirectTo: 'Home' },

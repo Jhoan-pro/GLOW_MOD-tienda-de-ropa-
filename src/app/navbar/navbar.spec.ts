@@ -39,4 +39,16 @@ describe('Navbar', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('abre el panel del carrito al hacer clic en el icono', async () => {
+    const icon = fixture.nativeElement.querySelector('.cart-icon') as HTMLElement;
+    icon.click();
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const panel = fixture.nativeElement.querySelector('.cart-panel');
+    expect(panel).toBeTruthy();
+    expect(panel.classList.contains('open')).toBe(true);
+    expect(component['carritoAbierto']()).toBe(true);
+  });
 });

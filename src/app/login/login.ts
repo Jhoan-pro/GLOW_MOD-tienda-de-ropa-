@@ -105,7 +105,7 @@ export class Login {
         this.router.navigate(['/admin-dashboard/dashBoard']);
         break;
       case 'cashier':
-        this.router.navigate(['/my-sales']);
+        this.router.navigate(['/admin-dashboard/my-sales']);
         break;
       default:
         this.router.navigate(['/']);

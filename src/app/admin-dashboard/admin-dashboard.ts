@@ -20,6 +20,12 @@ export class AdminDashboard {
   protected readonly isSubAdmin = computed(
     () => normalizeRole(this.session.user()?.role) === 'sub-admin',
   );
+  protected readonly esCajero = computed(
+    () => normalizeRole(this.session.user()?.role) === 'cashier',
+  );
+  protected readonly panelTitle = computed(() =>
+    this.esCajero() ? 'Panel de cajero' : 'Panel de administrador',
+  );
   protected readonly currentUserName = computed(
     () => this.session.user()?.name || 'Administrador',
   );
